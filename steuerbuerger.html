@@ -146,6 +146,7 @@ svg text { font-family: var(--mono); }
 #savings { background: var(--bg); }
 #inflation { background: var(--bg); }
 #opportunity { background: var(--bg); }
+#actions { background: var(--bg); }
 .savings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
 .savings-controls { display: flex; flex-direction: column; gap: 24px; }
 .ctrl-row { display: flex; flex-direction: column; gap: 8px; }
@@ -1669,7 +1670,7 @@ function App() {
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook'];
+  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'actions'];
 
   const taxes = calcAll(salary);
 
@@ -2632,6 +2633,67 @@ function App() {
         <div className="section-label">Sondervermögen · EU · Ausblick</div>
         <h2>Was kommt<br /><span className="red">noch auf dich zu?</span></h2>
         <OutlookSection taxes={taxes} />
+      </section>
+
+      {/* SECTION: ACTIONS */}
+      <section id="actions">
+        <div className="section-label">Deine Hebel</div>
+        <h2>Das System ändert sich nicht.<br /><span className="green">Aber du kannst.</span></h2>
+        <div style={{ marginBottom: 48, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          Du kannst dich im System anders positionieren. Hier sind die wirksamsten Hebel — vom Naheliegenden bis zum Radikalen.
+        </div>
+
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>🧠</div>
+            <h4 style={{ fontSize: 15, marginBottom: 8 }}>In dich investieren</h4>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Verstehen, wie Steuern, Inflation und Geldpolitik funktionieren — was du gerade tust. Dazu: Weiterbildung, neue Skills, Branchenwechsel. Gehaltssteigerungen durch Humankapital schlagen langfristig jede Sparquote.
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>📈</div>
+            <h4 style={{ fontSize: 15, marginBottom: 8 }}>Vermögen aufbauen</h4>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Geld auf dem Konto verliert garantiert an Wert. Breit gestreute ETFs brachten historisch ~7–8% p.a. Noch besser: eigene Firma (GmbH), Immobilien mit Abschreibung, Beteiligungen — produktive Assets statt nur passiv sparen.
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>🧾</div>
+            <h4 style={{ fontSize: 15, marginBottom: 8 }}>Steuerlast optimieren</h4>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Freibeträge, Werbungskosten, Pendlerpauschale ausschöpfen. Wer mehr will: GmbH-Struktur (~30% statt 42%+). Noch radikaler: Geo-Arbitrage — remote arbeiten, Steuerwohnsitz in Portugal, Dubai oder Georgien.
+            </div>
+          </div>
+        </div>
+
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>₿</div>
+            <h4 style={{ fontSize: 15, marginBottom: 8 }}>Deflationäres Sparen</h4>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Bitcoin hat einen fixen Supply von 21 Mio. — die einzige Währung, deren Menge nicht politisch steuerbar ist. Kontrovers, aber ein Gegenentwurf zur Geldmengenausweitung.
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>🤝</div>
+            <h4 style={{ fontSize: 15, marginBottom: 8 }}>Netzwerk-Ökonomie</h4>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Tauschen, Teilen, lokale Wirtschaftskreisläufe. Nicht alles muss über das steuerpflichtige Geldsystem laufen — Nachbarschaftshilfe, Coops, Skill-Sharing.
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>🔍</div>
+            <h4 style={{ fontSize: 15, marginBottom: 8 }}>Transparenz einfordern</h4>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Wählen, Haushalte hinterfragen, Initiativen wie den Bund der Steuerzahler unterstützen. Wer weiß, wohin das Geld fließt, kann bessere Entscheidungen treffen.
+            </div>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 40, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720, fontStyle: 'italic' }}>
+          Keine Finanzberatung. Jede Situation ist individuell. Aber Nichtstun ist auch eine Entscheidung — und die teuerste.
+        </div>
       </section>
 
       <footer className="footer">
