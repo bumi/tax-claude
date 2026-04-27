@@ -1511,7 +1511,7 @@ function App() {
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'savings', 'outlook'];
+  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'outlook'];
 
   const taxes = calcAll(salary);
 
@@ -1759,6 +1759,162 @@ function App() {
           </span>
         </div>
         <VatSection taxes={taxes} />
+      </section>
+
+      {/* SECTION 4b: HIDDEN TAXES */}
+      <section id="hidden-taxes">
+        <div className="section-label">Verbrauchsteuern · Besitzsteuern · Kuriositäten</div>
+        <h2>Und dann sind da<br /><span className="red">noch 40 weitere Steuern</span></h2>
+        <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 750 }}>
+          Deutschland hat über <strong style={{ color: 'var(--text)' }}>40 verschiedene Steuerarten</strong>.
+          Neben Einkommensteuer und Mehrwertsteuer zahlst du — oft ohne es zu merken — auf Benzin, Strom, Versicherungen, Kaffee, Bier, Sekt, Flüge, Hunde und sogar auf Lotteriegewinne.
+          <strong style={{ color: 'var(--red)' }}> 2024 kassierte der Staat darüber insgesamt ~150 Mrd. €</strong> — zusätzlich zu ESt und MwSt.
+        </div>
+
+        {/* Energie & Mobilität */}
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
+            Energie & Mobilität · 51,8 Mrd. € (2024)
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            {[
+              { name: 'Energiesteuer', amount: '35,1 Mrd.', sub: 'Benzin, Diesel, Heizöl, Erdgas', color: '#c0392b', detail: '65,45 Ct/l Benzin · 47,04 Ct/l Diesel' },
+              { name: 'Kfz-Steuer', amount: '9,7 Mrd.', sub: '49 Mio. zugelassene Fahrzeuge', color: '#a93226', detail: '~200 €/Jahr pro Pkw (Ø)' },
+              { name: 'Stromsteuer', amount: '5,2 Mrd.', sub: '2,05 Ct/kWh Verbrauch', color: '#96281b', detail: '~70 € pro Haushalt/Jahr' },
+              { name: 'Luftverkehrsteuer', amount: '1,8 Mrd.', sub: 'Pro Flugticket ab DE', color: '#d35400', detail: '12,73–70,83 € je nach Ziel' },
+            ].map((t, i) => (
+              <div key={i} style={{ background: 'var(--bg2)', borderRadius: 12, padding: '20px', border: '1px solid var(--border)' }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 24, fontWeight: 500, color: t.color, lineHeight: 1, marginBottom: 6 }}>{t.amount}</div>
+                <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 6 }}>{t.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 8 }}>{t.sub}</div>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', padding: '6px 10px', background: 'var(--bg3)', borderRadius: 6 }}>{t.detail}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Benzin Steuer-auf-Steuer Beispiel */}
+        <div style={{ marginBottom: 32, padding: '24px 28px', background: 'var(--bg2)', borderRadius: 14, border: '1px solid rgba(192,57,43,0.3)' }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+            Beispiel · Steuer auf Steuer: 1 Liter Super E10
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px 24px', fontSize: 14 }}>
+            {[
+              { label: 'Produktpreis (Rohöl, Raffinerie, Transport, Marge)', value: '~0,55 €', color: 'var(--text)' },
+              { label: '+ Energiesteuer', value: '0,6545 €', color: 'var(--red)' },
+              { label: '+ CO₂-Preis (2024: 45 €/t)', value: '~0,108 €', color: 'var(--red)' },
+              { label: '= Zwischensumme', value: '~1,31 €', color: 'var(--text-dim)' },
+              { label: '+ 19% MwSt auf alles (inkl. der anderen Steuern!)', value: '~0,25 €', color: 'var(--red)' },
+              { label: 'Endpreis an der Zapfsäule', value: '~1,56 €', color: 'var(--text)' },
+            ].map((r, i) => (
+              <React.Fragment key={i}>
+                <div style={{ color: 'var(--text-dim)', borderBottom: i === 5 ? 'none' : '1px solid var(--border)', paddingBottom: 6, paddingTop: i === 0 ? 0 : 6, fontWeight: i === 5 ? 700 : 400 }}>{r.label}</div>
+                <div style={{ fontFamily: 'var(--mono)', color: r.color, textAlign: 'right', borderBottom: i === 5 ? 'none' : '1px solid var(--border)', paddingBottom: 6, paddingTop: i === 0 ? 0 : 6, fontWeight: i === 5 ? 700 : 400 }}>{r.value}</div>
+              </React.Fragment>
+            ))}
+          </div>
+          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: 'var(--red)' }}>~65%</div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              des Benzinpreises sind Steuern und Abgaben — und die MwSt wird <strong style={{ color: 'var(--text)' }}>auf die anderen Steuern draufgeschlagen</strong> (Steuer auf Steuer).
+            </div>
+          </div>
+        </div>
+
+        {/* Konsum & Genuss + Vermögen */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
+          <div>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
+              Konsum · Versicherung · Genuss
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { name: 'Versicherungsteuer', amount: 18.2, note: '19% auf alle Versicherungsprämien (Haftpflicht, Hausrat, Kfz…)' },
+                { name: 'Tabaksteuer', amount: 15.6, note: '~65% des Zigarettenpreises sind Steuern' },
+                { name: 'Alkoholsteuer', amount: 2.0, note: 'Auf Spirituosen (1.303 €/hl reiner Alkohol)' },
+                { name: 'Kaffeesteuer', amount: 1.0, note: '2,19 €/kg Röstkaffee — einzigartig in der EU' },
+                { name: 'Biersteuer', amount: 0.6, note: '~9,44 €/hl (Ländersache)' },
+                { name: 'Schaumweinsteuer', amount: 0.4, note: '1,36 €/Flasche Sekt — aus dem Kaiserreich (1902!)' },
+              ].map((t, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 16, fontWeight: 500, color: 'var(--red)', minWidth: 70, textAlign: 'right' }}>{t.amount} Mrd.</div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{t.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5 }}>{t.note}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
+              Vermögen · Eigentum · Erbschaft
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { name: 'Grundsteuer', amount: '~15', note: 'Auf Grundbesitz (Kommunen), 2025 komplett reformiert' },
+                { name: 'Grunderwerbsteuer', amount: 12.7, note: '3,5–6,5% beim Immobilienkauf (Ländersache)' },
+                { name: 'Erbschaftsteuer', amount: 10.0, note: '7–50% je nach Verwandtschaftsgrad und Betrag' },
+              ].map((t, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 16, fontWeight: 500, color: 'var(--red)', minWidth: 70, textAlign: 'right' }}>{t.amount} Mrd.</div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{t.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5 }}>{t.note}</div>
+                  </div>
+                </div>
+              ))}
+              <div style={{ marginTop: 8, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
+                Kuriositäten
+              </div>
+              {[
+                { name: 'Lotteriesteuer', amount: 2.5, note: 'Rennwett- und Lotteriesteuer (Ländersache)' },
+                { name: 'Feuerschutzsteuer', amount: 0.7, note: 'Aufschlag auf Feuerversicherungen' },
+                { name: 'Hundesteuer', amount: 0.43, note: '430 Mio. € — Rekord 2024! (~50–200 €/Hund/Jahr)' },
+              ].map((t, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 16, fontWeight: 500, color: 'var(--text-dim)', minWidth: 70, textAlign: 'right' }}>{t.amount} Mrd.</div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{t.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5 }}>{t.note}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Gesamtübersicht */}
+        <div style={{ padding: '24px 28px', background: 'var(--bg2)', borderRadius: 14, border: '1px solid var(--border)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 20 }}>
+            <div>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Gesamte Steuereinnahmen DE 2024</div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 32, fontWeight: 500, color: 'var(--red)' }}>948 Mrd. €</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>davon ESt + MwSt</div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 32, fontWeight: 500, color: 'var(--text-dim)' }}>~625 Mrd.</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>»Versteckte« Steuern</div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 32, fontWeight: 500, color: 'var(--red)' }}>~150 Mrd.</div>
+            </div>
+          </div>
+          <div style={{ height: 12, borderRadius: 6, overflow: 'hidden', display: 'flex', marginBottom: 12 }}>
+            <div style={{ width: '36%', background: 'var(--red)' }} title="Lohn-/Einkommensteuer ~343 Mrd." />
+            <div style={{ width: '32%', background: '#c0392b' }} title="Umsatzsteuer ~302 Mrd." />
+            <div style={{ width: '16%', background: '#d35400' }} title="Verbrauch- & Verkehrsteuern ~150 Mrd." />
+            <div style={{ width: '8%', background: '#e67e22' }} title="Gewerbe- & Grundsteuer ~80 Mrd." />
+            <div style={{ width: '8%', background: '#f39c12' }} title="Körperschaftsteuer & Sonstige" />
+          </div>
+          <div style={{ display: 'flex', gap: 16, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', flexWrap: 'wrap' }}>
+            <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: 'var(--red)', marginRight: 4 }} />ESt/LSt 343 Mrd.</span>
+            <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#c0392b', marginRight: 4 }} />USt 302 Mrd.</span>
+            <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#d35400', marginRight: 4 }} />Verbrauch/Verkehr ~150 Mrd.</span>
+            <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#e67e22', marginRight: 4 }} />Gewerbe/Grund ~80 Mrd.</span>
+            <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#f39c12', marginRight: 4 }} />KSt & Sonstige</span>
+          </div>
+        </div>
       </section>
 
       {/* SECTION 5: SAVINGS */}
