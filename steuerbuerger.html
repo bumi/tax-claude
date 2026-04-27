@@ -349,7 +349,7 @@ function fmt(n, digits=0) {
 // Total: 476,81 Mrd. €. Percentages based on Einzelpläne (Soll 2024).
 const SPENDING = [
   { name: "Arbeit & Soziales", pct: 36.0, color: "#c0392b", desc: "Bürgergeld, Renten, Sozialhilfe (EP 11: 171,7 Mrd.)" },
-  { name: "Verteidigung", pct: 10.9, color: "#a93226", desc: "Bundeswehr, NATO-Verpflichtungen (EP 14: 52,0 Mrd.)" },
+  { name: "Militär", pct: 10.9, color: "#a93226", desc: "Bundeswehr, NATO-Verpflichtungen (EP 14: 52,0 Mrd.)" },
   { name: "Zinsen & Schulden", pct: 8.3, color: "#96281b", desc: "Schuldendienst des Bundes (EP 32: 39,6 Mrd.)" },
   { name: "Verkehr & Digital", pct: 7.5, color: "#d35400", desc: "Autobahnen, Schiene, Internet (EP 12: 35,8 Mrd.)" },
   { name: "Bildung & Forschung", pct: 4.7, color: "#f39c12", desc: "Hochschulen, Grundlagenforschung (EP 30: 22,3 Mrd.)" },
@@ -363,7 +363,7 @@ const SPENDING = [
 const SPENDING_DETAILS = {
   "Arbeit & Soziales": {
     explanation: "Das ist der mit Abstand größte Posten im Bundeshaushalt. Da die Rentenbeiträge allein nicht mehr ausreichen, schießt der Bund jedes Jahr über 100 Milliarden Euro als Zuschuss in die Rentenversicherung — direkt aus deinen Steuern. Hinzu kommen Bürgergeld, Grundsicherung und zahlreiche weitere Sozialleistungen.",
-    fact: "Der Bundeszuschuss zur Rentenversicherung (~100 Mrd. €) übersteigt die Verteidigungsausgaben (~52 Mrd.) um fast das Doppelte.",
+    fact: "Der Bundeszuschuss zur Rentenversicherung (~100 Mrd. €) übersteigt die Militärausgaben (~52 Mrd.) um fast das Doppelte.",
     items: [
       { name: "Bundeszuschuss Rentenversicherung", pct: 44 },
       { name: "Bürgergeld & Grundsicherung", pct: 18 },
@@ -373,9 +373,9 @@ const SPENDING_DETAILS = {
       { name: "Sonstiges Soziales", pct: 13 },
     ],
   },
-  "Verteidigung": {
-    explanation: "Nach dem russischen Angriff auf die Ukraine wurde der Verteidigungsetat massiv erhöht. Deutschland ist seit 2024 erstmals wieder beim NATO-Ziel von 2% des BIP angekommen. Das Geld fließt in Ausrüstung der Bundeswehr, Personalkosten, NATO-Beiträge und Rüstungsinvestitionen.",
-    fact: "2024 gibt Deutschland erstmals seit Jahrzehnten wieder 2% des BIP für Verteidigung aus — das entspricht ca. 90 Mrd. Euro inkl. Sondervermögen.",
+  "Militär": {
+    explanation: "Nach dem russischen Angriff auf die Ukraine wurde der Militäretat massiv erhöht. Deutschland ist seit 2024 erstmals wieder beim NATO-Ziel von 2% des BIP angekommen. Das Geld fließt in Ausrüstung der Bundeswehr, Personalkosten, NATO-Beiträge und Rüstungsinvestitionen.",
+    fact: "2024 gibt Deutschland erstmals seit Jahrzehnten wieder 2% des BIP fürs Militär aus — das entspricht ca. 90 Mrd. Euro inkl. Sondervermögen.",
     items: [
       { name: "Personal (Soldaten & Beamte)", pct: 35 },
       { name: "Rüstungsbeschaffung", pct: 28 },
@@ -1011,7 +1011,7 @@ const COMPARE_DATA = {
   base: {
     label: "Regulärer Haushalt 2024",
     items: [
-      { name: "Verteidigung", amount: 52, color: "#a93226", note: "Bundeswehr, NATO (EP 14)" },
+      { name: "Militär", amount: 52, color: "#a93226", note: "Bundeswehr, NATO (EP 14)" },
       { name: "Zinsen & Schulden", amount: 40, color: "#96281b", note: "Schuldendienst (EP 32: 39,6 Mrd.)" },
       { name: "Bildung & Forschung", amount: 22, color: "#2980b9", note: "Nur Bundesanteil — Bildung ist Ländersache! (EP 30)" },
       { name: "Gesundheit", amount: 16, color: "#27ae60", note: "GKV-Zuschuss, Pflege (EP 15: 16,2 Mrd. — stark gesunken nach Ende der Pandemieausgaben)" },
@@ -1021,7 +1021,7 @@ const COMPARE_DATA = {
   sonder: {
     label: "Mit Sondervermögen (annualisiert)",
     items: [
-      { name: "Verteidigung", amount: 72, color: "#a93226", note: "52 Mrd. regulär + 20 Mrd. Sondervermögen (100 Mrd./5 J.)", sonder: 20 },
+      { name: "Militär", amount: 72, color: "#a93226", note: "52 Mrd. regulär + 20 Mrd. Sondervermögen (100 Mrd./5 J.)", sonder: 20 },
       { name: "Zinsen & Schulden", amount: 58, color: "#96281b", note: "40 Mrd. + ~18 Mrd. Zinsen auf neue Sonderschulden (600 Mrd. × ~3%)", sonder: 18 },
       { name: "Bildung & Forschung", amount: 22, color: "#2980b9", note: "Kein Sondervermögen — unverändert. Bildung ist Ländersache!" },
       { name: "Gesundheit", amount: 16, color: "#27ae60", note: "Kein Sondervermögen — unverändert" },
@@ -1032,13 +1032,13 @@ const COMPARE_DATA = {
 
 const RATIOS = [
   {
-    a: "Bildung & Forschung", b: "Verteidigung",
-    context: "Für jeden Euro Bildung gibt der Bund X Euro für Militär aus.",
+    a: "Bildung & Forschung", b: "Militär",
+    context: "Für jeden Euro Bildung gibt der Bund X Euro fürs Militär aus.",
     note: "Bildung ist großteils Ländersache — Bundesanteil ist daher viel kleiner als der reale Gesamtaufwand.",
   },
   {
-    a: "Gesundheit", b: "Verteidigung",
-    context: "Für jeden Euro GKV-Zuschuss gibt der Bund X Euro für Militär aus.",
+    a: "Gesundheit", b: "Militär",
+    context: "Für jeden Euro GKV-Zuschuss gibt der Bund X Euro fürs Militär aus.",
     note: "Der GKV-Bundeszuschuss deckt nur den Fehlbetrag der Krankenversicherung ab.",
   },
   {
@@ -1062,7 +1062,7 @@ function SpendingComparison({ taxes }) {
   const maxAmount = Math.max(...data.items.map(i => i.amount));
 
   // Military vs civic groups
-  const military = data.items.find(i => i.name === "Verteidigung");
+  const military = data.items.find(i => i.name === "Militär");
   const debt = data.items.find(i => i.name === "Zinsen & Schulden");
   const edu = data.items.find(i => i.name === "Bildung & Forschung");
   const health = data.items.find(i => i.name === "Gesundheit");
@@ -1221,7 +1221,7 @@ function SpendingComparison({ taxes }) {
         </div>
         {(() => {
           const cats = [
-            { name: 'Verteidigung', v24: 52, v29: 100, color: '#a93226' },
+            { name: 'Militär', v24: 52, v29: 100, color: '#a93226' },
             { name: 'Zinsen', v24: 40, v29: 67, color: '#96281b' },
             { name: 'Soziales', v24: 172, v29: 215, color: '#7f8c8d' },
             { name: 'Verkehr', v24: 36, v29: 33, color: '#16a085' },
@@ -1287,7 +1287,7 @@ const SONDERVERMOEGEN = [
     status: "laufend",
     statusColor: "var(--red)",
     period: "2022–2027",
-    desc: "100 Mrd. Euro Sonderschulden für die Aufrüstung der Bundeswehr, beschlossen nach dem russischen Angriff auf die Ukraine. Wird bis ca. 2027 ausgegeben — danach muss das reguläre Verteidigungsbudget auf 2% des BIP steigen.",
+    desc: "100 Mrd. Euro Sonderschulden für die Aufrüstung der Bundeswehr, beschlossen nach dem russischen Angriff auf die Ukraine. Wird bis ca. 2027 ausgegeben — danach muss das reguläre Militärbudget auf 2% des BIP steigen.",
     perCapita: 1190,
   },
   {
@@ -1300,12 +1300,12 @@ const SONDERVERMOEGEN = [
     perCapita: 5950,
   },
   {
-    title: "Verteidigung (Schuldenbremsen-Ausnahme)",
+    title: "Militär (Schuldenbremsen-Ausnahme)",
     amount: "unbegrenzt",
     status: "ab 2025",
     statusColor: "#f39c12",
     period: "ab 2025 dauerhaft",
-    desc: "Alle Verteidigungsausgaben über 1% des BIP (~40 Mrd. €/Jahr) sind dauerhaft von der Schuldenbremse ausgenommen. Das bedeutet: strukturell mehr Schulden jedes Jahr — ohne politische Mehrheit dafür.",
+    desc: "Alle Militärausgaben über 1% des BIP (~40 Mrd. €/Jahr) sind dauerhaft von der Schuldenbremse ausgenommen. Das bedeutet: strukturell mehr Schulden jedes Jahr — ohne politische Mehrheit dafür.",
     perCapita: "~500/Jahr",
   },
 ];
@@ -1475,12 +1475,12 @@ function OutlookSection({ taxes }) {
               amount: "90 Mrd. €",
               status: "beschlossen April 2026",
               statusColor: "var(--red)",
-              desc: "Neues Großdarlehen: 30 Mrd. € Haushaltshilfe + 60 Mrd. € für Verteidigungsbeschaffung. Beschlossen im Rahmen verstärkter Zusammenarbeit (24 EU-Staaten). EU nimmt Kredit auf den Kapitalmärkten auf — die Ukraine soll langfristig zurückzahlen.",
+              desc: "Neues Großdarlehen: 30 Mrd. € Haushaltshilfe + 60 Mrd. € für Militärbeschaffung. Beschlossen im Rahmen verstärkter Zusammenarbeit (24 EU-Staaten). EU nimmt Kredit auf den Kapitalmärkten auf — die Ukraine soll langfristig zurückzahlen.",
               finance: "EU-Kreditaufnahme → Rückzahlung durch Ukraine (Ausfallrisiko bei EU/DE)",
               deAnteil: "~27%",
             },
             {
-              title: "SAFE (Verteidigung)",
+              title: "SAFE (Militär)",
               amount: "150 Mrd. €",
               status: "beschlossen Mai 2025",
               statusColor: "#e67e22",
@@ -1556,7 +1556,7 @@ function OutlookSection({ taxes }) {
           {[
             { trend: '↑', label: 'Rentenlücke', desc: 'Der Bundeszuschuss zur Rentenversicherung wird bis 2030 auf schätzungsweise 140 Mrd. €/J. steigen — Babyboomer-Rente beginnt.', color: 'var(--red)' },
             { trend: '↑', label: 'Zinslast', desc: 'Mit jedem Prozentpunkt Zinssteigerung kostet die Staatsverschuldung ~18 Mrd. € mehr pro Jahr. Tendenz steigend.', color: 'var(--red)' },
-            { trend: '↑', label: 'Verteidigung', desc: 'NATO-Ziel 2% BIP ist nun Untergrenze — nicht Ziel. Mittelfristig könnten 2,5–3% gefordert werden.', color: '#e67e22' },
+            { trend: '↑', label: 'Militär', desc: 'NATO-Ziel 2% BIP ist nun Untergrenze — nicht Ziel. Mittelfristig könnten 2,5–3% gefordert werden.', color: '#e67e22' },
             { trend: '?', label: 'Steuerreform', desc: 'Kalte Progression, Abbau des Solidaritätszuschlags für Spitzenverdiener, und Unternehmenssteuerreform stehen zur Diskussion.', color: 'var(--text-dim)' },
           ].map((item, i) => (
             <div key={i} style={{ background: 'var(--bg2)', borderRadius: 12, padding: '20px', border: '1px solid var(--border)' }}>
