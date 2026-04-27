@@ -1596,38 +1596,38 @@ function WelcomePopup({ onEnter }) {
         {/* Badge */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(192,57,43,0.15)', border: '1px solid rgba(192,57,43,0.4)', borderRadius: 100, padding: '6px 16px', marginBottom: 28 }}>
           <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--red)' }} />
-          <span style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--red)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Steuerbürger · Deutschland</span>
+          <span style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--red)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Steuerbürger · Deutschland 2024</span>
         </div>
 
         {/* Headline */}
-        <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em', marginBottom: 20 }}>
-          Glaubst du wirklich,<br />
-          <span style={{ color: 'var(--red)' }}>deine Steuern werden<br />sinnvoll ausgegeben?</span>
+        <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: 20 }}>
+          Du arbeitest jeden Tag<br />
+          <span style={{ color: 'var(--red)' }}>bis mittags für den Staat.</span>
         </h1>
 
-        <p style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 36 }}>
-          Als Steuerzahler zahlst du jeden Monat tausende Euro an den Staat.
-          Aber weißt du, <strong style={{ color: 'var(--text)' }}>wohin das Geld wirklich fließt</strong> — und wie viel davon?
+        <p style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 32 }}>
+          Einkommensteuer, Sozialabgaben, Mehrwertsteuer, Inflation — zusammen nehmen sie dir mehr als du denkst.
+          Hier siehst du <strong style={{ color: 'var(--text)' }}>wohin dein Geld wirklich fließt</strong> — und was du dagegen tun kannst.
         </p>
 
         {/* Stats */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 12, overflow: 'hidden', marginBottom: 36 }}>
           {[
             {
-              num: '2,4×',
-              text: 'mehr Bundesgeld geht in Militär & Schulden (92 Mrd.) als in Bildung und Gesundheit zusammen (38 Mrd.).',
-            },
-            {
               num: 'bis 60%',
-              text: 'deines Bruttogehalts fließen an den Staat — durch Einkommensteuer, Sozialabgaben und Mehrwertsteuer.',
+              text: 'deines Gehalts gehen an den Staat — bevor du auch nur einen Cent ausgibst.',
             },
             {
-              num: '600 Mrd. €',
-              text: 'neue Staatsschulden seit 2022. ~18 Mrd. € zusätzliche Zinsen pro Jahr — die zahlst du.',
+              num: '−36%',
+              text: 'Kaufkraft hat dein Geld seit 1999 verloren. 100 € von damals sind heute 63 € wert.',
             },
             {
-              num: '40%',
-              text: 'deiner Ersparnisse kann durch Abgeltungssteuer und Inflation aufgezehrt werden — über 20 Jahre.',
+              num: '+253%',
+              text: 'ist die Geldmenge im Euroraum gewachsen. Dein Gehalt nicht.',
+            },
+            {
+              num: '100→52',
+              text: 'Mrd. € — Militärausgaben verdoppeln sich bis 2029. Bildung bleibt bei 22 Mrd.',
             },
           ].map((s, i) => (
             <div key={i} style={{
@@ -1642,7 +1642,7 @@ function WelcomePopup({ onEnter }) {
         </div>
 
         {/* CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           <button
             onClick={handleEnter}
             style={{
@@ -1655,9 +1655,9 @@ function WelcomePopup({ onEnter }) {
             onMouseEnter={e => e.target.style.opacity = '0.88'}
             onMouseLeave={e => e.target.style.opacity = '1'}
           >
-            Zeig mir die Zahlen →
+            Zeig mir meine Zahlen →
           </button>
-          <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>Daten basieren auf dem offiziellen Bundeshaushalt 2024</span>
+          <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>Interaktiv · Bundeshaushalt 2024 · mit Handlungsoptionen</span>
         </div>
       </div>
     </div>
