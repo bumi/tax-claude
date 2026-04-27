@@ -1284,6 +1284,113 @@ function OutlookSection({ taxes }) {
         </div>
       </div>
 
+      {/* EU SONDERAUSGABEN */}
+      <div>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
+          EU-Sonderprogramme · Gemeinsame Schulden & Ukraine
+        </div>
+        <div style={{ marginBottom: 20, fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.75 }}>
+          Neben dem regulären EU-Haushalt hat die EU seit 2020 in beispiellosem Umfang <strong style={{ color: 'var(--text)' }}>gemeinsame Schulden</strong> aufgenommen — über Anleihen auf den Kapitalmärkten.
+          Deutschland haftet als größte Volkswirtschaft für den größten Anteil.
+          Die Rückzahlung erfolgt über Jahrzehnte aus dem EU-Haushalt — also letztlich aus <strong style={{ color: 'var(--red)' }}>Mitgliedsbeiträgen der Steuerzahler</strong>.
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 16 }}>
+          {[
+            {
+              title: "NextGenerationEU",
+              amount: "807 Mrd. €",
+              status: "laufend · Tilgung 2028–2058",
+              statusColor: "#e67e22",
+              desc: "Corona-Wiederaufbaufonds. Erstmals gemeinsame EU-Schulden in großem Stil. Deutschland erhält ~28 Mrd. € Zuschüsse, trägt aber als größter Nettozahler ~25% der Rückzahlung (~130 Mrd. €). Finanziert über EU-Anleihen, getilgt aus dem EU-Haushalt bis 2058.",
+              finance: "EU-Anleihen → Tilgung aus EU-Haushalt (= Mitgliedsbeiträge)",
+              deAnteil: "~25%",
+            },
+            {
+              title: "Ukraine-Fazilität",
+              amount: "50 Mrd. €",
+              status: "laufend · 2024–2027",
+              statusColor: "#e67e22",
+              desc: "Stabile Finanzierung für die Ukraine: 33 Mrd. € Darlehen + 17 Mrd. € Zuschüsse für Wiederaufbau und Modernisierung. Die Zuschüsse werden aus dem EU-Haushalt finanziert, die Darlehen über EU-Anleihen mit Garantie aus dem EU-Budget.",
+              finance: "EU-Haushalt (Zuschüsse) + EU-Anleihen (Darlehen)",
+              deAnteil: "~25%",
+            },
+            {
+              title: "Ukraine-Darlehen 2026–27",
+              amount: "90 Mrd. €",
+              status: "beschlossen April 2026",
+              statusColor: "var(--red)",
+              desc: "Neues Großdarlehen: 30 Mrd. € Haushaltshilfe + 60 Mrd. € für Verteidigungsbeschaffung. Beschlossen im Rahmen verstärkter Zusammenarbeit (24 EU-Staaten). EU nimmt Kredit auf den Kapitalmärkten auf — die Ukraine soll langfristig zurückzahlen.",
+              finance: "EU-Kreditaufnahme → Rückzahlung durch Ukraine (Ausfallrisiko bei EU/DE)",
+              deAnteil: "~27%",
+            },
+            {
+              title: "SAFE (Verteidigung)",
+              amount: "150 Mrd. €",
+              status: "beschlossen Mai 2025",
+              statusColor: "#e67e22",
+              desc: "»Security Action for Europe« — EU leiht sich 150 Mrd. € auf dem Kapitalmarkt und gibt zinsgünstige Darlehen an Mitgliedstaaten für gemeinsame Rüstungsbeschaffung weiter. Mitgliedstaaten müssen die Darlehen zurückzahlen.",
+              finance: "EU-Anleihen → Weitergabe als Darlehen an Mitgliedstaaten",
+              deAnteil: "proportional",
+            },
+          ].map((item, i) => (
+            <div key={i} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: item.statusColor, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{item.status}</div>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)' }}>DE-Anteil: {item.deAnteil}</div>
+              </div>
+              <div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: 'var(--red)', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                  {item.amount}
+                </div>
+              </div>
+              <div style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{item.title}</div>
+              <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, flexGrow: 1 }}>{item.desc}</div>
+              <div style={{ padding: '10px 14px', background: 'var(--bg3)', borderRadius: 8, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                <span style={{ color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Finanzierung: </span>{item.finance}
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Gesamtübersicht */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div style={{ padding: '20px 24px', background: 'var(--bg2)', borderRadius: 12, border: '1px solid rgba(192,57,43,0.3)' }}>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+              Summe EU-Sonderprogramme
+            </div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 48, fontWeight: 500, color: 'var(--red)', lineHeight: 1, marginBottom: 8 }}>
+              ~1,1 Bio. €
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              NextGenerationEU (807) + Ukraine-Fazilität (50) + Ukraine-Darlehen (90) + SAFE (150) = ~1.097 Mrd. Euro an gemeinsamen EU-Verbindlichkeiten — zusätzlich zum regulären EU-Haushalt.
+            </div>
+          </div>
+          <div style={{ padding: '20px 24px', background: 'var(--bg2)', borderRadius: 12, border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+              Wie wird das bezahlt?
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.8 }}>
+              {[
+                { icon: '1.', text: 'EU nimmt Anleihen auf dem Kapitalmarkt auf (»EU-Bonds«)' },
+                { icon: '2.', text: 'Rückzahlung über den EU-Haushalt — also über Mitgliedsbeiträge' },
+                { icon: '3.', text: 'Deutschland zahlt als größte Volkswirtschaft den höchsten Anteil (~25% nach BNE)' },
+                { icon: '4.', text: 'Geplante neue EU-Einnahmen (Plastiksteuer, CO₂-Grenzausgleich, Digitalabgabe) sollen helfen — ob sie reichen, ist offen' },
+              ].map((s, i) => (
+                <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 6 }}>
+                  <span style={{ fontFamily: 'var(--mono)', color: 'var(--red)', fontWeight: 600, flexShrink: 0 }}>{s.icon}</span>
+                  <span>{s.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: '16px 20px', background: 'rgba(192,57,43,0.08)', borderRadius: 10, border: '1px solid rgba(192,57,43,0.25)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+          <strong style={{ color: 'var(--text)' }}>Haftungsrisiko:</strong>{' '}
+          Bei den Ukraine-Darlehen (90 + 33 Mrd. €) trägt die EU das Ausfallrisiko — wenn die Ukraine nicht vollständig zurückzahlt, werden die Kosten auf die Mitgliedstaaten umgelegt.
+          Beim SAFE-Programm (150 Mrd.) nehmen die Staaten selbst Kredite auf.
+          Bei NextGenerationEU (807 Mrd.) ist Deutschland Netto-Zahler: Es erhält ~28 Mrd. €, haftet aber für ~25% der Gesamttilgung bis 2058.
+        </div>
+      </div>
+
       {/* FUTURE OUTLOOK */}
       <div>
         <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
@@ -1689,6 +1796,11 @@ function App() {
               { label: 'Sondervermögen Bundeswehr (BMF)', url: 'https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Schlaglichter/Sondervermoegen-Bundeswehr/sondervermoegen-bundeswehr.html' },
               { label: 'Schuldenstand (Bundesbank)', url: 'https://www.bundesbank.de/de/statistiken/oeffentliche-finanzen' },
               { label: 'BMF — Sollbericht 2024', url: 'https://www.bundesfinanzministerium.de/Monatsberichte/Ausgabe/2024/02/Inhalte/Kapitel-3-Analysen/3-1-sollbericht-2024.html' },
+              { label: 'Ukraine-Fazilität (EU-Kommission)', url: 'https://commission.europa.eu/topics/eu-solidarity-ukraine/eu-assistance-ukraine/ukraine-facility_en' },
+              { label: 'Ukraine-Darlehen 90 Mrd. (Rat)', url: 'https://www.consilium.europa.eu/en/press/press-releases/2026/04/23/council-finalises-90-billion-support-loan-to-ukraine/' },
+              { label: 'SAFE 150 Mrd. (EU-Vertretung DE)', url: 'https://germany.representation.ec.europa.eu/news/eu-mitgliedstaaten-billigen-150-milliarden-euro-fur-safe-verteidigungsdarlehenspaket-2025-05-27_de' },
+              { label: 'NextGenerationEU (EU-Kommission)', url: 'https://commission.europa.eu/strategy-and-policy/recovery-plan-europe_en' },
+              { label: 'ReArm Europe / Weißbuch (EU-Vertretung DE)', url: 'https://germany.representation.ec.europa.eu/news/zur-zukunft-der-europaischen-verteidigung-weissbuch-und-rearm-europe-2025-03-19_de' },
             ].map((s, i) => (
               <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
                 style={{ color: 'var(--text-dim)', fontSize: 11, fontFamily: 'var(--mono)', textDecoration: 'none', borderBottom: '1px solid var(--border)', paddingBottom: 1, transition: 'color 0.15s' }}
