@@ -420,15 +420,21 @@ function NavDots({ active, sections }) {
 }
 
 function BigBar({ taxes }) {
-  const { gross, incomeTax, soli, social, net } = taxes;
+  const { laborCost, employerSocial, incomeTax, soli, social, net } = taxes;
+  const base = laborCost;
   const segs = [
-    { label: "Einkommensteuer", amount: incomeTax, color: "var(--red)", pct: incomeTax/gross*100 },
-    { label: "Sozialabgaben", amount: social, color: "var(--red2)", pct: social/gross*100 },
-    ...(soli > 0 ? [{ label: "Soli", amount: soli, color: "var(--red3)", pct: soli/gross*100 }] : []),
-    { label: "Netto", amount: net, color: "var(--green)", pct: net/gross*100 },
+    { label: "AG-Sozialabgaben", amount: employerSocial, color: "var(--red4)", pct: employerSocial/base*100 },
+    { label: "Einkommensteuer", amount: incomeTax, color: "var(--red)", pct: incomeTax/base*100 },
+    { label: "Sozialabgaben (AN)", amount: social, color: "var(--red2)", pct: social/base*100 },
+    ...(soli > 0 ? [{ label: "Soli", amount: soli, color: "var(--red3)", pct: soli/base*100 }] : []),
+    { label: "Netto", amount: net, color: "var(--green)", pct: net/base*100 },
   ];
   return (
     <div className="big-bar-wrap">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)' }}>
+        <span>Arbeitskosten: {fmt(laborCost)} €</span>
+        <span style={{ color: 'var(--green)' }}>Netto: {fmt(net)} € ({(net/base*100).toFixed(1)}%)</span>
+      </div>
       <div className="big-bar">
         {segs.map((s, i) => (
           <div
@@ -437,7 +443,7 @@ function BigBar({ taxes }) {
             style={{ width: `${s.pct}%`, background: s.color }}
             title={`${s.label}: ${fmt(s.amount)}€ (${s.pct.toFixed(1)}%)`}
           >
-            {s.pct > 12 && (
+            {s.pct > 8 && (
               <span className="bar-seg-label" style={{ color: i < segs.length-1 ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)' }}>
                 {s.pct.toFixed(0)}%
               </span>
@@ -1621,7 +1627,7 @@ function App() {
           </div>
           <div>
             <div style={{ marginBottom: 20 }}>
-              <div className="section-label" style={{ marginBottom: 12 }}>So teilt sich dein Gehalt auf</div>
+              <div className="section-label" style={{ marginBottom: 12 }}>So teilen sich deine Arbeitskosten auf</div>
               <BigBar taxes={taxes} />
             </div>
             <div className="stats-row">
