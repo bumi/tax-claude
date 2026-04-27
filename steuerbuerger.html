@@ -81,11 +81,11 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .shocking-sub strong { color: var(--text); }
 
 /* STATS ROW */
-.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin-top: 32px; }
-.stat-card { background: var(--bg2); padding: 24px; }
-.stat-label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; font-family: var(--mono); }
-.stat-value { font-family: var(--mono); font-size: 28px; font-weight: 500; }
-.stat-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin-top: 32px; }
+.stat-card { background: var(--bg2); padding: 16px 14px; }
+.stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-family: var(--mono); }
+.stat-value { font-family: var(--mono); font-size: 22px; font-weight: 500; }
+.stat-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
 
 /* TAX BREAKDOWN SECTION */
 #breakdown { background: var(--bg); }
@@ -228,6 +228,16 @@ function calcSocial(annual) {
   return Math.round(kv + pv + rv + av);
 }
 
+// Arbeitgeberanteil: same BBG caps, but PV without Kinderlosenzuschlag
+function calcEmployerSocial(annual) {
+  const kvCap = 62100, rvCap = 90600;
+  const kv = Math.min(annual, kvCap) * 0.0815; // 7.3% + 0.85% avg. Zusatzbeitrag (1,7%/2)
+  const pv = Math.min(annual, kvCap) * 0.017;  // 1.7% (kein Kinderlosenzuschlag)
+  const rv = Math.min(annual, rvCap) * 0.093;
+  const av = Math.min(annual, rvCap) * 0.013;
+  return Math.round(kv + pv + rv + av);
+}
+
 function calcAll(monthly) {
   const g = monthly * 12;
   const it = calcIncomeTax(g);
@@ -236,15 +246,21 @@ function calcAll(monthly) {
   const soli = it <= 18130 ? 0
     : Math.round(Math.min(it * 0.055, 0.119 * (it - 18130)));
   const soc = calcSocial(g);
+  const empSoc = calcEmployerSocial(g);
   const net = g - it - soli - soc;
+  const laborCost = g + empSoc; // What the employer actually pays
   return {
     gross: monthly,
     incomeTax: Math.round(it / 12),
     soli: Math.round(soli / 12),
     social: Math.round(soc / 12),
+    employerSocial: Math.round(empSoc / 12),
+    laborCost: Math.round(laborCost / 12),
     net: Math.round(net / 12),
     annualGross: g, annualIT: it, annualSoli: soli, annualSocial: soc, annualNet: net,
+    annualEmployerSocial: empSoc, annualLaborCost: laborCost,
     effectiveRate: ((it + soli + soc) / g * 100),
+    totalStateRate: ((it + soli + soc + empSoc) / laborCost * 100), // vs. labor cost
     marginalRate: calcMarginal(g),
   };
 }
@@ -1405,6 +1421,8 @@ function App() {
 
   const totalTaken = taxes.incomeTax + taxes.soli + taxes.social;
   const takenPct = (totalTaken / taxes.gross * 100);
+  const totalStateTakeFromLabor = totalTaken + taxes.employerSocial;
+  const stateTakeFromLaborPct = (totalStateTakeFromLabor / taxes.laborCost * 100);
 
   const hints = [2500, 3500, 4500, 6000, 10000];
 
@@ -1458,6 +1476,41 @@ function App() {
                 Du bleibst mit <strong style={{ color: 'var(--green)' }}>{fmt(taxes.net)} € Netto</strong> übrig.
               </div>
             </div>
+            {/* Arbeitgeber callout */}
+            <div style={{
+              marginTop: 16, padding: '24px 28px', background: 'var(--bg2)', borderRadius: 12,
+              border: '1px solid rgba(232,65,42,0.25)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  Was dein Arbeitgeber wirklich zahlt
+                </div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 28, fontWeight: 500, color: 'var(--red4)' }}>
+                  {fmt(taxes.laborCost)} €<span style={{ fontSize: 14, color: 'var(--text-dim)' }}>/Mo.</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+                <div style={{ flex: 1, padding: '12px 14px', background: 'var(--bg3)', borderRadius: 8 }}>
+                  <div style={{ fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Dein Brutto</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 18, color: 'var(--text)' }}>{fmt(taxes.gross)} €</div>
+                </div>
+                <div style={{ flex: 1, padding: '12px 14px', background: 'var(--bg3)', borderRadius: 8 }}>
+                  <div style={{ fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>+ AG-Sozialabgaben</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 18, color: 'var(--red4)' }}>+{fmt(taxes.employerSocial)} €</div>
+                </div>
+              </div>
+              {/* Mini bar: labor cost breakdown */}
+              <div style={{ height: 10, borderRadius: 5, overflow: 'hidden', display: 'flex', marginBottom: 8 }}>
+                <div style={{ width: `${taxes.employerSocial / taxes.laborCost * 100}%`, background: 'var(--red4)' }} title="AG-Sozialabgaben" />
+                <div style={{ width: `${(taxes.incomeTax + taxes.soli) / taxes.laborCost * 100}%`, background: 'var(--red)' }} title="Einkommensteuer + Soli" />
+                <div style={{ width: `${taxes.social / taxes.laborCost * 100}%`, background: 'var(--red2)' }} title="AN-Sozialabgaben" />
+                <div style={{ width: `${taxes.net / taxes.laborCost * 100}%`, background: 'var(--green)' }} title="Netto" />
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                Dein Arbeitgeber zahlt <strong style={{ color: 'var(--text)' }}>{fmt(taxes.employerSocial)} €</strong> zusätzlich an Sozialabgaben — die siehst du nie auf deiner Abrechnung.
+                Bezogen auf die tatsächlichen Arbeitskosten nimmt der Staat <strong style={{ color: 'var(--red)' }}>{stateTakeFromLaborPct.toFixed(0)}%</strong> (vor MwSt).
+              </div>
+            </div>
           </div>
           <div>
             <div style={{ marginBottom: 20 }}>
@@ -1466,19 +1519,24 @@ function App() {
             </div>
             <div className="stats-row">
               <div className="stat-card">
+                <div className="stat-label">Arbeitskosten (AG)</div>
+                <div className="stat-value mono" style={{ color: 'var(--red4)' }}>{fmt(taxes.laborCost)} €</div>
+                <div className="stat-sub">Brutto + {fmt(taxes.employerSocial)} € AG-Anteil</div>
+              </div>
+              <div className="stat-card">
                 <div className="stat-label">Einkommensteuer</div>
                 <div className="stat-value mono red">{fmt(taxes.incomeTax)} €</div>
                 <div className="stat-sub">{(taxes.incomeTax/taxes.gross*100).toFixed(1)}% des Brutto</div>
               </div>
               <div className="stat-card">
-                <div className="stat-label">Sozialabgaben</div>
+                <div className="stat-label">Sozialabgaben (AN)</div>
                 <div className="stat-value mono" style={{ color: 'var(--red2)' }}>{fmt(taxes.social)} €</div>
                 <div className="stat-sub">KV + RV + PV + AV</div>
               </div>
               <div className="stat-card">
                 <div className="stat-label">Dein Netto</div>
                 <div className="stat-value mono green">{fmt(taxes.net)} €</div>
-                <div className="stat-sub">{(taxes.net/taxes.gross*100).toFixed(1)}% des Brutto</div>
+                <div className="stat-sub">{(taxes.net/taxes.laborCost*100).toFixed(1)}% der Arbeitskosten</div>
               </div>
             </div>
           </div>
@@ -1493,37 +1551,52 @@ function App() {
         <div className="breakdown-grid">
           <div>
             <div style={{ marginBottom: 24, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
-              Von deinem Brutto werden mehrere Abgaben abgezogen, bevor du irgendetwas siehst.
-              Jeder Posten ist staatlich vorgeschrieben.
+              Dein Arbeitgeber zahlt <strong style={{ color: 'var(--text)' }}>{fmt(taxes.laborCost)} €</strong> für dich — {fmt(taxes.employerSocial)} € davon siehst du nie.
+              Von deinem Brutto werden dann weitere Abgaben abgezogen.
             </div>
             <div className="waterfall">
+              {/* Arbeitgeber section */}
               {[
-                { label: 'Bruttogehalt', amount: taxes.gross, bar: 100, color: 'transparent', showBar: false },
+                { label: 'Arbeitskosten (Arbeitgeber zahlt)', amount: taxes.laborCost, bar: 100, color: 'transparent', showBar: false, isEmployer: true },
               ].concat([
-                { label: 'Krankenversicherung (8,15%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.0815 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.0815/12) / taxes.gross * 100, color: 'var(--red)' },
-                { label: 'Rentenversicherung (9,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.093/12) / taxes.gross * 100, color: 'var(--red)' },
-                { label: 'Pflegeversicherung (2,3%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.023 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.023/12) / taxes.gross * 100, color: 'var(--red2)' },
-                { label: 'Arbeitslosenversicherung (1,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.013 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.013/12) / taxes.gross * 100, color: 'var(--red2)' },
+                { label: '← AG Krankenvers. (8,15%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.0815 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.0815/12) / taxes.laborCost * 100, color: 'var(--red4)', isEmployer: true },
+                { label: '← AG Rentenvers. (9,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.093/12) / taxes.laborCost * 100, color: 'var(--red4)', isEmployer: true },
+                { label: '← AG Pflegevers. (1,7%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.017 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.017/12) / taxes.laborCost * 100, color: 'var(--red4)', isEmployer: true },
+                { label: '← AG Arbeitslosenvers. (1,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.013 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.013/12) / taxes.laborCost * 100, color: 'var(--red4)', isEmployer: true },
+              ]).concat([
+                { label: 'Bruttogehalt', amount: taxes.gross, bar: taxes.gross / taxes.laborCost * 100, color: 'transparent', showBar: false, isDivider: true },
+              ]).concat([
+                { label: 'Krankenversicherung (8,15%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.0815 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.0815/12) / taxes.laborCost * 100, color: 'var(--red)' },
+                { label: 'Rentenversicherung (9,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.093/12) / taxes.laborCost * 100, color: 'var(--red)' },
+                { label: 'Pflegeversicherung (2,3%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.023 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.023/12) / taxes.laborCost * 100, color: 'var(--red2)' },
+                { label: 'Arbeitslosenversicherung (1,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.013 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.013/12) / taxes.laborCost * 100, color: 'var(--red2)' },
               ].concat(taxes.incomeTax > 0 ? [
-                { label: 'Einkommensteuer', amount: taxes.incomeTax, bar: taxes.incomeTax / taxes.gross * 100, color: 'var(--red3)' },
+                { label: 'Einkommensteuer', amount: taxes.incomeTax, bar: taxes.incomeTax / taxes.laborCost * 100, color: 'var(--red3)' },
               ] : []).concat(taxes.soli > 0 ? [
-                { label: 'Solidaritätszuschlag (5,5%)', amount: taxes.soli, bar: taxes.soli / taxes.gross * 100, color: '#c0392b' },
+                { label: 'Solidaritätszuschlag (5,5%)', amount: taxes.soli, bar: taxes.soli / taxes.laborCost * 100, color: '#c0392b' },
               ] : [])).map((row, i) => (
                 <div key={i}>
-                  {i === 5 && <div className="wf-divider" />}
-                  <div className="wf-row" style={{ marginBottom: 6 }}>
-                    <div className="wf-label" style={{ color: i === 0 ? 'var(--text)' : 'var(--text-dim)', fontFamily: i === 0 ? 'var(--mono)' : undefined }}>
-                      {i === 0 ? `${fmt(row.amount)} € →` : row.label}
+                  {row.isDivider && <div className="wf-divider" style={{ margin: '12px 0' }} />}
+                  {i > 0 && !row.isDivider && !row.isEmployer && i === 6 && <div className="wf-divider" />}
+                  <div className="wf-row" style={{ marginBottom: 6, opacity: row.isEmployer && i > 0 ? 0.85 : 1 }}>
+                    <div className="wf-label" style={{
+                      color: row.isDivider ? 'var(--text)' : row.isEmployer && i === 0 ? 'var(--text)' : row.isEmployer ? 'var(--red4)' : 'var(--text-dim)',
+                      fontFamily: (i === 0 || row.isDivider) ? 'var(--mono)' : undefined,
+                      fontSize: row.isEmployer && i > 0 ? 12 : undefined,
+                    }}>
+                      {i === 0 ? `${fmt(row.amount)} € →` : row.isDivider ? `= ${fmt(row.amount)} € Brutto →` : row.label}
                     </div>
                     <div className="wf-bar-wrap">
                       {row.showBar !== false && (
-                        <div className="wf-bar" style={{ width: `${row.bar}%`, background: row.color || 'var(--red)' }}>
+                        <div className="wf-bar" style={{ width: `${row.bar}%`, background: row.color || 'var(--red)', opacity: row.isEmployer ? 0.7 : 1 }}>
                           <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
-                            {row.bar > 15 && `${row.bar.toFixed(0)}%`}
+                            {row.bar > 12 && `${row.bar.toFixed(0)}%`}
                           </span>
                         </div>
                       )}
-                      <span className="wf-value">−{fmt(row.amount)} €</span>
+                      <span className="wf-value" style={{ color: row.isEmployer ? 'var(--red4)' : undefined }}>
+                        {row.isDivider ? '' : `−${fmt(row.amount)} €`}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1532,9 +1605,13 @@ function App() {
               <div className="wf-total-row">
                 <div className="wf-total-label" style={{ fontFamily: 'var(--mono)', color: 'var(--green)' }}>= Netto</div>
                 <div className="wf-bar-wrap">
-                  <div className="wf-bar" style={{ width: `${taxes.net/taxes.gross*100}%`, background: 'var(--green)' }} />
+                  <div className="wf-bar" style={{ width: `${taxes.net/taxes.laborCost*100}%`, background: 'var(--green)' }} />
                   <span className="wf-value green">{fmt(taxes.net)} €</span>
                 </div>
+              </div>
+              <div style={{ marginTop: 16, padding: '14px 18px', background: 'rgba(232,65,42,0.08)', borderRadius: 8, border: '1px solid rgba(232,65,42,0.2)', fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+                <strong style={{ color: 'var(--text)' }}>Von {fmt(taxes.laborCost)} € Arbeitskosten</strong> behältst du <strong style={{ color: 'var(--green)' }}>{fmt(taxes.net)} €</strong> ({(taxes.net/taxes.laborCost*100).toFixed(1)}%).
+                Der Staat erhält <strong style={{ color: 'var(--red)' }}>{fmt(taxes.laborCost - taxes.net)} €</strong> ({((taxes.laborCost - taxes.net)/taxes.laborCost*100).toFixed(1)}%) — einschließlich der versteckten AG-Abgaben.
               </div>
             </div>
             <div style={{ marginTop: 32, padding: 20, background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.8 }}>
