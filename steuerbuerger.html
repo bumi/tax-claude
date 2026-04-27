@@ -144,6 +144,7 @@ svg text { font-family: var(--mono); }
 
 /* SAVINGS SECTION */
 #savings { background: var(--bg); }
+#inflation { background: var(--bg); }
 #opportunity { background: var(--bg); }
 .savings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
 .savings-controls { display: flex; flex-direction: column; gap: 24px; }
@@ -1668,7 +1669,7 @@ function App() {
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'outlook'];
+  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'inflation', 'opportunity', 'outlook'];
 
   const taxes = calcAll(salary);
 
@@ -2109,6 +2110,169 @@ function App() {
           Die Inflation frisst den Rest. Was bleibt wirklich übrig?
         </div>
         <SavingsChart taxes={taxes} />
+      </section>
+
+      {/* SECTION: INFLATION */}
+      <section id="inflation">
+        <div className="section-label">Die unsichtbare Steuer</div>
+        <h2>Inflation — <span className="red">die Steuer, die niemand beschließt</span></h2>
+        <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          Inflation entwertet dein Erspartes — still, stetig, ohne Steuerbescheid.
+          <strong style={{ color: 'var(--text)' }}>100 €</strong> aus dem Jahr 2004 haben heute nur noch eine Kaufkraft von etwa <strong style={{ color: 'var(--red)' }}>75 €</strong>.
+          Wer spart, verliert. Aber woher kommt Inflation eigentlich?
+        </div>
+
+        {/* Geldmenge M3 Chart */}
+        <div style={{ marginBottom: 48 }}>
+          <h3 style={{ fontSize: 20, marginBottom: 8 }}>Geldmenge im Euroraum (M3)</h3>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 24, lineHeight: 1.6 }}>
+            M3 misst alles Geld im Umlauf — Bargeld, Girokonten, Spareinlagen.
+            Je mehr Geld im System ist, desto weniger ist jeder einzelne Euro wert.
+          </div>
+          {(() => {
+            const data = [
+              { year: 1999, value: 4.7 },
+              { year: 2004, value: 6.4 },
+              { year: 2008, value: 9.4 },
+              { year: 2012, value: 9.8 },
+              { year: 2016, value: 11.3 },
+              { year: 2020, value: 14.4 },
+              { year: 2022, value: 16.1 },
+              { year: 2024, value: 16.6 },
+            ];
+            const maxVal = 18;
+            const barW = 60;
+            const gap = 20;
+            const chartW = data.length * (barW + gap);
+            const chartH = 260;
+            return (
+              <div style={{ overflowX: 'auto' }}>
+                <svg viewBox={`0 0 ${chartW + 60} ${chartH + 50}`} style={{ width: '100%', maxWidth: 700, height: 'auto' }}>
+                  {data.map((d, i) => {
+                    const barH = (d.value / maxVal) * chartH;
+                    const x = 40 + i * (barW + gap);
+                    const y = chartH - barH;
+                    const isPandemic = d.year >= 2020;
+                    return (
+                      <g key={d.year}>
+                        <rect x={x} y={y} width={barW} height={barH} rx={4}
+                          fill={isPandemic ? 'var(--red)' : 'rgba(255,255,255,0.15)'}
+                          opacity={isPandemic ? 0.9 : 0.7} />
+                        <text x={x + barW/2} y={y - 8} textAnchor="middle"
+                          fill={isPandemic ? 'var(--red)' : 'var(--text-dim)'} fontSize="13" fontWeight="600">
+                          {d.value} Bio.
+                        </text>
+                        <text x={x + barW/2} y={chartH + 20} textAnchor="middle"
+                          fill="var(--text-dim)" fontSize="12">{d.year}</text>
+                      </g>
+                    );
+                  })}
+                  {/* Annotation arrow for pandemic */}
+                  <text x={40 + 5 * (barW + gap) + barW/2} y={chartH + 42} textAnchor="middle"
+                    fill="var(--red)" fontSize="11" fontWeight="600">← Corona-Geldflut</text>
+                </svg>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Erklärung: Wie entsteht Inflation? */}
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 48 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>🏦</div>
+            <h4 style={{ fontSize: 16, marginBottom: 8 }}>1. Staat macht Schulden</h4>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              2020–2022: Deutschland nahm über <strong style={{ color: 'var(--text)' }}>400 Mrd. €</strong> neue Schulden auf —
+              Konjunkturpakete, Kurzarbeit, Energiepreisbremse.
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>🖨️</div>
+            <h4 style={{ fontSize: 16, marginBottom: 8 }}>2. EZB kauft Anleihen</h4>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Die EZB kaufte Staatsanleihen im Rahmen des PEPP-Programms für <strong style={{ color: 'var(--text)' }}>1,85 Bio. €</strong>.
+              Dafür wurde neues Geld geschaffen — die Geldmenge stieg rasant.
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>📈</div>
+            <h4 style={{ fontSize: 16, marginBottom: 8 }}>3. Preise steigen</h4>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              Mehr Geld trifft auf gleich viele Güter.
+              Ergebnis: Inflationsrate in Deutschland bis auf <strong style={{ color: 'var(--red)' }}>8,7%</strong> im Oktober 2022 —
+              ein 70-Jahres-Hoch.
+            </div>
+          </div>
+        </div>
+
+        {/* Nuance / Ehrlichkeit */}
+        <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)', marginBottom: 48, maxWidth: 720 }}>
+          <h4 style={{ fontSize: 16, marginBottom: 12, color: 'var(--text)' }}>Was noch dazukam</h4>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            Die Geldmengenausweitung war ein wesentlicher Treiber, aber nicht der einzige.
+            <strong style={{ color: 'var(--text)' }}> Lieferkettenprobleme</strong> (Container-Staus, Chipmangel) und der
+            <strong style={{ color: 'var(--text)' }}> Energiepreisschock</strong> nach dem russischen Angriff auf die Ukraine
+            (Gas +300%, Strom +200%) haben die Inflation 2021–2023 zusätzlich massiv befeuert.
+            Geldpolitik allein erklärt die Preisspitze nicht — aber sie hat den Boden bereitet.
+          </div>
+        </div>
+
+        {/* Kaufkraft-Verlust Beispiel */}
+        <div style={{ marginBottom: 32 }}>
+          <h3 style={{ fontSize: 20, marginBottom: 20 }}>Was 100 € Kaufkraft über 20 Jahre wirklich bedeuten</h3>
+          {(() => {
+            const years = [2004, 2008, 2012, 2016, 2020, 2024];
+            const purchasing = [100, 92, 85, 82, 78, 75];
+            const chartW = 600;
+            const chartH = 200;
+            const padL = 50;
+            const padR = 20;
+            const padT = 20;
+            const padB = 30;
+            const w = chartW - padL - padR;
+            const h = chartH - padT - padB;
+            const points = years.map((yr, i) => {
+              const x = padL + (i / (years.length - 1)) * w;
+              const y = padT + h - ((purchasing[i] - 60) / 45) * h;
+              return { x, y, yr, val: purchasing[i] };
+            });
+            const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+            const area = line + ` L${points[points.length-1].x},${padT + h} L${points[0].x},${padT + h} Z`;
+            return (
+              <svg viewBox={`0 0 ${chartW} ${chartH}`} style={{ width: '100%', maxWidth: 600, height: 'auto' }}>
+                <defs>
+                  <linearGradient id="kaufkraftGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--red)" stopOpacity="0.3"/>
+                    <stop offset="100%" stopColor="var(--red)" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                {/* 100€ reference line */}
+                <line x1={padL} y1={padT + h - ((100 - 60) / 45) * h} x2={padL + w} y2={padT + h - ((100 - 60) / 45) * h}
+                  stroke="rgba(255,255,255,0.15)" strokeDasharray="4,4" />
+                <text x={padL - 8} y={padT + h - ((100 - 60) / 45) * h + 4} textAnchor="end"
+                  fill="var(--text-dim)" fontSize="11">100 €</text>
+                <path d={area} fill="url(#kaufkraftGrad)" />
+                <path d={line} fill="none" stroke="var(--red)" strokeWidth="2.5" />
+                {points.map((p, i) => (
+                  <g key={p.yr}>
+                    <circle cx={p.x} cy={p.y} r={4} fill="var(--red)" />
+                    <text x={p.x} y={p.y - 12} textAnchor="middle" fill="var(--red)" fontSize="12" fontWeight="600">
+                      {p.val} €
+                    </text>
+                    <text x={p.x} y={padT + h + 18} textAnchor="middle" fill="var(--text-dim)" fontSize="11">
+                      {p.yr}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            );
+          })()}
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', marginTop: 12, lineHeight: 1.6 }}>
+            Bei durchschnittlich <strong style={{ color: 'var(--text)' }}>~2,5% Inflation pro Jahr</strong> verliert gespartes Geld
+            in 20 Jahren rund ein Viertel seiner Kaufkraft — ganz ohne dass du es ausgibst.
+            Inflation ist die Steuer, die kein Parlament beschließt.
+          </div>
+        </div>
       </section>
 
       {/* SECTION: OPPORTUNITY COST */}
