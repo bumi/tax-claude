@@ -202,25 +202,27 @@ svg text { font-family: var(--mono); }
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
-// ── GERMAN TAX MATH 2024 ──────────────────────────────────────────────────────
+// ── GERMAN TAX MATH 2024 (Steuerfortentwicklungsgesetz) ─────────────────────
+// Source: EStG §32a (2024), lohn-info.de/einkommensteuertarif_2024.html
 function calcIncomeTax(annual) {
-  if (annual <= 11604) return 0;
+  if (annual <= 11784) return 0;
   if (annual <= 17005) {
-    const y = (annual - 11604) / 10000;
-    return Math.round((933.7 * y + 1400) * y);
+    const y = (annual - 11784) / 10000;
+    return Math.round((954.80 * y + 1400) * y);
   }
   if (annual <= 66760) {
     const z = (annual - 17005) / 10000;
-    return Math.round((176.31 * z + 2397) * z + 1025);
+    return Math.round((181.19 * z + 2397) * z + 991.21);
   }
-  if (annual <= 277825) return Math.round(0.42 * annual - 10911);
-  return Math.round(0.45 * annual - 19246);
+  if (annual <= 277825) return Math.round(0.42 * annual - 10636.31);
+  return Math.round(0.45 * annual - 18971.06);
 }
 
+// Source: lohn-info.de/sozialversicherungsbeitraege2024.html
 function calcSocial(annual) {
   const kvCap = 62100, rvCap = 90600;
-  const kv = Math.min(annual, kvCap) * 0.090;
-  const pv = Math.min(annual, kvCap) * 0.0185; // 1.7% + 0.15% for childless avg
+  const kv = Math.min(annual, kvCap) * 0.0815; // 7.3% + 0.85% avg. Zusatzbeitrag (1,7%/2)
+  const pv = Math.min(annual, kvCap) * 0.023;  // 1.7% + 0.6% Kinderlosenzuschlag
   const rv = Math.min(annual, rvCap) * 0.093;
   const av = Math.min(annual, rvCap) * 0.013;
   return Math.round(kv + pv + rv + av);
@@ -229,7 +231,10 @@ function calcSocial(annual) {
 function calcAll(monthly) {
   const g = monthly * 12;
   const it = calcIncomeTax(g);
-  const soli = it > 18130 ? Math.round(it * 0.055) : 0;
+  // Soli: Freigrenze 18.130 €, Milderungszone bis ~33.710 €, darüber 5,5%
+  // Source: §4 SolZG, haufe.de/solidaritaetszuschlag-milderungszone
+  const soli = it <= 18130 ? 0
+    : Math.round(Math.min(it * 0.055, 0.119 * (it - 18130)));
   const soc = calcSocial(g);
   const net = g - it - soli - soc;
   return {
@@ -245,9 +250,9 @@ function calcAll(monthly) {
 }
 
 function calcMarginal(annual) {
-  if (annual <= 11604) return 0;
-  if (annual <= 17005) { const y=(annual-11604)/10000; return Math.min(100,(933.7*2*y+1400)/100); }
-  if (annual <= 66760) { const z=(annual-17005)/10000; return Math.min(100,(176.31*2*z+2397)/100); }
+  if (annual <= 11784) return 0;
+  if (annual <= 17005) { const y=(annual-11784)/10000; return Math.min(100,(954.80*2*y+1400)/100); }
+  if (annual <= 66760) { const z=(annual-17005)/10000; return Math.min(100,(181.19*2*z+2397)/100); }
   if (annual <= 277825) return 42;
   return 45;
 }
@@ -257,23 +262,25 @@ function fmt(n, digits=0) {
 }
 
 // ── GOVT SPENDING DATA ────────────────────────────────────────────────────────
+// Source: Bundeshaushaltsplan 2024, bundeshaushalt.de, bundestag.de
+// Total: 476,81 Mrd. €. Percentages based on Einzelpläne (Soll 2024).
 const SPENDING = [
-  { name: "Arbeit & Soziales", pct: 34.0, color: "#c0392b", desc: "Bürgergeld, Renten, Sozialhilfe" },
-  { name: "Verteidigung", pct: 10.8, color: "#a93226", desc: "Bundeswehr, NATO-Verpflichtungen" },
-  { name: "Zinsen & Schulden", pct: 8.4, color: "#96281b", desc: "Schuldendienst des Bundes" },
-  { name: "Verkehr & Digital", pct: 7.1, color: "#d35400", desc: "Autobahnen, Schiene, Internet" },
-  { name: "Gesundheit", pct: 5.3, color: "#e67e22", desc: "GKV-Zuschuss, Pflegeversicherung" },
-  { name: "Bildung & Forschung", pct: 4.8, color: "#f39c12", desc: "Hochschulen, Grundlagenforschung" },
-  { name: "Inneres & Migration", pct: 3.1, color: "#b7950b", desc: "Polizei, Asylkosten" },
-  { name: "Internationales", pct: 2.5, color: "#9a7d0a", desc: "Entwicklungshilfe, Diplomatie" },
-  { name: "Wirtschaft & Energie", pct: 2.5, color: "#7d6608", desc: "Subventionen, Energiewende" },
-  { name: "Sonstiges", pct: 11.5, color: "#5d4e37", desc: "Alle weiteren Bundesausgaben" },
+  { name: "Arbeit & Soziales", pct: 36.0, color: "#c0392b", desc: "Bürgergeld, Renten, Sozialhilfe (EP 11: 171,7 Mrd.)" },
+  { name: "Verteidigung", pct: 10.9, color: "#a93226", desc: "Bundeswehr, NATO-Verpflichtungen (EP 14: 52,0 Mrd.)" },
+  { name: "Zinsen & Schulden", pct: 8.3, color: "#96281b", desc: "Schuldendienst des Bundes (EP 32: 39,6 Mrd.)" },
+  { name: "Verkehr & Digital", pct: 7.5, color: "#d35400", desc: "Autobahnen, Schiene, Internet (EP 12: 35,8 Mrd.)" },
+  { name: "Bildung & Forschung", pct: 4.7, color: "#f39c12", desc: "Hochschulen, Grundlagenforschung (EP 30: 22,3 Mrd.)" },
+  { name: "Internationales", pct: 3.8, color: "#9a7d0a", desc: "Entwicklungshilfe, Diplomatie (EP 05+23: 18,2 Mrd.)" },
+  { name: "Gesundheit", pct: 3.4, color: "#e67e22", desc: "GKV-Zuschuss, Pflegeversicherung (EP 15: 16,2 Mrd.)" },
+  { name: "Inneres & Migration", pct: 2.9, color: "#b7950b", desc: "Polizei, Asylkosten (EP 06: 13,8 Mrd.)" },
+  { name: "Wirtschaft & Energie", pct: 1.8, color: "#7d6608", desc: "Subventionen, Energiewende (EP 09: 8,8 Mrd.)" },
+  { name: "Sonstiges", pct: 20.7, color: "#5d4e37", desc: "Familie, Landwirtschaft, Umwelt, Wohnen, Finanzverwaltung u.a." },
 ];
 
 const SPENDING_DETAILS = {
   "Arbeit & Soziales": {
     explanation: "Das ist der mit Abstand größte Posten im Bundeshaushalt. Da die Rentenbeiträge allein nicht mehr ausreichen, schießt der Bund jedes Jahr über 100 Milliarden Euro als Zuschuss in die Rentenversicherung — direkt aus deinen Steuern. Hinzu kommen Bürgergeld, Grundsicherung und zahlreiche weitere Sozialleistungen.",
-    fact: "Der Bundeszuschuss zur Rentenversicherung allein übersteigt alle Verteidigungsausgaben um das Doppelte.",
+    fact: "Der Bundeszuschuss zur Rentenversicherung (~100 Mrd. €) übersteigt die Verteidigungsausgaben (~52 Mrd.) um fast das Doppelte.",
     items: [
       { name: "Bundeszuschuss Rentenversicherung", pct: 44 },
       { name: "Bürgergeld & Grundsicherung", pct: 18 },
@@ -314,7 +321,7 @@ const SPENDING_DETAILS = {
     ],
   },
   "Gesundheit": {
-    explanation: "Der Bund beteiligt sich an den Kosten der gesetzlichen Krankenversicherung durch einen Bundeszuschuss. Dazu kommen Ausgaben für Pandemievorsorge, Krankenhausreform, und die Pflegeversicherung. Die eigentlichen GKV-Kosten werden jedoch hauptsächlich über Beiträge finanziert — was du hier siehst, ist nur der Steuerzuschuss.",
+    explanation: "Der Bund beteiligt sich an den Kosten der gesetzlichen Krankenversicherung durch einen Bundeszuschuss. Die eigentlichen GKV-Kosten (~320 Mrd. €/Jahr) werden hauptsächlich über Beiträge finanziert — was du hier siehst, ist nur der Steuerzuschuss. 2024 sank der Etat stark (von 24,5 auf 16,2 Mrd.) nach Ende der Pandemieausgaben.",
     fact: "Der GKV-Bundeszuschuss beträgt jährlich ca. 14,5 Mrd. Euro — ohne ihn würden die Kassenbeiträge noch höher ausfallen.",
     items: [
       { name: "Bundeszuschuss GKV", pct: 58 },
@@ -325,7 +332,7 @@ const SPENDING_DETAILS = {
   },
   "Bildung & Forschung": {
     explanation: "Deutschland gibt im internationalen Vergleich relativ wenig Bundesgeld für Bildung aus — da Bildung Ländersache ist. Der Bund finanziert hauptsächlich Hochschulen (BAföG, Hochschulpakt), Grundlagenforschung (DFG, Max-Planck, Fraunhofer) sowie die Digitalisierung von Schulen.",
-    fact: "Obwohl Bildung als Zukunftsinvestition gilt, macht sie nur knapp 5% des Bundeshaushalts aus — weniger als die Zinsen auf Staatsschulden.",
+    fact: "Obwohl Bildung als Zukunftsinvestition gilt, macht sie unter 5% des Bundeshaushalts aus — kaum mehr als die Hälfte der Zinsen auf Staatsschulden.",
     items: [
       { name: "Hochschulen & BAföG", pct: 30 },
       { name: "Grundlagenforschung (DFG, MPG)", pct: 25 },
@@ -347,7 +354,7 @@ const SPENDING_DETAILS = {
   },
   "Internationales": {
     explanation: "Deutschland ist einer der größten Geberstaaten der Welt. Das Geld fließt in Entwicklungshilfe, den deutschen Beitrag zum EU-Haushalt (separat verbucht), internationale Organisationen wie UN und WHO sowie die diplomatischen Vertretungen weltweit.",
-    fact: "Deutschland zahlt ca. 25 Mrd. Euro netto jährlich in den EU-Haushalt — und ist damit nach wie vor der größte Nettozahler der EU.",
+    fact: "Deutschland zahlt ca. 13 Mrd. Euro netto jährlich in den EU-Haushalt (operativer Haushaltssaldo 2024) — und ist damit pro Kopf der größte Nettozahler der EU.",
     items: [
       { name: "Entwicklungshilfe (BMZ)", pct: 45 },
       { name: "Auswärtiges Amt & Botschaften", pct: 20 },
@@ -366,15 +373,15 @@ const SPENDING_DETAILS = {
     ],
   },
   "Sonstiges": {
-    explanation: "Hier sind alle weiteren Ausgaben des Bundes zusammengefasst: Bundestag, Bundesrat, Bundespräsident, Bundesrechnungshof, Bundesministerien, Verwaltungskosten, allgemeine Rücklagen und weitere Einzelpläne, die keinem anderen Ressort zuzuordnen sind.",
-    fact: "Allein die Verwaltungskosten des Bundes (Personal, Gebäude, IT) betragen mehrere Milliarden Euro jährlich.",
+    explanation: "Hier sind alle weiteren Ausgaben des Bundes zusammengefasst: Allgemeine Finanzverwaltung (EP 60, größter Posten — enthält u.a. EU-Eigenmittel, Länderzuweisungen), Familie/Senioren/Jugend (EP 17), Landwirtschaft (EP 10), Wohnen/Stadtentwicklung (EP 25), Umwelt (EP 16), Justiz, Verfassungsorgane und weitere Einzelpläne.",
+    fact: "Allein die Allgemeine Finanzverwaltung (EP 60) umfasst Dutzende Milliarden Euro an Transfers und Zuweisungen.",
     items: [
-      { name: "Verfassungsorgane (Bundestag etc.)", pct: 12 },
-      { name: "Allgemeine Bundesverwaltung", pct: 28 },
-      { name: "Justiz & Rechtssystem", pct: 15 },
-      { name: "Landwirtschaft & Umwelt", pct: 20 },
-      { name: "Wohnen & Stadtentwicklung", pct: 14 },
-      { name: "Sonstige Einzelpläne", pct: 11 },
+      { name: "Familie, Senioren, Frauen & Jugend", pct: 14 },
+      { name: "Landwirtschaft & Ernährung", pct: 7 },
+      { name: "Wohnen & Stadtentwicklung", pct: 6 },
+      { name: "Umwelt & Naturschutz", pct: 3 },
+      { name: "Verfassungsorgane & Justiz", pct: 4 },
+      { name: "Allg. Finanzverwaltung & Sonstige", pct: 66 },
     ],
   },
 };
@@ -910,25 +917,26 @@ function SavingsChart({ taxes }) {
 }
 
 // ── SPENDING COMPARISON ───────────────────────────────────────────────────────
+// Source: Bundeshaushaltsplan 2024 (bundeshaushalt.de), bundestag.de
 const COMPARE_DATA = {
   base: {
     label: "Regulärer Haushalt 2024",
     items: [
-      { name: "Verteidigung", amount: 52, color: "#a93226", note: "Bundeswehr, NATO" },
-      { name: "Zinsen & Schulden", amount: 40, color: "#96281b", note: "Schuldendienst" },
-      { name: "Bildung & Forschung", amount: 23, color: "#2980b9", note: "Nur Bundesanteil — Bildung ist Ländersache!" },
-      { name: "Gesundheit", amount: 25, color: "#27ae60", note: "GKV-Zuschuss, Pflege" },
-      { name: "Infrastruktur", amount: 34, color: "#16a085", note: "Schiene, Straßen, Digital" },
+      { name: "Verteidigung", amount: 52, color: "#a93226", note: "Bundeswehr, NATO (EP 14)" },
+      { name: "Zinsen & Schulden", amount: 40, color: "#96281b", note: "Schuldendienst (EP 32: 39,6 Mrd.)" },
+      { name: "Bildung & Forschung", amount: 22, color: "#2980b9", note: "Nur Bundesanteil — Bildung ist Ländersache! (EP 30)" },
+      { name: "Gesundheit", amount: 16, color: "#27ae60", note: "GKV-Zuschuss, Pflege (EP 15: 16,2 Mrd. — stark gesunken nach Ende der Pandemieausgaben)" },
+      { name: "Infrastruktur", amount: 36, color: "#16a085", note: "Schiene, Straßen, Digital (EP 12: 35,8 Mrd.)" },
     ],
   },
   sonder: {
     label: "Mit Sondervermögen (annualisiert)",
     items: [
       { name: "Verteidigung", amount: 72, color: "#a93226", note: "52 Mrd. regulär + 20 Mrd. Sondervermögen (100 Mrd./5 J.)", sonder: 20 },
-      { name: "Zinsen & Schulden", amount: 64, color: "#96281b", note: "40 Mrd. + ~24 Mrd. Zinsen auf neue Sonderschulden (600 Mrd. × 4%)", sonder: 24 },
-      { name: "Bildung & Forschung", amount: 23, color: "#2980b9", note: "Kein Sondervermögen — unverändert. Bildung ist Ländersache!" },
-      { name: "Gesundheit", amount: 25, color: "#27ae60", note: "Kein Sondervermögen — unverändert" },
-      { name: "Infrastruktur", amount: 84, color: "#16a085", note: "34 Mrd. regulär + 50 Mrd. Sondervermögen (500 Mrd./10 J.)", sonder: 50 },
+      { name: "Zinsen & Schulden", amount: 58, color: "#96281b", note: "40 Mrd. + ~18 Mrd. Zinsen auf neue Sonderschulden (600 Mrd. × ~3%)", sonder: 18 },
+      { name: "Bildung & Forschung", amount: 22, color: "#2980b9", note: "Kein Sondervermögen — unverändert. Bildung ist Ländersache!" },
+      { name: "Gesundheit", amount: 16, color: "#27ae60", note: "Kein Sondervermögen — unverändert" },
+      { name: "Infrastruktur", amount: 86, color: "#16a085", note: "36 Mrd. regulär + 50 Mrd. Sondervermögen (500 Mrd./10 J.)", sonder: 50 },
     ],
   },
 };
@@ -1164,10 +1172,12 @@ const EU_SPENDING = [
 function OutlookSection({ taxes }) {
   const employed = 45_000_000;
   const annualTax = taxes.annualIT + taxes.annualSoli;
-  // EU net contribution per employed person ~555€/year
-  const euMonthly = Math.round(555 * (annualTax / (employed * 8000)) * 12) || 46;
-  // Additional interest from 600Mrd new debt at 4% = 24Mrd/year shared by ~45M workers
-  const additionalInterestMonthly = Math.round((600_000_000_000 * 0.04 / employed / 12) * (annualTax / 48000));
+  // EU net contribution: ~13.1 Mrd. / 45M employed = ~291€/year per worker
+  // Source: Bundesbank Monatsbericht EU-Haushalt 2024
+  const euMonthly = Math.round(291 * (annualTax / (employed * 8000)) * 12) || 24;
+  // Additional interest from 600Mrd new debt at ~3% = 18Mrd/year shared by ~45M workers
+  // Source: Bundesbank Bund yield data 2024/2025, ~2.5–3% on 10Y Bunds
+  const additionalInterestMonthly = Math.round((600_000_000_000 * 0.03 / employed / 12) * (annualTax / 48000));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 60 }}>
@@ -1203,7 +1213,7 @@ function OutlookSection({ taxes }) {
         </div>
         <div style={{ marginTop: 20, padding: '18px 24px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid rgba(192,57,43,0.3)', fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
           <span style={{ color: 'var(--red)', fontFamily: 'var(--mono)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: 10 }}>Zinslast:</span>
-          600 Mrd. neue Schulden bei ~4% Zinsen = <strong style={{ color: 'var(--text)' }}>~24 Mrd. Euro Zinsen pro Jahr</strong> zusätzlich — dauerhaft.
+          600 Mrd. neue Schulden bei ~3% Zinsen = <strong style={{ color: 'var(--text)' }}>~18 Mrd. Euro Zinsen pro Jahr</strong> zusätzlich — dauerhaft.
           Auf dein Gehalt heruntergerechnet: ca. <strong style={{ color: 'var(--red)' }}>+{fmt(additionalInterestMonthly)} €/Monat</strong> mehr Steuerbelastung in den nächsten Jahren.
         </div>
       </div>
@@ -1217,14 +1227,14 @@ function OutlookSection({ taxes }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75 }}>
               Zusätzlich zum Bundeshaushalt zahlt Deutschland als <strong style={{ color: 'var(--text)' }}>größter Nettozahler der EU</strong> jährlich rund{' '}
-              <strong style={{ color: 'var(--red)' }}>25 Mrd. Euro netto</strong> in den EU-Haushalt.
+              <strong style={{ color: 'var(--red)' }}>13 Mrd. Euro netto</strong> in den EU-Haushalt (operativer Haushaltssaldo 2024).
               Das ist Geld, das nach Brüssel fließt — über deinen Beitrag zum Bundeshaushalt hinaus.
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {[
-                { label: 'Brutto-Beitrag DE', value: '~37 Mrd. €', color: 'var(--red)' },
-                { label: 'Rückflüsse nach DE', value: '~12 Mrd. €', color: 'var(--green)' },
-                { label: 'Netto-Zahlung DE', value: '~25 Mrd. €', color: 'var(--red)' },
+                { label: 'Brutto-Beitrag DE', value: '~27 Mrd. €', color: 'var(--red)' },
+                { label: 'Rückflüsse nach DE', value: '~14 Mrd. €', color: 'var(--green)' },
+                { label: 'Netto-Zahlung DE', value: '~13 Mrd. €', color: 'var(--red)' },
               ].map((s, i) => (
                 <div key={i} style={{ background: 'var(--bg2)', borderRadius: 10, padding: '16px', border: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>{s.label}</div>
@@ -1266,7 +1276,7 @@ function OutlookSection({ taxes }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           {[
             { trend: '↑', label: 'Rentenlücke', desc: 'Der Bundeszuschuss zur Rentenversicherung wird bis 2030 auf schätzungsweise 140 Mrd. €/J. steigen — Babyboomer-Rente beginnt.', color: 'var(--red)' },
-            { trend: '↑', label: 'Zinslast', desc: 'Mit jedem Prozentpunkt Zinssteigerung kostet die Staatsverschuldung ~24 Mrd. € mehr pro Jahr. Tendenz steigend.', color: 'var(--red)' },
+            { trend: '↑', label: 'Zinslast', desc: 'Mit jedem Prozentpunkt Zinssteigerung kostet die Staatsverschuldung ~18 Mrd. € mehr pro Jahr. Tendenz steigend.', color: 'var(--red)' },
             { trend: '↑', label: 'Verteidigung', desc: 'NATO-Ziel 2% BIP ist nun Untergrenze — nicht Ziel. Mittelfristig könnten 2,5–3% gefordert werden.', color: '#e67e22' },
             { trend: '?', label: 'Steuerreform', desc: 'Kalte Progression, Abbau des Solidaritätszuschlags für Spitzenverdiener, und Unternehmenssteuerreform stehen zur Diskussion.', color: 'var(--text-dim)' },
           ].map((item, i) => (
@@ -1322,8 +1332,8 @@ function WelcomePopup({ onEnter }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 12, overflow: 'hidden', marginBottom: 36 }}>
           {[
             {
-              num: '2,3×',
-              text: 'mehr Bundesgeld geht in Militär & Schulden als in Schulen und Gesundheit zusammen.',
+              num: '2,4×',
+              text: 'mehr Bundesgeld geht in Militär & Schulden (92 Mrd.) als in Bildung und Gesundheit zusammen (38 Mrd.).',
             },
             {
               num: 'bis 60%',
@@ -1331,7 +1341,7 @@ function WelcomePopup({ onEnter }) {
             },
             {
               num: '600 Mrd. €',
-              text: 'neue Staatsschulden seit 2025. Die Zinsen dafür zahlst du — jetzt und in Zukunft.',
+              text: 'neue Staatsschulden seit 2022. ~18 Mrd. € zusätzliche Zinsen pro Jahr — die zahlst du.',
             },
             {
               num: '40%',
@@ -1490,9 +1500,9 @@ function App() {
               {[
                 { label: 'Bruttogehalt', amount: taxes.gross, bar: 100, color: 'transparent', showBar: false },
               ].concat([
-                { label: 'Krankenversicherung (9%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.09 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.09/12) / taxes.gross * 100, color: 'var(--red)' },
+                { label: 'Krankenversicherung (8,15%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.0815 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.0815/12) / taxes.gross * 100, color: 'var(--red)' },
                 { label: 'Rentenversicherung (9,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.093/12) / taxes.gross * 100, color: 'var(--red)' },
-                { label: 'Pflegeversicherung (1,85%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.0185 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.0185/12) / taxes.gross * 100, color: 'var(--red2)' },
+                { label: 'Pflegeversicherung (2,3%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.023 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.023/12) / taxes.gross * 100, color: 'var(--red2)' },
                 { label: 'Arbeitslosenversicherung (1,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.013 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.013/12) / taxes.gross * 100, color: 'var(--red2)' },
               ].concat(taxes.incomeTax > 0 ? [
                 { label: 'Einkommensteuer', amount: taxes.incomeTax, bar: taxes.incomeTax / taxes.gross * 100, color: 'var(--red3)' },
@@ -1557,9 +1567,12 @@ function App() {
         <div className="section-label">Mehrwertsteuer · 19%</div>
         <h2>Und wenn du<br />dein Netto ausgibst…</h2>
         <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 700 }}>
-          Der Staat ist noch nicht fertig. Von jedem Euro, den du ausgibst, sind 
-          <strong style={{ color: 'var(--red)' }}> 15,97 Cent MwSt.</strong> — 
+          Der Staat ist noch nicht fertig. Von jedem Euro, den du ausgibst, sind
+          <strong style={{ color: 'var(--red)' }}> 15,97 Cent MwSt.</strong> (bei 19%) —
           du wirst noch beim Ausgeben deines Nettos besteuert.
+          <span style={{ fontSize: 13, display: 'block', marginTop: 8, color: 'var(--text-dim)' }}>
+            Hinweis: Lebensmittel, Bücher u.a. werden mit 7% besteuert. Die Berechnung unten nutzt den Regelsteuersatz von 19% — der reale MwSt-Anteil liegt dadurch etwas niedriger.
+          </span>
         </div>
         <VatSection taxes={taxes} />
       </section>
@@ -1585,17 +1598,20 @@ function App() {
 
       <footer className="footer">
         <div className="footer-note">
-          Berechnung auf Basis Bundeshaushalt 2024, EStG §32a, Beitragssätze 2024 (KV 9% AN-Anteil + avg. Zusatzbeitrag, PV 1,85%, RV 9,3%, AV 1,3%). BBG: KV/PV 62.100 €/J., RV/AV 90.600 €/J. Steuerklasse 1, keine Kinder, keine Kirche. Zahlen dienen der Illustration.
+          Berechnung auf Basis Bundeshaushalt 2024 (476,81 Mrd. €), EStG §32a i.d.F. Steuerfortentwicklungsgesetz 2024 (Grundfreibetrag 11.784 €), Beitragssätze 2024 (KV 8,15% AN-Anteil inkl. Ø Zusatzbeitrag, PV 2,3% kinderlos, RV 9,3%, AV 1,3%). BBG: KV/PV 62.100 €/J., RV/AV 90.600 €/J. Soli mit Milderungszone (§4 SolZG, Freigrenze 18.130 €). Steuerklasse 1, keine Kinder, keine Kirche. MwSt-Berechnung mit Regelsteuersatz 19% (ermäßigt 7% nicht berücksichtigt). EU-Nettosaldo nach operativem Haushaltssaldo (Bundesbank). Zahlen dienen der Illustration.
           <div style={{ marginTop: 14, display: 'flex', flexWrap: 'wrap', gap: '6px 20px' }}>
             {[
-              { label: 'Bundeshaushalt 2024', url: 'https://www.bundeshaushalt.de' },
-              { label: 'BMF — Steuereinnahmen', url: 'https://www.bundesfinanzministerium.de/Web/DE/Themen/Steuern/steuern.html' },
-              { label: 'Destatis — Steuerquote', url: 'https://www.destatis.de/DE/Themen/Staat/Steuern/_inhalt.html' },
-              { label: 'EStG §32a (Einkommensteuer)', url: 'https://www.gesetze-im-internet.de/estg/__32a.html' },
-              { label: 'EU-Haushalt 2024', url: 'https://commission.europa.eu/strategy-and-policy/eu-budget_de' },
-              { label: 'Sondervermögen Bundeswehr', url: 'https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Schlaglichter/Sondervermoegen-Bundeswehr/sondervermoegen-bundeswehr.html' },
-              { label: 'Schuldenstand Deutschland', url: 'https://www.bundesbank.de/de/statistiken/oeffentliche-finanzen' },
-              { label: 'bpb — Staatsausgaben', url: 'https://www.bpb.de/kurz-knapp/zahlen-und-fakten/soziale-situation-in-deutschland/61769/staatsausgaben/' },
+              { label: 'Bundeshaushalt 2024 (interaktiv)', url: 'https://www.bundeshaushalt.de' },
+              { label: 'Bundestag — Haushalt 2024 (476,81 Mrd.)', url: 'https://www.bundestag.de/dokumente/textarchiv/2024/kw05-de-haushaltsgesetz-2024-finanzplan-977680' },
+              { label: 'EStG §32a (Einkommensteuertarif)', url: 'https://www.gesetze-im-internet.de/estg/__32a.html' },
+              { label: 'Einkommensteuertarif 2024 (Formeln)', url: 'https://www.lohn-info.de/einkommensteuertarif_2024.html' },
+              { label: 'Sozialversicherungsbeiträge 2024', url: 'https://www.lohn-info.de/sozialversicherungsbeitraege2024.html' },
+              { label: 'Solidaritätszuschlag (Milderungszone)', url: 'https://www.haufe.de/id/beitrag/solidaritaetszuschlag-zur-einkommensteuer-32-milderungszone-HI14712447.html' },
+              { label: 'Bundesbank — EU-Haushalt 2024', url: 'https://www.bundesbank.de/de/aufgaben/themen/monatsbericht-zum-eu-haushalt-2024-deutschland-weiterhin-nettozahler-aber-kein-spitzenreiter-967478' },
+              { label: 'bpb — EU-Nettozahler', url: 'https://www.bpb.de/kurz-knapp/zahlen-und-fakten/europa/70580/nettozahler-und-nettoempfaenger-in-der-eu/' },
+              { label: 'Sondervermögen Bundeswehr (BMF)', url: 'https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Schlaglichter/Sondervermoegen-Bundeswehr/sondervermoegen-bundeswehr.html' },
+              { label: 'Schuldenstand (Bundesbank)', url: 'https://www.bundesbank.de/de/statistiken/oeffentliche-finanzen' },
+              { label: 'BMF — Sollbericht 2024', url: 'https://www.bundesfinanzministerium.de/Monatsberichte/Ausgabe/2024/02/Inhalte/Kapitel-3-Analysen/3-1-sollbericht-2024.html' },
             ].map((s, i) => (
               <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
                 style={{ color: 'var(--text-dim)', fontSize: 11, fontFamily: 'var(--mono)', textDecoration: 'none', borderBottom: '1px solid var(--border)', paddingBottom: 1, transition: 'color 0.15s' }}
@@ -1605,7 +1621,7 @@ function App() {
             ))}
           </div>
         </div>
-        <div className="footer-year mono" style={{ fontSize: 11 }}>Stand 2024 / 2025</div>
+        <div className="footer-year mono" style={{ fontSize: 11 }}>Stand: Bundeshaushalt Soll 2024 · Steuertarif 2024 (StFEG)</div>
       </footer>
     </>
   );
