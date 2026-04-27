@@ -2068,6 +2068,79 @@ function App() {
           </div>
         </div>
 
+        {/* Alltagsbeispiele */}
+        <div style={{ marginBottom: 32, padding: '24px 28px', background: 'var(--bg2)', borderRadius: 14, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>
+            Was der Staat an deinem Alltag mitverdient
+          </div>
+          <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+            {[
+              {
+                icon: '⛽',
+                title: 'Autofahren',
+                calc: '~14.000 km/Jahr (~1.000 L)',
+                tax: '~654 €',
+                sub: '65,45 Ct/L Energiesteuer + CO₂-Preis + MwSt obendrauf',
+                perMonth: '~55 €/Mo',
+              },
+              {
+                icon: '🛡️',
+                title: 'Versicherungen',
+                calc: '~1.600 €/Jahr Prämien (Ø Haushalt)',
+                tax: '~304 €',
+                sub: '19% Versicherungsteuer auf Haftpflicht, Hausrat, Kfz…',
+                perMonth: '~25 €/Mo',
+              },
+              {
+                icon: '🚬',
+                title: 'Rauchen',
+                calc: '1 Schachtel pro Woche',
+                tax: '~200 €',
+                sub: '3,86 € Tabaksteuer pro Schachtel (~47% des Preises)',
+                perMonth: '~17 €/Mo',
+              },
+              {
+                icon: '☕',
+                title: 'Kaffee',
+                calc: '2 Tassen pro Tag',
+                tax: '~16 €',
+                sub: '2,19 €/kg Kaffeesteuer — einzigartig in der EU',
+                perMonth: '~1,30 €/Mo',
+              },
+              {
+                icon: '🍺',
+                title: 'Bier',
+                calc: '88 L/Jahr (Ø Deutscher)',
+                tax: '~8 €',
+                sub: '9,44 Ct/L Biersteuer + MwSt',
+                perMonth: '~0,70 €/Mo',
+              },
+              {
+                icon: '🥂',
+                title: 'Sekt & Schaumwein',
+                calc: '6 Flaschen pro Jahr',
+                tax: '~8 €',
+                sub: '1,36 €/Flasche — Steuer aus dem Kaiserreich (1902)',
+                perMonth: '~0,70 €/Mo',
+              },
+            ].map((item, i) => (
+              <div key={i} style={{ background: 'var(--bg3)', borderRadius: 12, padding: 20, border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <span style={{ fontSize: 24 }}>{item.icon}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600 }}>{item.title}</span>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 8 }}>{item.calc}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: 22, fontWeight: 500, color: 'var(--red)' }}>{item.tax}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>Steuer/Jahr</span>
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 8 }}>{item.sub}</div>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', padding: '4px 8px', background: 'var(--bg2)', borderRadius: 6, display: 'inline-block' }}>{item.perMonth}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Gesamtübersicht */}
         <div style={{ padding: '24px 28px', background: 'var(--bg2)', borderRadius: 14, border: '1px solid var(--border)' }}>
           <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 20 }}>
