@@ -174,6 +174,72 @@ svg text { font-family: var(--mono); }
 @keyframes welcomeCardIn { from { opacity: 0; transform: translateY(40px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes welcomeFadeOut { to { opacity: 0; pointer-events: none; } }
 .fade-in { animation: fadeInUp 0.6s ease forwards; }
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+.resp-grid { display: grid; }
+
+@media (max-width: 900px) {
+  section { padding: 60px 28px; min-height: auto; }
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .breakdown-grid { grid-template-columns: 1fr; gap: 32px; }
+  .vat-grid { grid-template-columns: 1fr; gap: 32px; }
+  .savings-grid { grid-template-columns: 1fr; gap: 32px; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .wf-label { width: 140px; font-size: 11px; }
+  .wf-total-label { width: 140px; font-size: 12px; }
+  .footer { padding: 32px 28px; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .footer-note { max-width: 100%; }
+  .scroll-hint { left: 28px; }
+  .nav-dots { right: 10px; gap: 8px; }
+  .nav-dot { width: 6px; height: 6px; }
+  /* Inline grids: force 1-col on tablet */
+  .resp-grid { grid-template-columns: 1fr !important; }
+  .resp-grid-2 { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 600px) {
+  section { padding: 48px 16px; }
+  h2 { margin-bottom: 24px; }
+  .hero-grid { gap: 28px; margin-top: 32px; }
+  .salary-display { font-size: 40px; }
+  .salary-display input[type=number] { font-size: 40px; width: 180px; }
+  .salary-unit { font-size: 20px; }
+  .shocking { padding: 20px; margin-top: 28px; }
+  .shocking-number { font-size: 48px; }
+  .big-bar { height: 48px; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .stat-card { padding: 12px 10px; }
+  .stat-value { font-size: 18px; }
+  .stat-label { font-size: 9px; }
+  .breakdown-grid { gap: 24px; }
+  .wf-row { gap: 6px; }
+  .wf-label { width: 110px; font-size: 10px; }
+  .wf-total-label { width: 110px; font-size: 11px; }
+  .wf-bar-wrap { height: 28px; }
+  .wf-value { font-size: 11px; right: 4px; }
+  .marginal-chart { padding: 16px; }
+  .true-rate-number { font-size: 64px; }
+  .true-rate { padding: 24px 16px; }
+  .euro-grid { grid-template-columns: repeat(10, 1fr); gap: 2px; }
+  .savings-controls { gap: 16px; }
+  .savings-breakdown { padding: 16px; }
+  .chart-wrap { padding: 16px; }
+  .chart-legend { gap: 10px; }
+  .cl-item { font-size: 10px; }
+  .personal-share { padding: 16px; }
+  .footer { padding: 24px 16px; }
+  .scroll-hint { left: 16px; bottom: 20px; }
+  .nav-dots { display: none; }
+  .spending-intro { font-size: 15px; }
+  .tm-cell { padding: 10px; min-width: 60px !important; }
+  .tm-cell-pct { font-size: 16px; }
+  .tm-cell-name { font-size: 11px; }
+  .tm-cell-amount { font-size: 12px; }
+  .resp-grid, .resp-grid-2 { grid-template-columns: 1fr !important; }
+  .resp-grid-2col { grid-template-columns: 1fr 1fr !important; }
+  .claude-badge { font-size: 10px !important; padding: 5px 10px 5px 8px !important; top: 8px !important; right: 8px !important; }
+  .claude-badge svg { width: 12px !important; height: 12px !important; }
+  svg { max-width: 100%; }
+}
 </style>
 
 <template id="__bundler_thumbnail" data-bg-color="#080a0d">
@@ -563,7 +629,7 @@ function SpendingModal({ cat, taxes, onClose }) {
         </div>
 
         {/* Your share callout */}
-        <div style={{
+        <div className="resp-grid-2col" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28,
           padding: '20px 24px', background: 'var(--bg3)', borderRadius: 12,
           border: `1px solid ${cat.color}44`,
@@ -1039,7 +1105,7 @@ function SpendingComparison({ taxes }) {
       </div>
 
       {/* Big face-off */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 0, marginBottom: 40, alignItems: 'center' }}>
+      <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 0, marginBottom: 40, alignItems: 'center' }}>
         {/* Left: Civil spending */}
         <div style={{ background: 'var(--bg2)', borderRadius: '14px 0 0 14px', padding: '28px 32px', border: '1px solid var(--border)', borderRight: 'none' }}>
           <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
@@ -1118,7 +1184,7 @@ function SpendingComparison({ taxes }) {
       </div>
 
       {/* Ratio callouts */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
+      <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
         {RATIOS.map((r, i) => {
           const aItem = data.items.find(it => it.name === r.a);
           const bItem = data.items.find(it => it.name === r.b);
@@ -1217,7 +1283,7 @@ function OutlookSection({ taxes }) {
         <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
           Neue Schulden · Sondervermögen
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
           {SONDERVERMOEGEN.map((sv, i) => (
             <div key={i} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '28px 28px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -1253,14 +1319,14 @@ function OutlookSection({ taxes }) {
         <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
           EU-Haushalt 2024 · 189 Milliarden Euro
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75 }}>
               Zusätzlich zum Bundeshaushalt zahlt Deutschland als <strong style={{ color: 'var(--text)' }}>größter Nettozahler der EU</strong> jährlich rund{' '}
               <strong style={{ color: 'var(--red)' }}>13 Mrd. Euro netto</strong> in den EU-Haushalt (operativer Haushaltssaldo 2024).
               Das ist Geld, das nach Brüssel fließt — über deinen Beitrag zum Bundeshaushalt hinaus.
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+            <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {[
                 { label: 'Brutto-Beitrag DE', value: '~27 Mrd. €', color: 'var(--red)' },
                 { label: 'Rückflüsse nach DE', value: '~14 Mrd. €', color: 'var(--green)' },
@@ -1322,7 +1388,7 @@ function OutlookSection({ taxes }) {
           Deutschland haftet als größte Volkswirtschaft für den größten Anteil.
           Die Rückzahlung erfolgt über Jahrzehnte aus dem EU-Haushalt — also letztlich aus <strong style={{ color: 'var(--red)' }}>Mitgliedsbeiträgen der Steuerzahler</strong>.
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 16 }}>
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 16 }}>
           {[
             {
               title: "NextGenerationEU",
@@ -1380,7 +1446,7 @@ function OutlookSection({ taxes }) {
           ))}
         </div>
         {/* Gesamtübersicht */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
           <div style={{ padding: '20px 24px', background: 'var(--bg2)', borderRadius: 12, border: '1px solid rgba(192,57,43,0.3)' }}>
             <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
               Summe EU-Sonderprogramme
@@ -1424,7 +1490,7 @@ function OutlookSection({ taxes }) {
         <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
           Mittelfristiger Ausblick
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+        <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           {[
             { trend: '↑', label: 'Rentenlücke', desc: 'Der Bundeszuschuss zur Rentenversicherung wird bis 2030 auf schätzungsweise 140 Mrd. €/J. steigen — Babyboomer-Rente beginnt.', color: 'var(--red)' },
             { trend: '↑', label: 'Zinslast', desc: 'Mit jedem Prozentpunkt Zinssteigerung kostet die Staatsverschuldung ~18 Mrd. € mehr pro Jahr. Tendenz steigend.', color: 'var(--red)' },
@@ -1454,12 +1520,13 @@ function WelcomePopup({ onEnter }) {
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
       background: 'rgba(4,5,8,0.97)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      display: 'flex', justifyContent: 'center',
       padding: '24px',
+      overflowY: 'auto', WebkitOverflowScrolling: 'touch',
       animation: leaving ? 'welcomeFadeOut 0.5s ease forwards' : 'welcomeFadeIn 0.4s ease forwards',
     }}>
       <div style={{
-        maxWidth: 640, width: '100%',
+        maxWidth: 640, width: '100%', margin: 'auto 0',
         animation: 'welcomeCardIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards',
       }}>
         {/* Badge */}
@@ -1571,6 +1638,7 @@ function App() {
         href="https://claude.ai"
         target="_blank"
         rel="noopener noreferrer"
+        className="claude-badge"
         style={{
           position: 'fixed', top: 16, right: 16, zIndex: 900,
           display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -1828,7 +1896,7 @@ function App() {
           <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
             Energie & Mobilität · 51,8 Mrd. € (2024)
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {[
               { name: 'Energiesteuer', amount: '35,1 Mrd.', sub: 'Benzin, Diesel, Heizöl, Erdgas', color: '#c0392b', detail: '65,45 Ct/l Benzin · 47,04 Ct/l Diesel' },
               { name: 'Kfz-Steuer', amount: '9,7 Mrd.', sub: '49 Mio. zugelassene Fahrzeuge', color: '#a93226', detail: '~200 €/Jahr pro Pkw (Ø)' },
@@ -1874,7 +1942,7 @@ function App() {
         </div>
 
         {/* Konsum & Genuss + Vermögen */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
           <div>
             <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
               Konsum · Versicherung · Genuss
@@ -1938,7 +2006,7 @@ function App() {
 
         {/* Gesamtübersicht */}
         <div style={{ padding: '24px 28px', background: 'var(--bg2)', borderRadius: 14, border: '1px solid var(--border)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 20 }}>
+          <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 20 }}>
             <div>
               <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Gesamte Steuereinnahmen DE 2024</div>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 32, fontWeight: 500, color: 'var(--red)' }}>948 Mrd. €</div>
@@ -2019,7 +2087,7 @@ function App() {
           const linePath = (key) => yearPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
 
           return (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
+            <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
@@ -2121,7 +2189,7 @@ function App() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="resp-grid-2col" style={{ marginTop: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   {[
                     { label: 'Nach 10 Jahren', value: yearPoints[10].value, paid: yearPoints[10].paid },
                     { label: 'Nach 20 Jahren', value: yearPoints[20].value, paid: yearPoints[20].paid },
