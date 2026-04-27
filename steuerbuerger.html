@@ -144,6 +144,7 @@ svg text { font-family: var(--mono); }
 
 /* SAVINGS SECTION */
 #savings { background: var(--bg); }
+#opportunity { background: var(--bg); }
 .savings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
 .savings-controls { display: flex; flex-direction: column; gap: 24px; }
 .ctrl-row { display: flex; flex-direction: column; gap: 8px; }
@@ -1538,7 +1539,7 @@ function App() {
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'outlook'];
+  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'outlook'];
 
   const taxes = calcAll(salary);
 
@@ -1564,6 +1565,30 @@ function App() {
     <>
       {showWelcome && <WelcomePopup onEnter={() => setShowWelcome(false)} />}
       <NavDots active={activeSection} sections={sectionIds} />
+
+      {/* Claude badge */}
+      <a
+        href="https://claude.ai"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: 'fixed', top: 16, right: 16, zIndex: 900,
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          background: 'rgba(18,18,20,0.85)', backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 100,
+          padding: '7px 14px 7px 10px',
+          textDecoration: 'none', color: 'var(--text-dim)',
+          fontSize: 11, fontFamily: 'var(--mono)', letterSpacing: '0.04em',
+          transition: 'border-color 0.2s, color 0.2s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(217,119,70,0.5)'; e.currentTarget.style.color = '#d97746'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'var(--text-dim)'; }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+          <path d="M12 2L14.09 8.26L20 9.27L15.55 13.97L16.91 20L12 16.9L7.09 20L8.45 13.97L4 9.27L9.91 8.26L12 2Z" fill="#d97746" opacity="0.8" />
+        </svg>
+        Recherchiert &amp; gebaut mit Claude
+      </a>
 
       {/* SECTION 1: HERO */}
       <section id="hero">
@@ -1954,6 +1979,168 @@ function App() {
           Die Inflation frisst den Rest. Was bleibt wirklich übrig?
         </div>
         <SavingsChart taxes={taxes} />
+      </section>
+
+      {/* SECTION: OPPORTUNITY COST */}
+      <section id="opportunity">
+        <div className="section-label">Gedankenexperiment</div>
+        <h2>Was wäre, wenn du<br /><span className="red">keine Einkommensteuer &amp; Sozialabgaben</span> zahlen müsstest?</h2>
+        <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          Stell dir vor, du könntest den Betrag, der jeden Monat durch Einkommensteuer und Sozialabgaben abfließt, stattdessen mit <strong style={{ color: 'var(--text)' }}>7,5% Rendite</strong> anlegen (historischer Durchschnitt MSCI World). Der Staat nimmt trotzdem weiterhin hunderte Milliarden über <strong style={{ color: 'var(--text)' }}>Konsumsteuern</strong> ein — Mehrwertsteuer, Kfz-Steuer, Energiesteuer, Tabaksteuer und dutzende weitere. Was hättest du nach 20 Jahren?
+        </div>
+        {(() => {
+          const monthlyTax = taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial;
+          const rate = 0.075 / 12;
+          const months = 20 * 12;
+          // Future value of annuity: PMT × ((1+r)^n - 1) / r
+          const fv = monthlyTax * ((Math.pow(1 + rate, months) - 1) / rate);
+          const totalPaid = monthlyTax * months;
+          const gains = fv - totalPaid;
+
+          // Breakdown by type
+          const items = [
+            { label: 'AG-Sozialabgaben', amount: taxes.employerSocial, color: 'var(--red4)' },
+            { label: 'Einkommensteuer', amount: taxes.incomeTax, color: 'var(--red)' },
+            { label: 'Sozialabgaben (AN)', amount: taxes.social, color: 'var(--red2)' },
+            ...(taxes.soli > 0 ? [{ label: 'Soli', amount: taxes.soli, color: 'var(--red3)' }] : []),
+          ];
+
+          // Year-by-year for chart
+          const yearPoints = Array.from({ length: 21 }, (_, yr) => {
+            const m = yr * 12;
+            const value = monthlyTax * ((Math.pow(1 + rate, m) - 1) / rate);
+            const paid = monthlyTax * m;
+            return { yr, value, paid };
+          });
+          const maxVal = yearPoints[20].value;
+          const w = 520, h = 240, pad = { top: 16, right: 20, bottom: 36, left: 56 };
+          const xS = yr => pad.left + (yr / 20) * (w - pad.left - pad.right);
+          const yS = v => pad.top + (1 - v / maxVal) * (h - pad.top - pad.bottom);
+          const linePath = (key) => yearPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
+
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+                    Monatlich an den Staat (inkl. AG-Anteil)
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+                    {items.map((item, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: 2, background: item.color, flexShrink: 0 }} />
+                          <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>{item.label}</span>
+                        </div>
+                        <span style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>{fmt(item.amount)} €</span>
+                      </div>
+                    ))}
+                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
+                      <span>Gesamt</span>
+                      <span className="mono red">{fmt(monthlyTax)} €/Mo.</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                    Das sind <strong style={{ color: 'var(--text)' }}>{fmt(monthlyTax * 12)} €</strong> pro Jahr, die nicht für dich arbeiten.
+                  </div>
+                </div>
+
+                <div style={{ background: 'rgba(74,190,100,0.06)', borderRadius: 14, padding: '28px', border: '1px solid rgba(74,190,100,0.25)' }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                    Nach 20 Jahren bei 7,5% Rendite
+                  </div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 48, fontWeight: 500, color: 'var(--green)', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                    {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(2)} Mio.` : `${fmt(fv)}`} €
+                  </div>
+                  <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
+                      <span>Eingezahlt (240 Monate)</span>
+                      <span className="mono">{fmt(totalPaid)} €</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                      <span style={{ color: 'var(--green)' }}>Rendite (Zinseszins)</span>
+                      <span className="mono green">+ {fmt(gains)} €</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ padding: '18px 22px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+                  <strong style={{ color: 'var(--text)' }}>Zum Vergleich:</strong>{' '}
+                  Stattdessen zahlst du in 20 Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und bekommst dafür vielleicht irgendwann Rente (sofern das System bis dahin noch funktioniert), finanzierst Militärausgaben, Schuldzinsen und EU-Transfers.
+                  Es geht nicht um die Abschaffung von Steuern, sondern darum, die <strong style={{ color: 'var(--text)' }}>Opportunitätskosten</strong> zu verdeutlichen. Ob das ein gutes Geschäft ist, entscheidest du.
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                  Vermögensentwicklung über 20 Jahre
+                </div>
+                <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: 'visible' }}>
+                  <defs>
+                    <linearGradient id="oppGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--green)" stopOpacity="0.2" />
+                      <stop offset="100%" stopColor="var(--green)" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  {[0, 0.25, 0.5, 0.75, 1].map((f, i) => {
+                    const v = Math.round(maxVal * f / 10000) * 10000;
+                    return (
+                      <g key={i}>
+                        <line x1={pad.left} x2={w - pad.right} y1={yS(v)} y2={yS(v)} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                        <text x={pad.left - 6} y={yS(v) + 4} fill="#555" fontSize="10" textAnchor="end">
+                          {v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : `${(v / 1000).toFixed(0)}k`}
+                        </text>
+                      </g>
+                    );
+                  })}
+                  {yearPoints.map((p, i) => (
+                    i % 2 === 0 && <text key={i} x={xS(p.yr)} y={h - 4} fill="#555" fontSize="10" textAnchor="middle">{p.yr}J</text>
+                  ))}
+                  <path d={`${linePath('value')} L${xS(20)},${yS(0)} L${xS(0)},${yS(0)} Z`} fill="url(#oppGrad)" />
+                  <path d={linePath('paid')} fill="none" stroke="var(--text)" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.4" />
+                  <path d={linePath('value')} fill="none" stroke="var(--green)" strokeWidth="2.5" />
+                  {/* End markers */}
+                  <circle cx={xS(20)} cy={yS(yearPoints[20].value)} r="4" fill="var(--green)" />
+                  <circle cx={xS(20)} cy={yS(yearPoints[20].paid)} r="4" fill="var(--text)" opacity="0.5" />
+                  {/* Labels at end */}
+                  <text x={xS(20) + 8} y={yS(yearPoints[20].value) + 4} fill="var(--green)" fontSize="11" fontFamily="var(--mono)">
+                    {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(1)}M` : `${(fv / 1000).toFixed(0)}k`}
+                  </text>
+                  <text x={xS(20) + 8} y={yS(yearPoints[20].paid) + 4} fill="#666" fontSize="11" fontFamily="var(--mono)">
+                    {(totalPaid / 1000).toFixed(0)}k
+                  </text>
+                </svg>
+                <div style={{ display: 'flex', gap: 20, marginTop: 12, fontSize: 12, color: 'var(--text-dim)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 16, height: 2, background: 'var(--green)', borderRadius: 1 }} />
+                    <span>Mit 7,5% Rendite</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 16, height: 2, background: 'var(--text)', opacity: 0.4, borderRadius: 1 }} />
+                    <span>Nur eingezahlt (ohne Rendite)</span>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {[
+                    { label: 'Nach 10 Jahren', value: yearPoints[10].value, paid: yearPoints[10].paid },
+                    { label: 'Nach 20 Jahren', value: yearPoints[20].value, paid: yearPoints[20].paid },
+                  ].map((item, i) => (
+                    <div key={i} style={{ background: 'var(--bg2)', borderRadius: 10, padding: '16px 18px', border: '1px solid var(--border)' }}>
+                      <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{item.label}</div>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: 22, color: 'var(--green)', marginBottom: 4 }}>
+                        {item.value >= 1_000_000 ? `${(item.value / 1_000_000).toFixed(2)} Mio.` : `${fmt(item.value)}`} €
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
+                        davon {fmt(item.value - item.paid)} € Rendite
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </section>
 
       {/* SECTION 6: OUTLOOK */}
