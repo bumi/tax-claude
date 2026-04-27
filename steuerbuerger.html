@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Steuerbürger — Wohin fließt dein Gehalt?</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080a0d;
+  --bg2: #0f1217;
+  --bg3: #161b22;
+  --border: rgba(255,255,255,0.08);
+  --text: #eee8dd;
+  --text-dim: #7a7a7a;
+  --red: oklch(0.60 0.22 22);
+  --red2: oklch(0.55 0.20 35);
+  --red3: oklch(0.50 0.18 50);
+  --red4: oklch(0.62 0.14 60);
+  --green: oklch(0.68 0.18 142);
+  --gold: oklch(0.75 0.14 75);
+  --blue: oklch(0.65 0.15 250);
+  --mono: 'DM Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+}
+html { scroll-behavior: smooth; background: var(--bg); color: var(--text); font-family: var(--sans); }
+body { overflow-x: hidden; }
+
+/* NAV DOTS */
+.nav-dots { position: fixed; right: 24px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 10px; }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); border: 1px solid rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s; }
+.nav-dot.active { background: var(--text); transform: scale(1.3); }
+.nav-dot:hover { background: rgba(255,255,255,0.4); }
+
+/* SECTIONS */
+section { min-height: 100vh; padding: 80px 60px; display: flex; flex-direction: column; justify-content: center; position: relative; border-bottom: 1px solid var(--border); }
+.section-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-size: clamp(48px, 7vw, 96px); font-weight: 700; line-height: 0.95; letter-spacing: -0.03em; }
+h2 { font-size: clamp(32px, 4vw, 56px); font-weight: 600; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 40px; }
+.mono { font-family: var(--mono); }
+.red { color: var(--red); }
+.green { color: var(--green); }
+.dim { color: var(--text-dim); }
+
+/* HERO */
+#hero { background: var(--bg); }
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-top: 60px; }
+.salary-input-wrap { display: flex; flex-direction: column; gap: 24px; }
+.salary-display { font-family: var(--mono); font-size: 64px; font-weight: 500; letter-spacing: -0.02em; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 16px; display: flex; align-items: baseline; gap: 12px; }
+.salary-display input[type=number] { font-family: var(--mono); font-size: 64px; font-weight: 500; background: none; border: none; color: var(--text); width: 280px; outline: none; letter-spacing: -0.02em; -moz-appearance: textfield; }
+.salary-display input[type=number]::-webkit-outer-spin-button,
+.salary-display input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+.salary-unit { font-size: 28px; color: var(--text-dim); font-weight: 300; }
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: var(--border); border-radius: 2px; outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--text); cursor: pointer; transition: transform 0.15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.salary-hints { display: flex; gap: 8px; flex-wrap: wrap; }
+.hint-btn { padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); font-family: var(--sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.hint-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+.hint-btn.active { border-color: var(--text); color: var(--text); }
+
+/* BIG BAR */
+.big-bar-wrap { display: flex; flex-direction: column; gap: 12px; }
+.big-bar { height: 64px; border-radius: 8px; overflow: hidden; display: flex; position: relative; }
+.bar-seg { height: 100%; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: default; }
+.bar-seg:hover { filter: brightness(1.15); }
+.bar-seg-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; color: rgba(0,0,0,0.7); font-weight: 500; white-space: nowrap; padding: 0 8px; }
+.bar-legend { display: flex; flex-direction: column; gap: 6px; }
+.legend-row { display: flex; align-items: center; justify-content: space-between; }
+.legend-left { display: flex; align-items: center; gap: 10px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.legend-label { font-size: 13px; color: var(--text-dim); }
+.legend-amount { font-family: var(--mono); font-size: 15px; color: var(--text); }
+.legend-pct { font-family: var(--mono); font-size: 12px; color: var(--text-dim); margin-left: 6px; }
+
+/* SHOCKING STAT */
+.shocking { margin-top: 48px; padding: 32px; background: var(--bg2); border-radius: 12px; border: 1px solid var(--border); }
+.shocking-number { font-family: var(--mono); font-size: 72px; font-weight: 500; color: var(--red); letter-spacing: -0.03em; line-height: 1; }
+.shocking-sub { font-size: 16px; color: var(--text-dim); margin-top: 8px; line-height: 1.5; }
+.shocking-sub strong { color: var(--text); }
+
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin-top: 32px; }
+.stat-card { background: var(--bg2); padding: 24px; }
+.stat-label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; font-family: var(--mono); }
+.stat-value { font-family: var(--mono); font-size: 28px; font-weight: 500; }
+.stat-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+/* TAX BREAKDOWN SECTION */
+#breakdown { background: var(--bg); }
+.breakdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+.waterfall { display: flex; flex-direction: column; gap: 4px; }
+.wf-row { display: flex; align-items: center; gap: 12px; }
+.wf-label { font-size: 13px; color: var(--text-dim); width: 180px; flex-shrink: 0; text-align: right; }
+.wf-bar-wrap { flex: 1; height: 36px; background: var(--bg3); border-radius: 4px; overflow: hidden; position: relative; }
+.wf-bar { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); display: flex; align-items: center; padding-left: 10px; }
+.wf-value { font-family: var(--mono); font-size: 13px; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+.wf-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.wf-total-row { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+.wf-total-label { font-size: 14px; width: 180px; flex-shrink: 0; text-align: right; }
+
+/* MARGINAL RATE CHART */
+.marginal-chart { background: var(--bg2); border-radius: 12px; border: 1px solid var(--border); padding: 28px; }
+.chart-title { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; font-family: var(--mono); }
+svg text { font-family: var(--mono); }
+
+/* GOVT SPENDING */
+#spending { background: var(--bg); }
+.spending-intro { font-size: 18px; color: var(--text-dim); margin-bottom: 40px; max-width: 600px; line-height: 1.6; }
+.spending-intro strong { color: var(--text); }
+.treemap-wrap { display: grid; gap: 3px; border-radius: 10px; overflow: hidden; margin-bottom: 40px; }
+.tm-cell { padding: 16px; cursor: default; transition: filter 0.2s; position: relative; overflow: hidden; }
+.tm-cell:hover { filter: brightness(1.12); }
+.tm-cell-name { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.8); line-height: 1.3; }
+.tm-cell-amount { font-family: var(--mono); font-size: 15px; color: rgba(0,0,0,0.7); margin-top: 4px; }
+.tm-cell-pct { font-family: var(--mono); font-size: 22px; font-weight: 500; color: rgba(0,0,0,0.6); }
+.personal-share { background: var(--bg2); border-radius: 12px; padding: 28px; border: 1px solid var(--border); }
+.personal-title { font-size: 14px; color: var(--text-dim); font-family: var(--mono); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.1em; }
+.ps-rows { display: flex; flex-direction: column; gap: 10px; }
+.ps-row { display: flex; align-items: center; justify-content: space-between; }
+.ps-label { font-size: 14px; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+.ps-dot { width: 8px; height: 8px; border-radius: 50%; }
+.ps-amount { font-family: var(--mono); font-size: 15px; }
+
+/* VAT SECTION */
+#vat { background: var(--bg); }
+.vat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+.spend-slider-wrap { display: flex; flex-direction: column; gap: 20px; }
+.spend-label { font-size: 15px; color: var(--text-dim); }
+.spend-label strong { color: var(--text); }
+.vat-flow { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+.vat-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-radius: 8px; background: var(--bg2); border: 1px solid var(--border); }
+.vat-row-label { font-size: 14px; }
+.vat-row-value { font-family: var(--mono); font-size: 16px; }
+.vat-big { padding: 24px 28px; border-radius: 12px; background: rgba(232,65,42,0.12); border: 1px solid rgba(232,65,42,0.3); }
+.vat-total-taken { font-family: var(--mono); font-size: 48px; font-weight: 500; color: var(--red); margin-bottom: 8px; }
+.vat-comparison { display: flex; flex-direction: column; gap: 24px; }
+.true-rate { text-align: center; padding: 40px; background: var(--bg2); border-radius: 12px; border: 1px solid var(--border); }
+.true-rate-number { font-family: var(--mono); font-size: 96px; font-weight: 500; color: var(--red); line-height: 1; }
+.true-rate-label { font-size: 16px; color: var(--text-dim); margin-top: 12px; }
+.euro-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin-top: 24px; }
+.euro-cell { aspect-ratio: 1; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+/* SAVINGS SECTION */
+#savings { background: var(--bg); }
+.savings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+.savings-controls { display: flex; flex-direction: column; gap: 24px; }
+.ctrl-row { display: flex; flex-direction: column; gap: 8px; }
+.ctrl-label { display: flex; justify-content: space-between; font-size: 14px; }
+.ctrl-name { color: var(--text-dim); }
+.ctrl-value { font-family: var(--mono); color: var(--text); }
+.savings-breakdown { background: var(--bg2); border-radius: 12px; padding: 24px; border: 1px solid var(--border); margin-top: 24px; }
+.chart-wrap { background: var(--bg2); border-radius: 12px; padding: 28px; border: 1px solid var(--border); }
+.chart-legend { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.cl-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); }
+.cl-line { width: 24px; height: 2px; border-radius: 1px; }
+.final-erosion { padding: 20px; background: rgba(232,65,42,0.08); border-radius: 8px; border: 1px solid rgba(232,65,42,0.2); margin-top: 16px; }
+.erosion-number { font-family: var(--mono); font-size: 36px; color: var(--red); }
+.erosion-label { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+/* FOOTER */
+.footer { padding: 40px 60px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.footer-note { font-size: 12px; color: var(--text-dim); max-width: 600px; line-height: 1.7; }
+.footer-year { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+
+/* SCROLL INDICATOR */
+.scroll-hint { position: absolute; bottom: 32px; left: 60px; font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.15em; display: flex; align-items: center; gap: 12px; }
+.scroll-hint::after { content: ''; display: block; width: 40px; height: 1px; background: var(--border); }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes welcomeFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcomeCardIn { from { opacity: 0; transform: translateY(40px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes welcomeFadeOut { to { opacity: 0; pointer-events: none; } }
+.fade-in { animation: fadeInUp 0.6s ease forwards; }
+</style>
+
+<template id="__bundler_thumbnail" data-bg-color="#080a0d">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#080a0d"/>
+    <!-- Title -->
+    <text x="100" y="140" font-family="sans-serif" font-size="72" font-weight="700" fill="#eee8dd">Steuer</text>
+    <text x="100" y="220" font-family="sans-serif" font-size="72" font-weight="700" fill="#c0392b">bürger</text>
+    <!-- Big bar -->
+    <rect x="100" y="300" width="350" height="60" rx="6" fill="#c0392b" opacity="0.85"/>
+    <rect x="450" y="300" width="220" height="60" rx="6" fill="#d35400" opacity="0.85"/>
+    <rect x="670" y="300" width="430" height="60" rx="6" fill="#2d8a4e" opacity="0.85"/>
+    <!-- Labels -->
+    <text x="100" y="400" font-family="sans-serif" font-size="22" fill="#7a7a7a">Einkommensteuer</text>
+    <text x="450" y="400" font-family="sans-serif" font-size="22" fill="#7a7a7a">Sozial</text>
+    <text x="670" y="400" font-family="sans-serif" font-size="22" fill="#7a7a7a">Netto</text>
+    <!-- Euro symbol -->
+    <text x="1000" y="500" font-family="sans-serif" font-size="260" font-weight="700" fill="#c0392b" opacity="0.15">€</text>
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ── GERMAN TAX MATH 2024 ──────────────────────────────────────────────────────
+function calcIncomeTax(annual) {
+  if (annual <= 11604) return 0;
+  if (annual <= 17005) {
+    const y = (annual - 11604) / 10000;
+    return Math.round((933.7 * y + 1400) * y);
+  }
+  if (annual <= 66760) {
+    const z = (annual - 17005) / 10000;
+    return Math.round((176.31 * z + 2397) * z + 1025);
+  }
+  if (annual <= 277825) return Math.round(0.42 * annual - 10911);
+  return Math.round(0.45 * annual - 19246);
+}
+
+function calcSocial(annual) {
+  const kvCap = 62100, rvCap = 90600;
+  const kv = Math.min(annual, kvCap) * 0.090;
+  const pv = Math.min(annual, kvCap) * 0.0185; // 1.7% + 0.15% for childless avg
+  const rv = Math.min(annual, rvCap) * 0.093;
+  const av = Math.min(annual, rvCap) * 0.013;
+  return Math.round(kv + pv + rv + av);
+}
+
+function calcAll(monthly) {
+  const g = monthly * 12;
+  const it = calcIncomeTax(g);
+  const soli = it > 18130 ? Math.round(it * 0.055) : 0;
+  const soc = calcSocial(g);
+  const net = g - it - soli - soc;
+  return {
+    gross: monthly,
+    incomeTax: Math.round(it / 12),
+    soli: Math.round(soli / 12),
+    social: Math.round(soc / 12),
+    net: Math.round(net / 12),
+    annualGross: g, annualIT: it, annualSoli: soli, annualSocial: soc, annualNet: net,
+    effectiveRate: ((it + soli + soc) / g * 100),
+    marginalRate: calcMarginal(g),
+  };
+}
+
+function calcMarginal(annual) {
+  if (annual <= 11604) return 0;
+  if (annual <= 17005) { const y=(annual-11604)/10000; return Math.min(100,(933.7*2*y+1400)/100); }
+  if (annual <= 66760) { const z=(annual-17005)/10000; return Math.min(100,(176.31*2*z+2397)/100); }
+  if (annual <= 277825) return 42;
+  return 45;
+}
+
+function fmt(n, digits=0) {
+  return new Intl.NumberFormat('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
+}
+
+// ── GOVT SPENDING DATA ────────────────────────────────────────────────────────
+const SPENDING = [
+  { name: "Arbeit & Soziales", pct: 34.0, color: "#c0392b", desc: "Bürgergeld, Renten, Sozialhilfe" },
+  { name: "Verteidigung", pct: 10.8, color: "#a93226", desc: "Bundeswehr, NATO-Verpflichtungen" },
+  { name: "Zinsen & Schulden", pct: 8.4, color: "#96281b", desc: "Schuldendienst des Bundes" },
+  { name: "Verkehr & Digital", pct: 7.1, color: "#d35400", desc: "Autobahnen, Schiene, Internet" },
+  { name: "Gesundheit", pct: 5.3, color: "#e67e22", desc: "GKV-Zuschuss, Pflegeversicherung" },
+  { name: "Bildung & Forschung", pct: 4.8, color: "#f39c12", desc: "Hochschulen, Grundlagenforschung" },
+  { name: "Inneres & Migration", pct: 3.1, color: "#b7950b", desc: "Polizei, Asylkosten" },
+  { name: "Internationales", pct: 2.5, color: "#9a7d0a", desc: "Entwicklungshilfe, Diplomatie" },
+  { name: "Wirtschaft & Energie", pct: 2.5, color: "#7d6608", desc: "Subventionen, Energiewende" },
+  { name: "Sonstiges", pct: 11.5, color: "#5d4e37", desc: "Alle weiteren Bundesausgaben" },
+];
+
+const SPENDING_DETAILS = {
+  "Arbeit & Soziales": {
+    explanation: "Das ist der mit Abstand größte Posten im Bundeshaushalt. Da die Rentenbeiträge allein nicht mehr ausreichen, schießt der Bund jedes Jahr über 100 Milliarden Euro als Zuschuss in die Rentenversicherung — direkt aus deinen Steuern. Hinzu kommen Bürgergeld, Grundsicherung und zahlreiche weitere Sozialleistungen.",
+    fact: "Der Bundeszuschuss zur Rentenversicherung allein übersteigt alle Verteidigungsausgaben um das Doppelte.",
+    items: [
+      { name: "Bundeszuschuss Rentenversicherung", pct: 44 },
+      { name: "Bürgergeld & Grundsicherung", pct: 18 },
+      { name: "Eingliederungshilfe / Pflege", pct: 10 },
+      { name: "Kinderzuschlag & Familienhilfen", pct: 8 },
+      { name: "Arbeitsmarktprogramme", pct: 7 },
+      { name: "Sonstiges Soziales", pct: 13 },
+    ],
+  },
+  "Verteidigung": {
+    explanation: "Nach dem russischen Angriff auf die Ukraine wurde der Verteidigungsetat massiv erhöht. Deutschland ist seit 2024 erstmals wieder beim NATO-Ziel von 2% des BIP angekommen. Das Geld fließt in Ausrüstung der Bundeswehr, Personalkosten, NATO-Beiträge und Rüstungsinvestitionen.",
+    fact: "2024 gibt Deutschland erstmals seit Jahrzehnten wieder 2% des BIP für Verteidigung aus — das entspricht ca. 90 Mrd. Euro inkl. Sondervermögen.",
+    items: [
+      { name: "Personal (Soldaten & Beamte)", pct: 35 },
+      { name: "Rüstungsbeschaffung", pct: 28 },
+      { name: "Betrieb & Infrastruktur", pct: 20 },
+      { name: "NATO-Beitrag & Auslandseinsätze", pct: 12 },
+      { name: "Forschung & Entwicklung", pct: 5 },
+    ],
+  },
+  "Zinsen & Schulden": {
+    explanation: "Deutschland hat über 2,4 Billionen Euro Staatsschulden angehäuft. Jedes Jahr müssen Milliarden Euro nur für Zinsen gezahlt werden — Geld, das für nichts anderes genutzt werden kann. Mit dem Anstieg der Zinsen seit 2022 hat sich dieser Posten massiv verteuert.",
+    fact: "Allein die Zinsen auf Bundesschulden kosteten 2024 ca. 40 Mrd. Euro — das ist mehr als das gesamte Bildungsbudget.",
+    items: [
+      { name: "Zinszahlungen auf Bundesanleihen", pct: 85 },
+      { name: "Tilgungen & sonstige Schuldenkosten", pct: 15 },
+    ],
+  },
+  "Verkehr & Digital": {
+    explanation: "Autobahnen, Bundesstraßen, Schiene, Wasserstraßen und Breitbandausbau. Deutschland hat einen enormen Investitionsstau in der Infrastruktur aufgebaut. Ein großer Teil der Mittel fließt in die Autobahn GmbH, die Deutsche Bahn und Förderprogramme für schnelles Internet.",
+    fact: "Jede vierte Autobahnbrücke in Deutschland gilt als sanierungsbedürftig — der Investitionsstau beläuft sich auf über 40 Mrd. Euro.",
+    items: [
+      { name: "Bundesfernstraßen & Autobahn GmbH", pct: 38 },
+      { name: "Schieneninfrastruktur (DB)", pct: 32 },
+      { name: "Breitband & Digitalisierung", pct: 16 },
+      { name: "Wasserstraßen & Häfen", pct: 8 },
+      { name: "Sonstiges", pct: 6 },
+    ],
+  },
+  "Gesundheit": {
+    explanation: "Der Bund beteiligt sich an den Kosten der gesetzlichen Krankenversicherung durch einen Bundeszuschuss. Dazu kommen Ausgaben für Pandemievorsorge, Krankenhausreform, und die Pflegeversicherung. Die eigentlichen GKV-Kosten werden jedoch hauptsächlich über Beiträge finanziert — was du hier siehst, ist nur der Steuerzuschuss.",
+    fact: "Der GKV-Bundeszuschuss beträgt jährlich ca. 14,5 Mrd. Euro — ohne ihn würden die Kassenbeiträge noch höher ausfallen.",
+    items: [
+      { name: "Bundeszuschuss GKV", pct: 58 },
+      { name: "Pflegeversicherung (Zuschuss)", pct: 18 },
+      { name: "Krankenhausreform & Investitionen", pct: 14 },
+      { name: "Pandemievorsorge & Arzneimittel", pct: 10 },
+    ],
+  },
+  "Bildung & Forschung": {
+    explanation: "Deutschland gibt im internationalen Vergleich relativ wenig Bundesgeld für Bildung aus — da Bildung Ländersache ist. Der Bund finanziert hauptsächlich Hochschulen (BAföG, Hochschulpakt), Grundlagenforschung (DFG, Max-Planck, Fraunhofer) sowie die Digitalisierung von Schulen.",
+    fact: "Obwohl Bildung als Zukunftsinvestition gilt, macht sie nur knapp 5% des Bundeshaushalts aus — weniger als die Zinsen auf Staatsschulden.",
+    items: [
+      { name: "Hochschulen & BAföG", pct: 30 },
+      { name: "Grundlagenforschung (DFG, MPG)", pct: 25 },
+      { name: "Angewandte Forschung (Fraunhofer)", pct: 18 },
+      { name: "Digitalpakt Schulen", pct: 12 },
+      { name: "Berufsbildung & Weiterbildung", pct: 15 },
+    ],
+  },
+  "Inneres & Migration": {
+    explanation: "Bundespolizei, Verfassungsschutz, BKA, aber auch Kosten für Asylverfahren, Unterbringung und Integration von Geflüchteten. Dieser Posten ist in den letzten Jahren stark gestiegen — nicht zuletzt durch die Fluchtbewegungen seit 2015 und erneut seit 2022.",
+    fact: "Die Kosten für Asylbewerber und Geflüchtete belaufen sich auf Bundes-, Landes- und Kommunalebene zusammen auf über 20 Mrd. Euro jährlich.",
+    items: [
+      { name: "Bundespolizei & BKA", pct: 38 },
+      { name: "Asyl & Flüchtlingskosten (Bundesanteil)", pct: 30 },
+      { name: "Verfassungsschutz & Nachrichtendienste", pct: 16 },
+      { name: "Zoll & Grenzsicherung", pct: 10 },
+      { name: "Sonstiges", pct: 6 },
+    ],
+  },
+  "Internationales": {
+    explanation: "Deutschland ist einer der größten Geberstaaten der Welt. Das Geld fließt in Entwicklungshilfe, den deutschen Beitrag zum EU-Haushalt (separat verbucht), internationale Organisationen wie UN und WHO sowie die diplomatischen Vertretungen weltweit.",
+    fact: "Deutschland zahlt ca. 25 Mrd. Euro netto jährlich in den EU-Haushalt — und ist damit nach wie vor der größte Nettozahler der EU.",
+    items: [
+      { name: "Entwicklungshilfe (BMZ)", pct: 45 },
+      { name: "Auswärtiges Amt & Botschaften", pct: 20 },
+      { name: "Humanitäre Hilfe", pct: 18 },
+      { name: "Internationale Organisationen", pct: 17 },
+    ],
+  },
+  "Wirtschaft & Energie": {
+    explanation: "Subventionen für Unternehmen, Förderung erneuerbarer Energien, Ausgleichszahlungen für die Energiewende und Technologieprogramme. Hier verstecken sich auch viele Förderungen für Schlüsselindustrien sowie Mittel für die Transformation hin zur Klimaneutralität.",
+    fact: "Deutschland subventioniert Energie und Industrie mit über 65 Mrd. Euro jährlich (inkl. Steuervergünstigungen) — mehr als die meisten anderen EU-Staaten.",
+    items: [
+      { name: "Energiewende & Klimaschutzfonds", pct: 35 },
+      { name: "Industriesubventionen & Bürgschaften", pct: 28 },
+      { name: "Mittelstandsförderung", pct: 18 },
+      { name: "Tourismusförderung & sonstiges", pct: 19 },
+    ],
+  },
+  "Sonstiges": {
+    explanation: "Hier sind alle weiteren Ausgaben des Bundes zusammengefasst: Bundestag, Bundesrat, Bundespräsident, Bundesrechnungshof, Bundesministerien, Verwaltungskosten, allgemeine Rücklagen und weitere Einzelpläne, die keinem anderen Ressort zuzuordnen sind.",
+    fact: "Allein die Verwaltungskosten des Bundes (Personal, Gebäude, IT) betragen mehrere Milliarden Euro jährlich.",
+    items: [
+      { name: "Verfassungsorgane (Bundestag etc.)", pct: 12 },
+      { name: "Allgemeine Bundesverwaltung", pct: 28 },
+      { name: "Justiz & Rechtssystem", pct: 15 },
+      { name: "Landwirtschaft & Umwelt", pct: 20 },
+      { name: "Wohnen & Stadtentwicklung", pct: 14 },
+      { name: "Sonstige Einzelpläne", pct: 11 },
+    ],
+  },
+};
+
+// ── COMPONENTS ────────────────────────────────────────────────────────────────
+
+function NavDots({ active, sections }) {
+  return (
+    <div className="nav-dots">
+      {sections.map((s, i) => (
+        <div
+          key={i}
+          className={`nav-dot ${active === i ? 'active' : ''}`}
+          onClick={() => document.getElementById(s).scrollIntoView({ behavior: 'smooth' })}
+          title={s}
+        />
+      ))}
+    </div>
+  );
+}
+
+function BigBar({ taxes }) {
+  const { gross, incomeTax, soli, social, net } = taxes;
+  const segs = [
+    { label: "Einkommensteuer", amount: incomeTax, color: "var(--red)", pct: incomeTax/gross*100 },
+    { label: "Sozialabgaben", amount: social, color: "var(--red2)", pct: social/gross*100 },
+    ...(soli > 0 ? [{ label: "Soli", amount: soli, color: "var(--red3)", pct: soli/gross*100 }] : []),
+    { label: "Netto", amount: net, color: "var(--green)", pct: net/gross*100 },
+  ];
+  return (
+    <div className="big-bar-wrap">
+      <div className="big-bar">
+        {segs.map((s, i) => (
+          <div
+            key={i}
+            className="bar-seg"
+            style={{ width: `${s.pct}%`, background: s.color }}
+            title={`${s.label}: ${fmt(s.amount)}€ (${s.pct.toFixed(1)}%)`}
+          >
+            {s.pct > 12 && (
+              <span className="bar-seg-label" style={{ color: i < segs.length-1 ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)' }}>
+                {s.pct.toFixed(0)}%
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="bar-legend">
+        {segs.map((s, i) => (
+          <div className="legend-row" key={i}>
+            <div className="legend-left">
+              <div className="legend-dot" style={{ background: s.color }} />
+              <span className="legend-label">{s.label}</span>
+            </div>
+            <div>
+              <span className="legend-amount">{fmt(s.amount)} €</span>
+              <span className="legend-pct">{s.pct.toFixed(1)}%</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MarginalChart({ monthly }) {
+  const w = 380, h = 220, pad = { top: 16, right: 20, bottom: 40, left: 44 };
+  const maxSal = 20000;
+  const points = [];
+  for (let m = 0; m <= maxSal; m += 200) {
+    const a = m * 12;
+    points.push({ x: m, y: calcMarginal(a) + (calcSocial(Math.min(a,90600*1.01)) / Math.max(a,1) * 100) });
+  }
+  const xScale = v => pad.left + (v / maxSal) * (w - pad.left - pad.right);
+  const yScale = v => pad.top + (1 - v / 70) * (h - pad.top - pad.bottom);
+  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xScale(p.x)},${yScale(p.y)}`).join(' ');
+  const curX = xScale(monthly);
+  const curY = yScale(points.find(p => p.x >= monthly)?.y || 0);
+  return (
+    <div className="marginal-chart">
+      <div className="chart-title">GRENZBELASTUNG NACH EINKOMMEN (STEUER + SOZIAL)</div>
+      <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: 'visible' }}>
+        <defs>
+          <linearGradient id="mgGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--red)" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="var(--red)" stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        {[0, 20, 40, 60].map(v => (
+          <g key={v}>
+            <line x1={pad.left} x2={w-pad.right} y1={yScale(v)} y2={yScale(v)} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+            <text x={pad.left - 6} y={yScale(v) + 4} fill="#555" fontSize="10" textAnchor="end">{v}%</text>
+          </g>
+        ))}
+        {[0, 5000, 10000, 15000, 20000].map(v => (
+          <text key={v} x={xScale(v)} y={h - 6} fill="#555" fontSize="10" textAnchor="middle">{v >= 1000 ? `${v/1000}k` : v}</text>
+        ))}
+        <path d={`${path} L${xScale(maxSal)},${yScale(0)} L${xScale(0)},${yScale(0)} Z`} fill="url(#mgGrad)" />
+        <path d={path} fill="none" stroke="var(--red)" strokeWidth="2" />
+        <line x1={curX} x2={curX} y1={pad.top} y2={h - pad.bottom} stroke="var(--text)" strokeWidth="1" strokeDasharray="4,3" opacity="0.5" />
+        <circle cx={curX} cy={curY} r="5" fill="var(--text)" />
+        <text x={curX + 7} y={curY - 8} fill="var(--text)" fontSize="11">du</text>
+      </svg>
+    </div>
+  );
+}
+
+function SpendingModal({ cat, taxes, onClose }) {
+  const details = SPENDING_DETAILS[cat.name];
+  const annualShare = (taxes.annualIT + taxes.annualSoli) * cat.pct / 100;
+  const monthlyShare = annualShare / 12;
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      {/* Backdrop */}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }} onClick={onClose} />
+
+      {/* Panel */}
+      <div style={{
+        position: 'relative', zIndex: 1, width: '100%', maxWidth: 800,
+        background: 'var(--bg2)', borderRadius: '20px 20px 0 0',
+        border: '1px solid var(--border)', borderBottom: 'none',
+        padding: '40px 48px 48px',
+        animation: 'slideUp 0.3s cubic-bezier(0.4,0,0.2,1)',
+        maxHeight: '85vh', overflowY: 'auto',
+      }}>
+        {/* Drag handle */}
+        <div style={{ width: 40, height: 4, background: 'var(--border)', borderRadius: 2, margin: '-12px auto 28px' }} />
+
+        {/* Close */}
+        <button onClick={onClose} style={{
+          position: 'absolute', top: 24, right: 24, background: 'var(--bg3)',
+          border: '1px solid var(--border)', color: 'var(--text-dim)', width: 36, height: 36,
+          borderRadius: '50%', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: 'var(--mono)',
+        }}>×</button>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+          <div style={{ width: 14, height: 14, borderRadius: 3, background: cat.color, flexShrink: 0 }} />
+          <div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>
+              {cat.pct.toFixed(1)}% des Bundeshaushalts
+            </div>
+            <h3 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}>{cat.name}</h3>
+          </div>
+        </div>
+
+        {/* Your share callout */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28,
+          padding: '20px 24px', background: 'var(--bg3)', borderRadius: 12,
+          border: `1px solid ${cat.color}44`,
+        }}>
+          <div>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Dein Beitrag / Monat</div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: cat.color }}>{fmt(monthlyShare, 0)} €</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Dein Beitrag / Jahr</div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: 'var(--text-dim)' }}>{fmt(annualShare, 0)} €</div>
+          </div>
+        </div>
+
+        {/* Explanation */}
+        {details && (
+          <>
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Was steckt dahinter?</div>
+              <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.75 }}>{details.explanation}</p>
+            </div>
+
+            {/* Sub-items */}
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Aufschlüsselung</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {details.items.map((item, i) => (
+                  <div key={i}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>{item.name}</span>
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)' }}>
+                        {fmt(monthlyShare * item.pct / 100, 0)} €&nbsp;
+                        <span style={{ color: 'var(--text-dim)', fontSize: 11 }}>({item.pct}%)</span>
+                      </span>
+                    </div>
+                    <div style={{ height: 6, background: 'var(--bg)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{
+                        height: '100%', borderRadius: 3, background: cat.color,
+                        width: `${item.pct}%`, opacity: 0.7 + i * 0.03,
+                        transition: 'width 0.6s cubic-bezier(0.4,0,0.2,1)',
+                      }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Fact */}
+            <div style={{
+              padding: '16px 20px', borderRadius: 10,
+              background: `${cat.color}18`, border: `1px solid ${cat.color}40`,
+              fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7,
+            }}>
+              <span style={{ color: cat.color, fontFamily: 'var(--mono)', fontSize: 11, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Wusstest du?</span>
+              {details.fact}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SpendingTreemap({ taxes, onSelect }) {
+  const ann = taxes.annualIT + taxes.annualSoli;
+  const rows = [
+    { cols: SPENDING.slice(0, 4) },
+    { cols: SPENDING.slice(4, 7) },
+    { cols: SPENDING.slice(7) },
+  ];
+  const share = (pct) => (ann * pct / 100 / 12);
+  return (
+    <div>
+      <div style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--mono)', marginBottom: 10, letterSpacing: '0.05em' }}>
+        ↓ Klicke auf eine Kategorie für Details
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginBottom: 32 }}>
+        {rows.map((row, ri) => (
+          <div key={ri} style={{ display: 'flex', gap: 3 }}>
+            {row.cols.map((cat, ci) => (
+              <div
+                key={ci}
+                className="tm-cell"
+                style={{ background: cat.color, flex: cat.pct, minWidth: 80, cursor: 'pointer' }}
+                onClick={() => onSelect(cat)}
+                title={`${cat.name} — klicken für Details`}
+              >
+                <div className="tm-cell-pct">{cat.pct.toFixed(0)}%</div>
+                <div className="tm-cell-name">{cat.name}</div>
+                <div className="tm-cell-amount">{fmt(taxes.annualGross > 0 ? share(cat.pct) : 0, 0)} €/Mo.</div>
+                <div style={{ position: 'absolute', bottom: 8, right: 10, fontSize: 10, opacity: 0.5, fontFamily: 'var(--mono)' }}>→</div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="personal-share">
+        <div className="personal-title">Dein monatlicher Beitrag — klicken für Details</div>
+        <div className="ps-rows">
+          {SPENDING.map((cat, i) => (
+            <div
+              className="ps-row"
+              key={i}
+              onClick={() => onSelect(cat)}
+              style={{ cursor: 'pointer', borderRadius: 6, padding: '4px 8px', margin: '0 -8px', transition: 'background 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg3)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              <div className="ps-label">
+                <div className="ps-dot" style={{ background: cat.color }} />
+                {cat.name}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span className="ps-amount">{fmt(share(cat.pct), 0)} €</span>
+                <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>→</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VatSection({ taxes }) {
+  const [spendPct, setSpendPct] = useState(80);
+  const net = taxes.net;
+  const spending = net * spendPct / 100;
+  const saving = net - spending;
+  const vatInSpending = spending * 19 / 119;
+  const netPurchasing = spending - vatInSpending;
+  const totalStateTake = taxes.incomeTax + taxes.soli + taxes.social + vatInSpending;
+  const trueTakeRate = (totalStateTake / taxes.gross * 100);
+
+  const euroCount = 100;
+  const stateCells = Math.round(trueTakeRate);
+
+  return (
+    <div className="vat-grid">
+      <div>
+        <div className="spend-slider-wrap">
+          <div>
+            <div className="ctrl-label">
+              <span className="ctrl-name">Wie viel gibst du aus?</span>
+              <span className="ctrl-value mono">{spendPct}% des Nettos</span>
+            </div>
+            <input type="range" min="0" max="100" value={spendPct}
+              onChange={e => setSpendPct(+e.target.value)} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#555', marginTop: 4 }}>
+              <span>Alles sparen</span><span>Alles ausgeben</span>
+            </div>
+          </div>
+          <div className="vat-flow">
+            <div className="vat-row">
+              <span className="vat-row-label" style={{ color: 'var(--text-dim)' }}>Netto (nach Steuern)</span>
+              <span className="vat-row-value mono">{fmt(net)} €</span>
+            </div>
+            <div className="vat-row" style={{ borderColor: 'rgba(232,65,42,0.3)' }}>
+              <span className="vat-row-label">Ausgaben ({spendPct}%)</span>
+              <span className="vat-row-value mono">{fmt(spending)} €</span>
+            </div>
+            <div className="vat-row" style={{ background: 'rgba(232,65,42,0.1)', borderColor: 'rgba(232,65,42,0.3)' }}>
+              <span className="vat-row-label red">← MwSt. darin (19%)</span>
+              <span className="vat-row-value mono red">{fmt(vatInSpending)} €</span>
+            </div>
+            <div className="vat-row" style={{ background: 'rgba(74,190,100,0.06)', borderColor: 'rgba(74,190,100,0.2)' }}>
+              <span className="vat-row-label green">Tatsächliche Kaufkraft</span>
+              <span className="vat-row-value mono green">{fmt(netPurchasing + saving)} €</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="vat-comparison">
+        <div className="true-rate">
+          <div className="section-label">Dein realer Steuersatz (Steuer + Sozial + MwSt)</div>
+          <div className="true-rate-number">{trueTakeRate.toFixed(0)}%</div>
+          <div className="true-rate-label">
+            Von je <strong>100 € Brutto</strong> behältst du wirklich nur{' '}
+            <strong style={{ color: 'var(--green)' }}>{(100 - trueTakeRate).toFixed(0)} €</strong>
+          </div>
+        </div>
+        <div>
+          <div style={{ marginBottom: 10, fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
+            JEDER EURO DEINES BRUTTOGEHALTS:
+          </div>
+          <div className="euro-grid">
+            {Array.from({ length: euroCount }).map((_, i) => {
+              const isState = i < stateCells;
+              return (
+                <div
+                  key={i}
+                  className="euro-cell"
+                  style={{
+                    background: isState ? 'var(--red)' : 'var(--green)',
+                    opacity: isState ? 0.7 + (i/euroCount)*0.3 : 0.8,
+                  }}
+                  title={isState ? "Staat" : "Du"}
+                />
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 10, height: 10, background: 'var(--red)', borderRadius: 2 }} />
+              <span style={{ color: 'var(--text-dim)' }}>Staat ({stateCells} Cent)</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 10, height: 10, background: 'var(--green)', borderRadius: 2 }} />
+              <span style={{ color: 'var(--text-dim)' }}>Du ({euroCount - stateCells} Cent)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SavingsChart({ taxes }) {
+  const [savePct, setSavePct] = useState(20);
+  const [years, setYears] = useState(20);
+  const [interest, setInterest] = useState(5);
+  const [inflation, setInflation] = useState(2.5);
+
+  const monthlySaving = taxes.net * savePct / 100;
+  const annualSaving = monthlySaving * 12;
+
+  const CGT_RATE = 0.26375; // Abgeltungssteuer + Soli
+  const FREIBETRAG = 1000; // annual
+
+  const points = Array.from({ length: years + 1 }, (_, yr) => {
+    // Nominal: compound with interest, no tax yet
+    let nominal = 0;
+    for (let y = 0; y < yr; y++) nominal = (nominal + annualSaving) * (1 + interest / 100);
+    // Real: deflate by inflation
+    const real = nominal / Math.pow(1 + inflation / 100, yr);
+    // After CGT: gains portion taxed
+    const principal = annualSaving * yr;
+    const gains = Math.max(0, nominal - principal);
+    const taxableGains = Math.max(0, gains - FREIBETRAG * yr);
+    const afterTax = nominal - taxableGains * CGT_RATE;
+    const afterTaxReal = afterTax / Math.pow(1 + inflation / 100, yr);
+    return { yr, nominal, real, afterTax, afterTaxReal, principal };
+  });
+
+  const maxVal = points[points.length - 1].nominal;
+  const w = 560, h = 260, pad = { top: 20, right: 20, bottom: 40, left: 60 };
+  const xS = yr => pad.left + (yr / years) * (w - pad.left - pad.right);
+  const yS = v => pad.top + (1 - v / maxVal) * (h - pad.top - pad.bottom);
+  const line = (key) => points.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
+  const last = points[points.length - 1];
+
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map(f => Math.round(maxVal * f / 1000) * 1000);
+
+  return (
+    <div className="savings-grid">
+      <div className="savings-controls">
+        <div className="ctrl-row">
+          <div className="ctrl-label">
+            <span className="ctrl-name">Sparrate</span>
+            <span className="ctrl-value mono">{savePct}% → {fmt(monthlySaving)} €/Mo.</span>
+          </div>
+          <input type="range" min="0" max="60" value={savePct} onChange={e => setSavePct(+e.target.value)} />
+        </div>
+        <div className="ctrl-row">
+          <div className="ctrl-label">
+            <span className="ctrl-name">Spardauer</span>
+            <span className="ctrl-value mono">{years} Jahre</span>
+          </div>
+          <input type="range" min="1" max="40" value={years} onChange={e => setYears(+e.target.value)} />
+        </div>
+        <div className="ctrl-row">
+          <div className="ctrl-label">
+            <span className="ctrl-name">Rendite (nominal)</span>
+            <span className="ctrl-value mono">{interest}% / Jahr</span>
+          </div>
+          <input type="range" min="0" max="12" step="0.5" value={interest} onChange={e => setInterest(+e.target.value)} />
+        </div>
+        <div className="ctrl-row">
+          <div className="ctrl-label">
+            <span className="ctrl-name">Inflation</span>
+            <span className="ctrl-value mono">{inflation}% / Jahr</span>
+          </div>
+          <input type="range" min="0" max="8" step="0.5" value={inflation} onChange={e => setInflation(+e.target.value)} />
+        </div>
+        <div className="savings-breakdown">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+              <span style={{ color: 'var(--text-dim)' }}>Eingezahlt ({years} J.)</span>
+              <span className="mono">{fmt(last.principal)} €</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+              <span style={{ color: 'var(--text-dim)' }}>Nominalwert</span>
+              <span className="mono">{fmt(last.nominal)} €</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <span style={{ color: 'var(--red)' }}>− Abgeltungssteuer (26,375%)</span>
+              <span className="mono red">− {fmt(last.nominal - last.afterTax)} €</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+              <span style={{ color: 'var(--red)' }}>− Inflation ({inflation}%/J.)</span>
+              <span className="mono red">− {fmt(last.afterTax - last.afterTaxReal)} €</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 16, borderTop: '1px solid var(--border)', paddingTop: 12, fontWeight: 600 }}>
+              <span className="green">Reale Kaufkraft</span>
+              <span className="mono green">{fmt(last.afterTaxReal)} €</span>
+            </div>
+          </div>
+          <div className="final-erosion" style={{ marginTop: 20 }}>
+            <div className="erosion-number">
+              {last.afterTaxReal > 0 && last.principal > 0
+                ? `${((1 - last.afterTaxReal / last.nominal) * 100).toFixed(0)}%`
+                : '—'}
+            </div>
+            <div className="erosion-label">
+              deines nominalen Vermögens werden durch Steuern + Inflation aufgezehrt
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="chart-wrap">
+        <div className="chart-title" style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
+          VERMÖGENSENTWICKLUNG ÜBER {years} JAHRE
+        </div>
+        <div className="chart-legend">
+          <div className="cl-item"><div className="cl-line" style={{ background: 'var(--text)', opacity: 0.4 }} />Eingezahlt</div>
+          <div className="cl-item"><div className="cl-line" style={{ background: 'var(--gold)' }} />Nominalwert</div>
+          <div className="cl-item"><div className="cl-line" style={{ background: 'var(--blue)' }} />Nach Abgeltungssteuer</div>
+          <div className="cl-item"><div className="cl-line" style={{ background: 'var(--green)' }} />Reale Kaufkraft</div>
+          <div className="cl-item"><div className="cl-line" style={{ background: 'var(--red)', opacity: 0.6 }} />Verlust durch Staat+Inflation</div>
+        </div>
+        <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: 'visible' }}>
+          <defs>
+            <linearGradient id="nomGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="var(--gold)" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="realGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--green)" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="var(--green)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {yTicks.map((v, i) => (
+            <g key={i}>
+              <line x1={pad.left} x2={w - pad.right} y1={yS(v)} y2={yS(v)} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+              <text x={pad.left - 6} y={yS(v) + 4} fill="#555" fontSize="10" textAnchor="end">
+                {v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}
+              </text>
+            </g>
+          ))}
+          {Array.from({ length: years + 1 }, (_, i) => i).filter(y => y % Math.ceil(years/6) === 0).map(y => (
+            <text key={y} x={xS(y)} y={h - 6} fill="#555" fontSize="10" textAnchor="middle">{y}J</text>
+          ))}
+          {/* Gap fill between nominal and real */}
+          <path
+            d={`${line('nominal')} L${xS(years)},${yS(last.afterTaxReal)} ${[...points].reverse().map((p,i)=>`${i===0?'M':'L'}${xS(p.yr)},${yS(p.afterTaxReal)}`).join(' ')} Z`}
+            fill="var(--red)" opacity="0.08"
+          />
+          {/* Nominal area */}
+          <path d={`${line('nominal')} L${xS(years)},${yS(0)} L${xS(0)},${yS(0)} Z`} fill="url(#nomGrad)" />
+          {/* Real area */}
+          <path d={`${line('afterTaxReal')} L${xS(years)},${yS(0)} L${xS(0)},${yS(0)} Z`} fill="url(#realGrad)" />
+          {/* Principal line */}
+          <path d={line('principal')} fill="none" stroke="var(--text)" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.4" />
+          {/* Nominal line */}
+          <path d={line('nominal')} fill="none" stroke="var(--gold)" strokeWidth="2.5" />
+          {/* After tax line */}
+          <path d={line('afterTax')} fill="none" stroke="var(--blue)" strokeWidth="2" strokeDasharray="6,3" />
+          {/* Real value line */}
+          <path d={line('afterTaxReal')} fill="none" stroke="var(--green)" strokeWidth="2.5" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ── SPENDING COMPARISON ───────────────────────────────────────────────────────
+const COMPARE_DATA = {
+  base: {
+    label: "Regulärer Haushalt 2024",
+    items: [
+      { name: "Verteidigung", amount: 52, color: "#a93226", note: "Bundeswehr, NATO" },
+      { name: "Zinsen & Schulden", amount: 40, color: "#96281b", note: "Schuldendienst" },
+      { name: "Bildung & Forschung", amount: 23, color: "#2980b9", note: "Nur Bundesanteil — Bildung ist Ländersache!" },
+      { name: "Gesundheit", amount: 25, color: "#27ae60", note: "GKV-Zuschuss, Pflege" },
+      { name: "Infrastruktur", amount: 34, color: "#16a085", note: "Schiene, Straßen, Digital" },
+    ],
+  },
+  sonder: {
+    label: "Mit Sondervermögen (annualisiert)",
+    items: [
+      { name: "Verteidigung", amount: 72, color: "#a93226", note: "52 Mrd. regulär + 20 Mrd. Sondervermögen (100 Mrd./5 J.)", sonder: 20 },
+      { name: "Zinsen & Schulden", amount: 64, color: "#96281b", note: "40 Mrd. + ~24 Mrd. Zinsen auf neue Sonderschulden (600 Mrd. × 4%)", sonder: 24 },
+      { name: "Bildung & Forschung", amount: 23, color: "#2980b9", note: "Kein Sondervermögen — unverändert. Bildung ist Ländersache!" },
+      { name: "Gesundheit", amount: 25, color: "#27ae60", note: "Kein Sondervermögen — unverändert" },
+      { name: "Infrastruktur", amount: 84, color: "#16a085", note: "34 Mrd. regulär + 50 Mrd. Sondervermögen (500 Mrd./10 J.)", sonder: 50 },
+    ],
+  },
+};
+
+const RATIOS = [
+  {
+    a: "Bildung & Forschung", b: "Verteidigung",
+    context: "Für jeden Euro Bildung gibt der Bund X Euro für Militär aus.",
+    note: "Bildung ist großteils Ländersache — Bundesanteil ist daher viel kleiner als der reale Gesamtaufwand.",
+  },
+  {
+    a: "Gesundheit", b: "Verteidigung",
+    context: "Für jeden Euro GKV-Zuschuss gibt der Bund X Euro für Militär aus.",
+    note: "Der GKV-Bundeszuschuss deckt nur den Fehlbetrag der Krankenversicherung ab.",
+  },
+  {
+    a: "Bildung & Forschung", b: "Zinsen & Schulden",
+    context: "Für jeden Euro Bildung zahlt der Bund X Euro Zinsen auf alte Schulden.",
+    note: "Zinsen wachsen mit jedem neuen Sondervermögen.",
+  },
+];
+
+function SpendingComparison({ taxes }) {
+  const [withSonder, setWithSonder] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const data = withSonder ? COMPARE_DATA.sonder : COMPARE_DATA.base;
+  const annualTax = taxes.annualIT + taxes.annualSoli;
+  const totalBundeshaushalt = 476; // Mrd.
+
+  const getPersonal = (amountMrd) => {
+    return (annualTax / (totalBundeshaushalt * 1e9) * amountMrd * 1e9 / 12);
+  };
+
+  const maxAmount = Math.max(...data.items.map(i => i.amount));
+
+  // Military vs civic groups
+  const military = data.items.find(i => i.name === "Verteidigung");
+  const debt = data.items.find(i => i.name === "Zinsen & Schulden");
+  const edu = data.items.find(i => i.name === "Bildung & Forschung");
+  const health = data.items.find(i => i.name === "Gesundheit");
+  const infra = data.items.find(i => i.name === "Infrastruktur");
+
+  const civilTotal = edu.amount + health.amount + infra.amount;
+  const stateTotal = military.amount + debt.amount;
+
+  return (
+    <div style={{ marginTop: 60, borderTop: '1px solid var(--border)', paddingTop: 48 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 36, flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
+            Vergleich · Wer bekommt mehr?
+          </div>
+          <h3 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            Schulen, Straßen & Gesundheit<br />
+            <span style={{ color: 'var(--red)' }}>vs. Militär & Schulden</span>
+          </h3>
+        </div>
+        {/* Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0, background: 'var(--bg3)', borderRadius: 100, padding: 4, border: '1px solid var(--border)', flexShrink: 0 }}>
+          {[false, true].map((val) => (
+            <button
+              key={String(val)}
+              onClick={() => setWithSonder(val)}
+              style={{
+                padding: '8px 20px', borderRadius: 100, border: 'none', cursor: 'pointer',
+                fontFamily: 'var(--sans)', fontSize: 13, transition: 'all 0.2s',
+                background: withSonder === val ? 'var(--text)' : 'transparent',
+                color: withSonder === val ? 'var(--bg)' : 'var(--text-dim)',
+                fontWeight: withSonder === val ? 600 : 400,
+              }}
+            >
+              {val ? 'Mit Sondervermögen' : 'Regulärer Haushalt'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Big face-off */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 0, marginBottom: 40, alignItems: 'center' }}>
+        {/* Left: Civil spending */}
+        <div style={{ background: 'var(--bg2)', borderRadius: '14px 0 0 14px', padding: '28px 32px', border: '1px solid var(--border)', borderRight: 'none' }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+            Gesellschaft (Bildung + Gesundheit + Infrastruktur)
+          </div>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 56, fontWeight: 500, color: '#2980b9', lineHeight: 1, marginBottom: 4 }}>
+            {civilTotal} <span style={{ fontSize: 22, color: 'var(--text-dim)' }}>Mrd. €</span>
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 20 }}>pro Jahr</div>
+          {[edu, health, infra].map((item, i) => (
+            <div key={i} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5, fontSize: 13 }}>
+                <span style={{ color: 'var(--text-dim)' }}>{item.name}</span>
+                <span style={{ fontFamily: 'var(--mono)', color: 'var(--text)' }}>
+                  {item.amount} Mrd.
+                  {item.sonder && <span style={{ color: '#f39c12', fontSize: 11 }}> +{item.sonder} SV</span>}
+                </span>
+              </div>
+              <div style={{ height: 8, background: 'var(--bg)', borderRadius: 4, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${item.amount / maxAmount * 100}%`, background: item.color, borderRadius: 4, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                  {item.sonder && (
+                    <div style={{ height: '100%', width: `${item.sonder / item.amount * 100}%`, background: '#f39c12', opacity: 0.7 }} />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+          <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(41,128,185,0.1)', borderRadius: 8, border: '1px solid rgba(41,128,185,0.25)', fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+            <strong style={{ color: '#2980b9' }}>Dein Anteil: {fmt(getPersonal(civilTotal), 0)} €/Mo.</strong><br/>
+            für Bildung, Gesundheit &amp; Infrastruktur zusammen
+          </div>
+        </div>
+
+        {/* VS divider */}
+        <div style={{ background: 'var(--bg3)', padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, border: '1px solid var(--border)', zIndex: 1 }}>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text-dim)', letterSpacing: '0.1em', writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)' }}>
+            {stateTotal > civilTotal
+              ? `${(stateTotal / civilTotal).toFixed(1)}× mehr →`
+              : `← ${(civilTotal / stateTotal).toFixed(1)}× mehr`}
+          </div>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 18, fontWeight: 700, color: 'var(--text-dim)' }}>VS</div>
+        </div>
+
+        {/* Right: Military + debt */}
+        <div style={{ background: 'var(--bg2)', borderRadius: '0 14px 14px 0', padding: '28px 32px', border: '1px solid var(--border)', borderLeft: 'none' }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+            Militär + Zinsen auf Staatsschulden
+          </div>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 56, fontWeight: 500, color: 'var(--red)', lineHeight: 1, marginBottom: 4 }}>
+            {stateTotal} <span style={{ fontSize: 22, color: 'var(--text-dim)' }}>Mrd. €</span>
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 20 }}>pro Jahr</div>
+          {[military, debt].map((item, i) => (
+            <div key={i} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5, fontSize: 13 }}>
+                <span style={{ color: 'var(--text-dim)' }}>{item.name}</span>
+                <span style={{ fontFamily: 'var(--mono)', color: 'var(--text)' }}>
+                  {item.amount} Mrd.
+                  {item.sonder && <span style={{ color: '#f39c12', fontSize: 11 }}> +{item.sonder} SV</span>}
+                </span>
+              </div>
+              <div style={{ height: 8, background: 'var(--bg)', borderRadius: 4, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${item.amount / maxAmount * 100}%`, background: item.color, borderRadius: 4, transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)', position: 'relative' }}>
+                  {item.sonder && (
+                    <div style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: `${item.sonder / item.amount * 100}%`, background: '#f39c12', opacity: 0.7 }} />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+          <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(192,57,43,0.1)', borderRadius: 8, border: '1px solid rgba(192,57,43,0.25)', fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+            <strong style={{ color: 'var(--red)' }}>Dein Anteil: {fmt(getPersonal(stateTotal), 0)} €/Mo.</strong><br/>
+            für Militär &amp; Zinsen auf Staatsschulden
+          </div>
+        </div>
+      </div>
+
+      {/* Ratio callouts */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
+        {RATIOS.map((r, i) => {
+          const aItem = data.items.find(it => it.name === r.a);
+          const bItem = data.items.find(it => it.name === r.b);
+          const ratio = (bItem.amount / aItem.amount).toFixed(1);
+          return (
+            <div key={i} style={{ background: 'var(--bg2)', borderRadius: 12, padding: '20px 24px', border: '1px solid var(--border)' }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 42, fontWeight: 500, color: 'var(--red)', lineHeight: 1, marginBottom: 8 }}>{ratio}×</div>
+              <div style={{ fontSize: 13, color: 'var(--text)', marginBottom: 8, lineHeight: 1.5 }}>
+                Für jeden €1 <span style={{ color: bItem.color }}>{r.a}</span> gibt der Bund <strong style={{ color: 'var(--red)' }}>{ratio}€</strong> für <span style={{ color: 'var(--red)' }}>{r.b}</span> aus.
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.6 }}>{r.note}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Context note */}
+      <div style={{ padding: '16px 24px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.8 }}>
+        <span style={{ color: 'var(--text)', fontWeight: 600 }}>Wichtiger Hinweis:</span>{' '}
+        Bildung, Schulen und ein Großteil der Gesundheitsversorgung sind in Deutschland <strong style={{ color: 'var(--text)' }}>Ländersache</strong> — der Bundesanteil (hier gezeigt) ist daher nur ein kleiner Teil der tatsächlichen Gesamtausgaben.
+        Gesamte öffentliche Bildungsausgaben (Bund + Länder + Kommunen): <strong style={{ color: '#2980b9' }}>~170 Mrd. €/Jahr</strong>.
+        GKV-Gesamtausgaben: <strong style={{ color: '#27ae60' }}>~320 Mrd. €/Jahr</strong>.
+        Trotzdem: Im Bundeshaushalt allein übersteigen Militär + Zinsen die Ausgaben für Bildung + Gesundheit + Infrastruktur zusammen
+        {withSonder ? ' — und mit Sondervermögen wird der Abstand noch deutlicher.' : '.'}
+        {' '}<button onClick={() => setWithSonder(!withSonder)} style={{ background: 'none', border: 'none', color: 'var(--text)', textDecoration: 'underline', cursor: 'pointer', fontFamily: 'var(--sans)', fontSize: 13 }}>
+          {withSonder ? 'Regulären Haushalt anzeigen' : 'Sondervermögen einberechnen →'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── OUTLOOK SECTION ───────────────────────────────────────────────────────────
+const SONDERVERMOEGEN = [
+  {
+    title: "Sondervermögen Bundeswehr",
+    amount: 100,
+    status: "laufend",
+    statusColor: "var(--red)",
+    period: "2022–2027",
+    desc: "100 Mrd. Euro Sonderschulden für die Aufrüstung der Bundeswehr, beschlossen nach dem russischen Angriff auf die Ukraine. Wird bis ca. 2027 ausgegeben — danach muss das reguläre Verteidigungsbudget auf 2% des BIP steigen.",
+    perCapita: 1190,
+  },
+  {
+    title: "Infrastruktur-Sondervermögen",
+    amount: 500,
+    status: "beschlossen März 2025",
+    statusColor: "#e67e22",
+    period: "2025–2035",
+    desc: "500 Mrd. Euro neuer Schulden für Infrastruktur (Schiene, Straßen, Schulen, Digitalisierung), beschlossen im März 2025 mit Reform der Schuldenbremse. Rund 50 Mrd. Euro pro Jahr über 10 Jahre.",
+    perCapita: 5950,
+  },
+  {
+    title: "Verteidigung (Schuldenbremsen-Ausnahme)",
+    amount: "unbegrenzt",
+    status: "ab 2025",
+    statusColor: "#f39c12",
+    period: "ab 2025 dauerhaft",
+    desc: "Alle Verteidigungsausgaben über 1% des BIP (~40 Mrd. €/Jahr) sind dauerhaft von der Schuldenbremse ausgenommen. Das bedeutet: strukturell mehr Schulden jedes Jahr — ohne politische Mehrheit dafür.",
+    perCapita: "~500/Jahr",
+  },
+];
+
+const EU_SPENDING = [
+  { name: "Landwirtschaft (GAP)", pct: 31, color: "#6b8e3e" },
+  { name: "Kohäsion & Regionen", pct: 30, color: "#4a7a6e" },
+  { name: "Forschung (Horizon)", pct: 10, color: "#3d6b8a" },
+  { name: "Nachbarschaft & Welt", pct: 9, color: "#5a5a8a" },
+  { name: "Migration & Grenzen", pct: 4, color: "#7a5a7a" },
+  { name: "EU-Verwaltung", pct: 6, color: "#5a4a5a" },
+  { name: "Sonstiges", pct: 10, color: "#3a3a4a" },
+];
+
+function OutlookSection({ taxes }) {
+  const employed = 45_000_000;
+  const annualTax = taxes.annualIT + taxes.annualSoli;
+  // EU net contribution per employed person ~555€/year
+  const euMonthly = Math.round(555 * (annualTax / (employed * 8000)) * 12) || 46;
+  // Additional interest from 600Mrd new debt at 4% = 24Mrd/year shared by ~45M workers
+  const additionalInterestMonthly = Math.round((600_000_000_000 * 0.04 / employed / 12) * (annualTax / 48000));
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 60 }}>
+
+      {/* SONDERVERMÖGEN */}
+      <div>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
+          Neue Schulden · Sondervermögen
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {SONDERVERMOEGEN.map((sv, i) => (
+            <div key={i} style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '28px 28px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: sv.statusColor, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{sv.status}</div>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)' }}>{sv.period}</div>
+              </div>
+              <div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: typeof sv.amount === 'number' ? 48 : 28, fontWeight: 500, color: 'var(--red)', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                  {typeof sv.amount === 'number' ? `${sv.amount} Mrd.` : sv.amount}
+                </div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text-dim)', marginTop: 2 }}>Euro neue Schulden</div>
+              </div>
+              <div style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.3 }}>{sv.title}</div>
+              <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, flexGrow: 1 }}>{sv.desc}</div>
+              {typeof sv.perCapita === 'number' && (
+                <div style={{ marginTop: 4, padding: '12px 16px', background: 'rgba(192,57,43,0.1)', borderRadius: 8, border: '1px solid rgba(192,57,43,0.25)' }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Pro Kopf (alle Einwohner)</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 22, color: 'var(--red)' }}>{fmt(sv.perCapita)} €</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 20, padding: '18px 24px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid rgba(192,57,43,0.3)', fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+          <span style={{ color: 'var(--red)', fontFamily: 'var(--mono)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginRight: 10 }}>Zinslast:</span>
+          600 Mrd. neue Schulden bei ~4% Zinsen = <strong style={{ color: 'var(--text)' }}>~24 Mrd. Euro Zinsen pro Jahr</strong> zusätzlich — dauerhaft.
+          Auf dein Gehalt heruntergerechnet: ca. <strong style={{ color: 'var(--red)' }}>+{fmt(additionalInterestMonthly)} €/Monat</strong> mehr Steuerbelastung in den nächsten Jahren.
+        </div>
+      </div>
+
+      {/* EU */}
+      <div>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
+          EU-Haushalt 2024 · 189 Milliarden Euro
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75 }}>
+              Zusätzlich zum Bundeshaushalt zahlt Deutschland als <strong style={{ color: 'var(--text)' }}>größter Nettozahler der EU</strong> jährlich rund{' '}
+              <strong style={{ color: 'var(--red)' }}>25 Mrd. Euro netto</strong> in den EU-Haushalt.
+              Das ist Geld, das nach Brüssel fließt — über deinen Beitrag zum Bundeshaushalt hinaus.
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              {[
+                { label: 'Brutto-Beitrag DE', value: '~37 Mrd. €', color: 'var(--red)' },
+                { label: 'Rückflüsse nach DE', value: '~12 Mrd. €', color: 'var(--green)' },
+                { label: 'Netto-Zahlung DE', value: '~25 Mrd. €', color: 'var(--red)' },
+              ].map((s, i) => (
+                <div key={i} style={{ background: 'var(--bg2)', borderRadius: 10, padding: '16px', border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>{s.label}</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 18, color: s.color }}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: '16px 20px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Dein persönlicher EU-Beitrag (netto)</div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 36, color: 'var(--red)' }}>~{fmt(euMonthly)} €<span style={{ fontSize: 16, color: 'var(--text-dim)' }}>/Mo.</span></div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>Anteil am Netto-EU-Beitrag Deutschlands, proportional zu deiner Steuerleistung</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Wofür gibt die EU das Geld aus?</div>
+            {EU_SPENDING.map((item, i) => (
+              <div key={i}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>{item.name}</span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--text-dim)' }}>{item.pct}%</span>
+                </div>
+                <div style={{ height: 8, background: 'var(--bg3)', borderRadius: 4, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${item.pct}%`, background: item.color, borderRadius: 4, transition: 'width 0.6s cubic-bezier(0.4,0,0.2,1)' }} />
+                </div>
+              </div>
+            ))}
+            <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.7, padding: '12px 16px', background: 'var(--bg2)', borderRadius: 8, border: '1px solid var(--border)' }}>
+              Der größte EU-Ausgabenposten ist die gemeinsame Agrarpolitik (GAP) — fast ein Drittel des gesamten EU-Haushalts fließt in Subventionen für die Landwirtschaft, vor allem in reiche landwirtschaftliche Regionen Frankreichs, Spaniens und Polens.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FUTURE OUTLOOK */}
+      <div>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 20 }}>
+          Mittelfristiger Ausblick
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {[
+            { trend: '↑', label: 'Rentenlücke', desc: 'Der Bundeszuschuss zur Rentenversicherung wird bis 2030 auf schätzungsweise 140 Mrd. €/J. steigen — Babyboomer-Rente beginnt.', color: 'var(--red)' },
+            { trend: '↑', label: 'Zinslast', desc: 'Mit jedem Prozentpunkt Zinssteigerung kostet die Staatsverschuldung ~24 Mrd. € mehr pro Jahr. Tendenz steigend.', color: 'var(--red)' },
+            { trend: '↑', label: 'Verteidigung', desc: 'NATO-Ziel 2% BIP ist nun Untergrenze — nicht Ziel. Mittelfristig könnten 2,5–3% gefordert werden.', color: '#e67e22' },
+            { trend: '?', label: 'Steuerreform', desc: 'Kalte Progression, Abbau des Solidaritätszuschlags für Spitzenverdiener, und Unternehmenssteuerreform stehen zur Diskussion.', color: 'var(--text-dim)' },
+          ].map((item, i) => (
+            <div key={i} style={{ background: 'var(--bg2)', borderRadius: 12, padding: '20px', border: '1px solid var(--border)' }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 32, color: item.color, lineHeight: 1, marginBottom: 8 }}>{item.trend}</div>
+              <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 10 }}>{item.label}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.7 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── WELCOME POPUP ─────────────────────────────────────────────────────────────
+function WelcomePopup({ onEnter }) {
+  const [leaving, setLeaving] = useState(false);
+  const handleEnter = () => {
+    setLeaving(true);
+    setTimeout(onEnter, 500);
+  };
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(4,5,8,0.97)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '24px',
+      animation: leaving ? 'welcomeFadeOut 0.5s ease forwards' : 'welcomeFadeIn 0.4s ease forwards',
+    }}>
+      <div style={{
+        maxWidth: 640, width: '100%',
+        animation: 'welcomeCardIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards',
+      }}>
+        {/* Badge */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(192,57,43,0.15)', border: '1px solid rgba(192,57,43,0.4)', borderRadius: 100, padding: '6px 16px', marginBottom: 28 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--red)' }} />
+          <span style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--red)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Steuerbürger · Deutschland</span>
+        </div>
+
+        {/* Headline */}
+        <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em', marginBottom: 20 }}>
+          Glaubst du wirklich,<br />
+          <span style={{ color: 'var(--red)' }}>deine Steuern werden<br />sinnvoll ausgegeben?</span>
+        </h1>
+
+        <p style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 36 }}>
+          Als Steuerzahler zahlst du jeden Monat tausende Euro an den Staat.
+          Aber weißt du, <strong style={{ color: 'var(--text)' }}>wohin das Geld wirklich fließt</strong> — und wie viel davon?
+        </p>
+
+        {/* Stats */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 12, overflow: 'hidden', marginBottom: 36 }}>
+          {[
+            {
+              num: '2,3×',
+              text: 'mehr Bundesgeld geht in Militär & Schulden als in Schulen und Gesundheit zusammen.',
+            },
+            {
+              num: 'bis 60%',
+              text: 'deines Bruttogehalts fließen an den Staat — durch Einkommensteuer, Sozialabgaben und Mehrwertsteuer.',
+            },
+            {
+              num: '600 Mrd. €',
+              text: 'neue Staatsschulden seit 2025. Die Zinsen dafür zahlst du — jetzt und in Zukunft.',
+            },
+            {
+              num: '40%',
+              text: 'deiner Ersparnisse kann durch Abgeltungssteuer und Inflation aufgezehrt werden — über 20 Jahre.',
+            },
+          ].map((s, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center', gap: 20,
+              background: i % 2 === 0 ? 'var(--bg2)' : 'var(--bg3)',
+              padding: '18px 24px',
+            }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 28, fontWeight: 500, color: 'var(--red)', minWidth: 100, flexShrink: 0, lineHeight: 1 }}>{s.num}</div>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>{s.text}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <button
+            onClick={handleEnter}
+            style={{
+              padding: '16px 36px', borderRadius: 100, border: 'none',
+              background: 'var(--text)', color: 'var(--bg)',
+              fontFamily: 'var(--sans)', fontSize: 16, fontWeight: 600,
+              cursor: 'pointer', letterSpacing: '-0.01em',
+              transition: 'transform 0.15s, opacity 0.15s',
+            }}
+            onMouseEnter={e => e.target.style.opacity = '0.88'}
+            onMouseLeave={e => e.target.style.opacity = '1'}
+          >
+            Zeig mir die Zahlen →
+          </button>
+          <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>Daten basieren auf dem offiziellen Bundeshaushalt 2024</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MAIN APP ──────────────────────────────────────────────────────────────────
+function App() {
+  const [salary, setSalary] = useState(4500);
+  const [activeSection, setActiveSection] = useState(0);
+  const [selectedCat, setSelectedCat] = useState(null);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'savings', 'outlook'];
+
+  const taxes = calcAll(salary);
+
+  useEffect(() => {
+    const handler = () => {
+      const scrollY = window.scrollY;
+      const height = window.innerHeight;
+      const idx = Math.min(sectionIds.length - 1, Math.round(scrollY / height));
+      setActiveSection(idx);
+    };
+    window.addEventListener('scroll', handler, { passive: true });
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  const totalTaken = taxes.incomeTax + taxes.soli + taxes.social;
+  const takenPct = (totalTaken / taxes.gross * 100);
+
+  const hints = [2500, 3500, 4500, 6000, 10000];
+
+  return (
+    <>
+      {showWelcome && <WelcomePopup onEnter={() => setShowWelcome(false)} />}
+      <NavDots active={activeSection} sections={sectionIds} />
+
+      {/* SECTION 1: HERO */}
+      <section id="hero">
+        <div className="section-label">Steuerbürger · Deutschland 2024</div>
+        <h1>Wohin fließt<br /><span className="red">dein Gehalt?</span></h1>
+        <div className="hero-grid">
+          <div className="salary-input-wrap">
+            <div>
+              <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 12, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                Dein monatliches Bruttogehalt
+              </div>
+              <div className="salary-display">
+                <input
+                  type="number"
+                  value={salary}
+                  min={1000}
+                  max={30000}
+                  step={100}
+                  onChange={e => setSalary(Math.max(500, +e.target.value || 0))}
+                />
+                <span className="salary-unit">€ / Monat</span>
+              </div>
+            </div>
+            <input
+              type="range"
+              min={1000}
+              max={20000}
+              step={100}
+              value={Math.min(salary, 20000)}
+              onChange={e => setSalary(+e.target.value)}
+            />
+            <div className="salary-hints">
+              {hints.map(h => (
+                <button key={h} className={`hint-btn ${salary === h ? 'active' : ''}`} onClick={() => setSalary(h)}>
+                  {fmt(h)} €
+                </button>
+              ))}
+            </div>
+            <div className="shocking">
+              <div className="section-label" style={{ marginBottom: 8 }}>Der Staat nimmt monatlich</div>
+              <div className="shocking-number">−{fmt(totalTaken)} €</div>
+              <div className="shocking-sub">
+                Das sind <strong>{takenPct.toFixed(1)}%</strong> deines Bruttogehalts — noch bevor du auch nur einen Cent ausgegeben hast.
+                Du bleibst mit <strong style={{ color: 'var(--green)' }}>{fmt(taxes.net)} € Netto</strong> übrig.
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div className="section-label" style={{ marginBottom: 12 }}>So teilt sich dein Gehalt auf</div>
+              <BigBar taxes={taxes} />
+            </div>
+            <div className="stats-row">
+              <div className="stat-card">
+                <div className="stat-label">Einkommensteuer</div>
+                <div className="stat-value mono red">{fmt(taxes.incomeTax)} €</div>
+                <div className="stat-sub">{(taxes.incomeTax/taxes.gross*100).toFixed(1)}% des Brutto</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-label">Sozialabgaben</div>
+                <div className="stat-value mono" style={{ color: 'var(--red2)' }}>{fmt(taxes.social)} €</div>
+                <div className="stat-sub">KV + RV + PV + AV</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-label">Dein Netto</div>
+                <div className="stat-value mono green">{fmt(taxes.net)} €</div>
+                <div className="stat-sub">{(taxes.net/taxes.gross*100).toFixed(1)}% des Brutto</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="scroll-hint">nach unten scrollen</div>
+      </section>
+
+      {/* SECTION 2: BREAKDOWN */}
+      <section id="breakdown">
+        <div className="section-label">Schicht für Schicht</div>
+        <h2>Die Steuerrechnung<br />im Detail</h2>
+        <div className="breakdown-grid">
+          <div>
+            <div style={{ marginBottom: 24, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              Von deinem Brutto werden mehrere Abgaben abgezogen, bevor du irgendetwas siehst.
+              Jeder Posten ist staatlich vorgeschrieben.
+            </div>
+            <div className="waterfall">
+              {[
+                { label: 'Bruttogehalt', amount: taxes.gross, bar: 100, color: 'transparent', showBar: false },
+              ].concat([
+                { label: 'Krankenversicherung (9%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.09 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.09/12) / taxes.gross * 100, color: 'var(--red)' },
+                { label: 'Rentenversicherung (9,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.093/12) / taxes.gross * 100, color: 'var(--red)' },
+                { label: 'Pflegeversicherung (1,85%)', amount: Math.round(Math.min(taxes.annualGross, 62100) * 0.0185 / 12), bar: (Math.min(taxes.annualGross, 62100)*0.0185/12) / taxes.gross * 100, color: 'var(--red2)' },
+                { label: 'Arbeitslosenversicherung (1,3%)', amount: Math.round(Math.min(taxes.annualGross, 90600) * 0.013 / 12), bar: (Math.min(taxes.annualGross, 90600)*0.013/12) / taxes.gross * 100, color: 'var(--red2)' },
+              ].concat(taxes.incomeTax > 0 ? [
+                { label: 'Einkommensteuer', amount: taxes.incomeTax, bar: taxes.incomeTax / taxes.gross * 100, color: 'var(--red3)' },
+              ] : []).concat(taxes.soli > 0 ? [
+                { label: 'Solidaritätszuschlag (5,5%)', amount: taxes.soli, bar: taxes.soli / taxes.gross * 100, color: '#c0392b' },
+              ] : [])).map((row, i) => (
+                <div key={i}>
+                  {i === 5 && <div className="wf-divider" />}
+                  <div className="wf-row" style={{ marginBottom: 6 }}>
+                    <div className="wf-label" style={{ color: i === 0 ? 'var(--text)' : 'var(--text-dim)', fontFamily: i === 0 ? 'var(--mono)' : undefined }}>
+                      {i === 0 ? `${fmt(row.amount)} € →` : row.label}
+                    </div>
+                    <div className="wf-bar-wrap">
+                      {row.showBar !== false && (
+                        <div className="wf-bar" style={{ width: `${row.bar}%`, background: row.color || 'var(--red)' }}>
+                          <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
+                            {row.bar > 15 && `${row.bar.toFixed(0)}%`}
+                          </span>
+                        </div>
+                      )}
+                      <span className="wf-value">−{fmt(row.amount)} €</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div className="wf-divider" />
+              <div className="wf-total-row">
+                <div className="wf-total-label" style={{ fontFamily: 'var(--mono)', color: 'var(--green)' }}>= Netto</div>
+                <div className="wf-bar-wrap">
+                  <div className="wf-bar" style={{ width: `${taxes.net/taxes.gross*100}%`, background: 'var(--green)' }} />
+                  <span className="wf-value green">{fmt(taxes.net)} €</span>
+                </div>
+              </div>
+            </div>
+            <div style={{ marginTop: 32, padding: 20, background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.8 }}>
+              <div style={{ marginBottom: 8, color: 'var(--text)', fontFamily: 'var(--mono)' }}>Grenzsteuersatz: <span className="red">{taxes.marginalRate.toFixed(0)}%</span></div>
+              Jeder zusätzliche Euro, den du verdienst, wird zu <strong style={{ color: 'var(--red)' }}>{taxes.marginalRate.toFixed(0)}%</strong> besteuert.
+              1 Überstunde á {fmt(salary/160, 2)} € Brutto bringt dir netto nur {fmt(salary/160 * (1 - taxes.marginalRate/100), 2)} €.
+            </div>
+          </div>
+          <MarginalChart monthly={salary} />
+        </div>
+      </section>
+
+      {/* SECTION 3: GOVT SPENDING */}
+      <section id="spending">
+        <div className="section-label">Bundeshaushalt 2024 · 476 Milliarden Euro</div>
+        <h2>Wofür werden<br />deine Steuern ausgegeben?</h2>
+        <div className="spending-intro">
+          Deine jährlichen Steuern: <strong className="red">{fmt(taxes.annualIT + taxes.annualSoli)} €</strong>.
+          So verteilt der Bund dein Geld (proportional zu deinem Anteil):
+        </div>
+        <SpendingTreemap taxes={taxes} onSelect={setSelectedCat} />
+        {selectedCat && (
+          <SpendingModal cat={selectedCat} taxes={taxes} onClose={() => setSelectedCat(null)} />
+        )}
+        <SpendingComparison taxes={taxes} />
+      </section>
+
+      {/* SECTION 4: VAT */}
+      <section id="vat">
+        <div className="section-label">Mehrwertsteuer · 19%</div>
+        <h2>Und wenn du<br />dein Netto ausgibst…</h2>
+        <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 700 }}>
+          Der Staat ist noch nicht fertig. Von jedem Euro, den du ausgibst, sind 
+          <strong style={{ color: 'var(--red)' }}> 15,97 Cent MwSt.</strong> — 
+          du wirst noch beim Ausgeben deines Nettos besteuert.
+        </div>
+        <VatSection taxes={taxes} />
+      </section>
+
+      {/* SECTION 5: SAVINGS */}
+      <section id="savings">
+        <div className="section-label">Abgeltungssteuer + Inflation</div>
+        <h2>Und wenn du<br />sparst…</h2>
+        <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 700 }}>
+          Auf Kapitalerträge (Zinsen, Dividenden, Kursgewinne) fällt 
+          <strong style={{ color: 'var(--red)' }}> Abgeltungssteuer von 26,375%</strong> an.
+          Die Inflation frisst den Rest. Was bleibt wirklich übrig?
+        </div>
+        <SavingsChart taxes={taxes} />
+      </section>
+
+      {/* SECTION 6: OUTLOOK */}
+      <section id="outlook">
+        <div className="section-label">Sondervermögen · EU · Ausblick</div>
+        <h2>Was kommt<br /><span className="red">noch auf dich zu?</span></h2>
+        <OutlookSection taxes={taxes} />
+      </section>
+
+      <footer className="footer">
+        <div className="footer-note">
+          Berechnung auf Basis Bundeshaushalt 2024, EStG §32a, Beitragssätze 2024 (KV 9% AN-Anteil + avg. Zusatzbeitrag, PV 1,85%, RV 9,3%, AV 1,3%). BBG: KV/PV 62.100 €/J., RV/AV 90.600 €/J. Steuerklasse 1, keine Kinder, keine Kirche. Zahlen dienen der Illustration.
+          <div style={{ marginTop: 14, display: 'flex', flexWrap: 'wrap', gap: '6px 20px' }}>
+            {[
+              { label: 'Bundeshaushalt 2024', url: 'https://www.bundeshaushalt.de' },
+              { label: 'BMF — Steuereinnahmen', url: 'https://www.bundesfinanzministerium.de/Web/DE/Themen/Steuern/steuern.html' },
+              { label: 'Destatis — Steuerquote', url: 'https://www.destatis.de/DE/Themen/Staat/Steuern/_inhalt.html' },
+              { label: 'EStG §32a (Einkommensteuer)', url: 'https://www.gesetze-im-internet.de/estg/__32a.html' },
+              { label: 'EU-Haushalt 2024', url: 'https://commission.europa.eu/strategy-and-policy/eu-budget_de' },
+              { label: 'Sondervermögen Bundeswehr', url: 'https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Schlaglichter/Sondervermoegen-Bundeswehr/sondervermoegen-bundeswehr.html' },
+              { label: 'Schuldenstand Deutschland', url: 'https://www.bundesbank.de/de/statistiken/oeffentliche-finanzen' },
+              { label: 'bpb — Staatsausgaben', url: 'https://www.bpb.de/kurz-knapp/zahlen-und-fakten/soziale-situation-in-deutschland/61769/staatsausgaben/' },
+            ].map((s, i) => (
+              <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+                style={{ color: 'var(--text-dim)', fontSize: 11, fontFamily: 'var(--mono)', textDecoration: 'none', borderBottom: '1px solid var(--border)', paddingBottom: 1, transition: 'color 0.15s' }}
+                onMouseEnter={e => e.target.style.color = 'var(--text)'}
+                onMouseLeave={e => e.target.style.color = 'var(--text-dim)'}
+              >{s.label} ↗</a>
+            ))}
+          </div>
+        </div>
+        <div className="footer-year mono" style={{ fontSize: 11 }}>Stand 2024 / 2025</div>
+      </footer>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
