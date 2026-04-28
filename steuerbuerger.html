@@ -854,7 +854,7 @@ function SavingsChart({ taxes }) {
   const [savePct, setSavePct] = useState(20);
   const [years, setYears] = useState(20);
   const [interest, setInterest] = useState(5);
-  const [inflation, setInflation] = useState(2.5);
+  const [inflation, setInflation] = useState(2);
 
   const monthlySaving = taxes.net * savePct / 100;
   const annualSaving = monthlySaving * 12;
@@ -2182,7 +2182,7 @@ function App() {
         {(() => {
           const monthlyTax = taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial;
           const rate = 0.075 / 12;
-          const inflation = 0.025;
+          const inflation = 0.02;
           const months = 20 * 12;
           // Future value of annuity: PMT × ((1+r)^n - 1) / r
           const fv = monthlyTax * ((Math.pow(1 + rate, months) - 1) / rate);
@@ -2258,7 +2258,7 @@ function App() {
                       <span className="mono green">+ {fmt(gains)} €</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, borderTop: '1px solid rgba(74,190,100,0.2)', paddingTop: 8 }}>
-                      <span style={{ color: 'var(--red)' }}>− Inflation (2,5%/J.)</span>
+                      <span style={{ color: 'var(--red)' }}>− Inflation (2%/J.)</span>
                       <span className="mono red">− {fmt(inflationLoss)} €</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, borderTop: '1px solid rgba(74,190,100,0.2)', paddingTop: 8, fontWeight: 600 }}>
@@ -2331,7 +2331,7 @@ function App() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <div style={{ width: 14, height: 2, background: 'var(--gold)', borderRadius: 1 }} />
-                    <span>Real (nach 2,5% Inflation)</span>
+                    <span>Real (nach 2% Inflation)</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <div style={{ width: 14, height: 2, background: 'var(--text)', opacity: 0.4, borderRadius: 1 }} />
@@ -2528,7 +2528,7 @@ function App() {
             </div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>📈</div>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>📉</div>
             <h4 style={{ fontSize: 16, marginBottom: 8 }}>3. Kaufkraft sinkt</h4>
             <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>
               Mehr Geld trifft auf gleich viele Güter — die Preise steigen.
@@ -2579,7 +2579,7 @@ function App() {
             Aber was kannst du dir davon noch kaufen?
           </div>
           {(() => {
-            const inflRate = 0.025;
+            const inflRate = 0.02;
             const monthly = 100;
             const years = 20;
             const dataPoints = [];
@@ -2958,6 +2958,7 @@ function App() {
             <h4 style={{ fontSize: 15, marginBottom: 8 }}>Deflationäres Sparen</h4>
             <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
               Bitcoin hat einen fixen Supply von 21 Mio. — die einzige Währung, deren Menge nicht politisch steuerbar ist. Kontrovers, aber ein Gegenentwurf zur Geldmengenausweitung.
+              Gold als klassischer Inflationsschutz seit Jahrtausenden.
             </div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
