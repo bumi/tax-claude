@@ -143,6 +143,7 @@ svg text { font-family: var(--mono); }
 .euro-cell { aspect-ratio: 1; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 8px; }
 
 /* SAVINGS SECTION */
+#geldfluss { background: var(--bg); }
 #savings { background: var(--bg); }
 #inflation { background: var(--bg); }
 #opportunity { background: var(--bg); }
@@ -759,8 +760,7 @@ function SpendingTreemap({ taxes, onSelect }) {
   );
 }
 
-function VatSection({ taxes }) {
-  const [spendPct, setSpendPct] = useState(80);
+function VatSection({ taxes, spendPct, setSpendPct }) {
   const net = taxes.net;
   const spending = net * spendPct / 100;
   const saving = net - spending;
@@ -1679,7 +1679,8 @@ function App() {
   const [selectedCat, setSelectedCat] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
   const [inclSocial, setInclSocial] = useState(false);
-  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
+  const [spendPct, setSpendPct] = useState(80);
+  const sectionIds = ['hero', 'breakdown', 'geldfluss', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
 
   const taxes = calcAll(salary);
 
@@ -1916,6 +1917,259 @@ function App() {
         </div>
       </section>
 
+      {/* SECTION: GELDFLUSS SANKEY */}
+      <section id="geldfluss">
+        <div className="section-label">Wohin fließt dein Geld?</div>
+        <h2>Der Geldfluss<br /><span className="red">von deinen Arbeitskosten</span></h2>
+        <div style={{ marginBottom: 32, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          Dein Arbeitgeber zahlt <strong style={{ color: 'var(--text)' }}>{fmt(taxes.laborCost)} €</strong> für dich.
+          Hier siehst du, wohin jeder Euro fließt — und wer darüber entscheidet.
+          Die Einkommensteuer gehört nicht nur dem Bund: <strong style={{ color: 'var(--text)' }}>42,5% Bund, 42,5% Länder, 15% Gemeinden</strong> (Art. 106 GG).
+        </div>
+        {(() => {
+          // === DATA ===
+          const agKV = Math.round(Math.min(taxes.annualGross, 62100) * 0.0815 / 12);
+          const agRV = Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12);
+          const agPV = Math.round(Math.min(taxes.annualGross, 62100) * 0.017 / 12);
+          const agAV = Math.round(Math.min(taxes.annualGross, 90600) * 0.013 / 12);
+          const anKV = Math.round(Math.min(taxes.annualGross, 62100) * 0.0815 / 12);
+          const anRV = Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12);
+          const anPV = Math.round(Math.min(taxes.annualGross, 62100) * 0.023 / 12);
+          const anAV = Math.round(Math.min(taxes.annualGross, 90600) * 0.013 / 12);
+          const est = taxes.incomeTax;
+          const soli = taxes.soli;
+          const netto = taxes.net;
+          const total = taxes.laborCost;
+
+          // Middle column: recipients
+          const bundESt = Math.round(est * 0.425);
+          const laenderESt = Math.round(est * 0.425);
+          const gemeindenESt = Math.round(est * 0.15);
+          const bundSoli = soli;
+          const bundTotal = bundESt + bundSoli;
+          const laenderTotal = laenderESt;
+          const gemeindenTotal = gemeindenESt;
+          const rvTotal = anRV + agRV;
+          const kvTotal = anKV + agKV;
+          const pvTotal = anPV + agPV;
+          const avTotal = anAV + agAV;
+
+          // Column 3: What happens to Netto (MwSt + Alltagssteuern)
+          const nettoSpending = netto * spendPct / 100;
+          const vatFromNetto = Math.round(nettoSpending * 19 / 119);
+          // Einzelne Verbrauchsteuern & Zwangsabgaben (monatlich, Durchschnittswerte)
+          const kaltmiete = Math.round(netto * 0.25); // Ø ~25% des Netto (Destatis 2022: 27,8% Bruttokaltmiete, Kaltmiete allein ~25%)
+          const energiesteuer = Math.round(1080 / 12); // Autofahren: ~1.080 €/Jahr
+          const versicherungsteuer = Math.round(304 / 12); // Versicherungsteuer: ~304 €/Jahr
+          const rundfunk = 18; // Rundfunkbeitrag: 18,36 €/Mo pro Haushalt
+          const kaffeesteuer = Math.round(16 / 12); // Kaffeesteuer: ~16 €/Jahr
+          const bierSektsteuer = Math.round(16 / 12); // Bier + Sekt: ~16 €/Jahr
+          const alltagsTotal = energiesteuer + versicherungsteuer + rundfunk + kaffeesteuer + bierSektsteuer;
+          const verbleibt = netto - vatFromNetto - kaltmiete - alltagsTotal;
+
+          // === SANKEY LAYOUT ===
+          const w = 900, h = 520;
+          const colX = [80, 260, 460, 680]; // 4 columns: source, deductions, recipients, netto-split
+          const nodeW = 14;
+
+          // Helper: layout nodes vertically with gaps
+          const layoutNodes = (items, startY, availH, gap = 6) => {
+            const totalVal = items.reduce((s, it) => s + it.value, 0);
+            const totalGap = gap * (items.length - 1);
+            const scale = (availH - totalGap) / totalVal;
+            let y = startY;
+            return items.map(it => {
+              const height = Math.max(2, it.value * scale);
+              const node = { ...it, y, height };
+              y += height + gap;
+              return node;
+            });
+          };
+
+          // Column 0: Labor cost (single block)
+          const col0 = [{ label: 'Arbeitskosten', value: total, color: 'var(--text-dim)' }];
+          const nodes0 = layoutNodes(col0, 20, h - 40);
+
+          // Column 1: Deductions breakdown
+          const col1Items = [
+            { label: 'AG-Krankenvers.', value: agKV, color: 'var(--red4)' },
+            { label: 'AG-Rentenvers.', value: agRV, color: 'var(--red4)' },
+            { label: 'AG-Pflegevers.', value: agPV, color: 'var(--red4)' },
+            { label: 'AG-Arbeitslosenvers.', value: agAV, color: 'var(--red4)' },
+            { label: 'AN-Krankenvers.', value: anKV, color: 'var(--red2)' },
+            { label: 'AN-Rentenvers.', value: anRV, color: 'var(--red2)' },
+            { label: 'AN-Pflegevers.', value: anPV, color: 'var(--red2)' },
+            { label: 'AN-Arbeitslosenvers.', value: anAV, color: 'var(--red2)' },
+            { label: 'Einkommensteuer', value: est, color: 'var(--red)' },
+            ...(soli > 0 ? [{ label: 'Soli', value: soli, color: 'var(--red3)' }] : []),
+            { label: 'Netto', value: netto, color: 'var(--green)' },
+          ];
+          const nodes1 = layoutNodes(col1Items, 20, h - 40);
+
+          // Column 2: Recipients
+          const col2Items = [
+            { label: 'Krankenkassen', value: kvTotal, color: '#c0392b' },
+            { label: 'Rentenversicherung', value: rvTotal, color: '#a93226' },
+            { label: 'Pflegekassen', value: pvTotal, color: '#96281b' },
+            { label: 'BA für Arbeit', value: avTotal, color: '#d35400' },
+            { label: 'Bund (42,5% ESt)', value: bundTotal, color: 'var(--red)' },
+            { label: 'Länder (42,5% ESt)', value: laenderTotal, color: 'var(--red3)' },
+            { label: 'Gemeinden (15% ESt)', value: gemeindenTotal, color: 'var(--red4)' },
+            { label: 'Du', value: netto, color: 'var(--green)' },
+          ];
+          const nodes2 = layoutNodes(col2Items, 20, h - 40);
+
+          // Column 3: Netto breakdown
+          const col3Items = [
+            { label: 'Kaltmiete (Ø 25%)', value: kaltmiete, color: 'var(--text-dim)' },
+            { label: 'MwSt (' + spendPct + '% Konsum)', value: vatFromNetto, color: 'var(--red3)' },
+            { label: 'Energiesteuer (Kraftstoff)', value: energiesteuer, color: 'var(--red4)' },
+            { label: 'Versicherungsteuer', value: versicherungsteuer, color: 'var(--red4)' },
+            { label: 'Rundfunkbeitrag', value: rundfunk, color: 'var(--red4)' },
+            { label: 'Kaffee-/Bier-/Sektsteuer', value: kaffeesteuer + bierSektsteuer, color: 'var(--red4)' },
+            { label: 'Verbleibt bei dir', value: Math.max(1, verbleibt), color: 'var(--green)' },
+          ];
+          // Layout col3 aligned to "Du" node in col2
+          const duNode = nodes2[nodes2.length - 1]; // last node = Du
+          const nodes3 = layoutNodes(col3Items, duNode.y, duNode.height, 4);
+
+          // Draw Sankey flow path
+          const flowPath = (x0, y0, h0, x1, y1, h1) => {
+            const midX = (x0 + x1) / 2;
+            return `M${x0},${y0} C${midX},${y0} ${midX},${y1} ${x1},${y1} L${x1},${y1 + h1} C${midX},${y1 + h1} ${midX},${y0 + h0} ${x0},${y0 + h0} Z`;
+          };
+
+          // Build flows: col0 → col1
+          const flows01 = [];
+          let srcOffset0 = 0;
+          nodes1.forEach(n1 => {
+            const frac = n1.value / total;
+            const srcH = frac * nodes0[0].height;
+            flows01.push({
+              path: flowPath(colX[0] + nodeW, nodes0[0].y + srcOffset0, srcH, colX[1], n1.y, n1.height),
+              color: n1.color, opacity: 0.35,
+            });
+            srcOffset0 += srcH;
+          });
+
+          // Build flows: col1 → col2
+          const flows12 = [];
+          const col2Offsets = nodes2.map(() => 0);
+          // Map: which col1 nodes flow to which col2 nodes
+          const mapping12 = [
+            // AG social → insurance
+            { from: 0, to: 0, value: agKV }, // AG-KV → Krankenkassen
+            { from: 1, to: 1, value: agRV }, // AG-RV → Rentenvers.
+            { from: 2, to: 2, value: agPV }, // AG-PV → Pflegekassen
+            { from: 3, to: 3, value: agAV }, // AG-AV → BA für Arbeit
+            // AN social → insurance
+            { from: 4, to: 0, value: anKV }, // AN-KV → Krankenkassen
+            { from: 5, to: 1, value: anRV }, // AN-RV → Rentenvers.
+            { from: 6, to: 2, value: anPV }, // AN-PV → Pflegekassen
+            { from: 7, to: 3, value: anAV }, // AN-AV → BA für Arbeit
+            // ESt → Bund/Länder/Gemeinden
+            { from: 8, to: 4, value: bundESt }, // ESt → Bund
+            { from: 8, to: 5, value: laenderESt }, // ESt → Länder
+            { from: 8, to: 6, value: gemeindenESt }, // ESt → Gemeinden
+          ];
+          // Soli → Bund
+          if (soli > 0) {
+            mapping12.push({ from: nodes1.length - 2, to: 4, value: soli }); // Soli node → Bund
+          }
+          // Netto → Du
+          mapping12.push({ from: nodes1.length - 1, to: 7, value: netto });
+
+          const col1Offsets = nodes1.map(() => 0);
+          mapping12.forEach(m => {
+            const n1 = nodes1[m.from];
+            const n2 = nodes2[m.to];
+            const srcFrac = m.value / n1.value;
+            const dstFrac = m.value / n2.value;
+            const srcH = srcFrac * n1.height;
+            const dstH = dstFrac * n2.height;
+            flows12.push({
+              path: flowPath(colX[1] + nodeW, n1.y + col1Offsets[m.from], srcH, colX[2], n2.y + col2Offsets[m.to], dstH),
+              color: n2.color, opacity: 0.3,
+            });
+            col1Offsets[m.from] += srcH;
+            col2Offsets[m.to] += dstH;
+          });
+
+          // Build flows: col2 (Du) → col3
+          const flows23 = [];
+          let duOffset = 0;
+          nodes3.forEach(n3 => {
+            const frac = n3.value / duNode.value;
+            const srcH = frac * duNode.height;
+            flows23.push({
+              path: flowPath(colX[2] + nodeW, duNode.y + duOffset, srcH, colX[3], n3.y, n3.height),
+              color: n3.color, opacity: 0.3,
+            });
+            duOffset += srcH;
+          });
+
+          return (
+            <div style={{ overflowX: 'auto' }}>
+              <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ minWidth: 700, overflow: 'visible' }}>
+                {/* Column headers */}
+                <text x={colX[0] + nodeW/2} y={10} fill="#555" fontSize="10" textAnchor="middle" fontFamily="var(--mono)">ARBEITSKOSTEN</text>
+                <text x={colX[1] + nodeW/2} y={10} fill="#555" fontSize="10" textAnchor="middle" fontFamily="var(--mono)">ABZÜGE</text>
+                <text x={colX[2] + nodeW/2} y={10} fill="#555" fontSize="10" textAnchor="middle" fontFamily="var(--mono)">EMPFÄNGER</text>
+                <text x={colX[3] + nodeW/2} y={10} fill="#555" fontSize="10" textAnchor="middle" fontFamily="var(--mono)">DEIN NETTO</text>
+
+                {/* Flows */}
+                {[...flows01, ...flows12, ...flows23].map((f, i) => (
+                  <path key={i} d={f.path} fill={f.color} opacity={f.opacity} />
+                ))}
+
+                {/* Nodes col0 */}
+                {nodes0.map((n, i) => (
+                  <g key={`c0-${i}`}>
+                    <rect x={colX[0]} y={n.y} width={nodeW} height={n.height} fill="var(--text-dim)" rx="2" />
+                    <text x={colX[0] - 4} y={n.y + n.height/2 + 4} fill="var(--text)" fontSize="11" textAnchor="end" fontWeight="600">{fmt(n.value)} €</text>
+                  </g>
+                ))}
+
+                {/* Nodes col1 */}
+                {nodes1.map((n, i) => (
+                  <g key={`c1-${i}`}>
+                    <rect x={colX[1]} y={n.y} width={nodeW} height={n.height} fill={n.color} rx="2" />
+                    {n.height > 10 && (
+                      <text x={colX[1] + nodeW + 4} y={n.y + n.height/2 + 3} fill="var(--text-dim)" fontSize="9">{n.label} ({fmt(n.value)} €)</text>
+                    )}
+                  </g>
+                ))}
+
+                {/* Nodes col2 */}
+                {nodes2.map((n, i) => (
+                  <g key={`c2-${i}`}>
+                    <rect x={colX[2]} y={n.y} width={nodeW} height={n.height} fill={n.color} rx="2" />
+                    {n.height > 10 && (
+                      <text x={colX[2] + nodeW + 4} y={n.y + n.height/2 + 3} fill="var(--text-dim)" fontSize="9">{n.label} ({fmt(n.value)} €)</text>
+                    )}
+                  </g>
+                ))}
+
+                {/* Nodes col3 */}
+                {nodes3.map((n, i) => (
+                  <g key={`c3-${i}`}>
+                    <rect x={colX[3]} y={n.y} width={nodeW} height={n.height} fill={n.color} rx="2" />
+                    {n.height > 6 && (
+                      <text x={colX[3] + nodeW + 4} y={n.y + n.height/2 + 3} fill="var(--text-dim)" fontSize="9">{n.label} ({fmt(n.value)} €)</text>
+                    )}
+                  </g>
+                ))}
+
+              </svg>
+            </div>
+          );
+        })()}
+        <div style={{ marginTop: 24, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+          Quelle Steuerverteilung: <a href="https://www.gesetze-im-internet.de/gg/art_106.html" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Art. 106 GG</a>.
+          Sozialversicherungsbeiträge fließen direkt an die jeweiligen Träger, nicht über den Staatshaushalt.
+        </div>
+      </section>
+
       {/* SECTION 3: GOVT SPENDING */}
       <section id="spending">
         <div className="section-label">Bundeshaushalt 2024 · 476 Milliarden Euro</div>
@@ -1943,7 +2197,7 @@ function App() {
             Hinweis: Lebensmittel, Bücher u.a. werden mit 7% besteuert, Kaltmiete ist MwSt-frei (0%). Die Berechnung unten nutzt den Regelsteuersatz von 19% — der reale MwSt-Anteil liegt dadurch etwas niedriger. Es geht hier nur um Konsum und dient zur Veranschaulichung.
           </span>
         </div>
-        <VatSection taxes={taxes} />
+        <VatSection taxes={taxes} spendPct={spendPct} setSpendPct={setSpendPct} />
       </section>
 
       {/* SECTION 4b: HIDDEN TAXES */}
