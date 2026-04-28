@@ -1746,6 +1746,9 @@ function App() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [inclSocial, setInclSocial] = useState(false);
   const [spendPct, setSpendPct] = useState(80);
+  const [oppYears, setOppYears] = useState(20);
+  const [oppInterest, setOppInterest] = useState(7.5);
+  const [oppInflation, setOppInflation] = useState(2);
   const sectionIds = ['hero', 'breakdown', 'geldfluss', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
 
   const taxes = calcAll(salary);
@@ -2485,7 +2488,7 @@ function App() {
         <div className="section-label">Gedankenexperiment</div>
         <h2>Was wäre, wenn du<br /><span className="red">keine Einkommensteuer{inclSocial ? ' & Sozialabgaben' : ''}</span> zahlen müsstest?</h2>
         <div style={{ marginBottom: 24, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
-          Stell dir vor, du könntest den Betrag, der jeden Monat durch Einkommensteuer{inclSocial ? ' und Sozialabgaben' : ''} abfließt, stattdessen mit <strong style={{ color: 'var(--text)' }}>7,5% Rendite</strong> anlegen (historischer Durchschnitt MSCI World). Der Staat nimmt trotzdem weiterhin hunderte Milliarden über <strong style={{ color: 'var(--text)' }}>Konsumsteuern</strong> ein. Rein zur Inspiration — wie es anders gehen könnte, zeigt die Sektion <a href="#rethink" style={{ color: 'var(--gold)' }}>Steuern &amp; Geld neu denken</a>.
+          Stell dir vor, du könntest den Betrag, der jeden Monat durch Einkommensteuer{inclSocial ? ' und Sozialabgaben' : ''} abfließt, stattdessen anlegen. Der Staat nimmt trotzdem weiterhin hunderte Milliarden über <strong style={{ color: 'var(--text)' }}>Konsumsteuern</strong> ein. Rein zur Inspiration — wie es anders gehen könnte, zeigt die Sektion <a href="#rethink" style={{ color: 'var(--gold)' }}>Steuern &amp; Geld neu denken</a>.
         </div>
         {/* Toggle: Sozialabgaben einbeziehen */}
         <div style={{ marginBottom: 36, display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -2512,15 +2515,15 @@ function App() {
           const monthlyTax = inclSocial
             ? taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial
             : taxes.incomeTax + taxes.soli;
-          const rate = 0.075 / 12;
-          const inflation = 0.02;
-          const months = 20 * 12;
+          const rate = oppInterest / 100 / 12;
+          const inflRate = oppInflation / 100;
+          const months = oppYears * 12;
           // Future value of annuity: PMT × ((1+r)^n - 1) / r
-          const fv = monthlyTax * ((Math.pow(1 + rate, months) - 1) / rate);
+          const fv = rate > 0 ? monthlyTax * ((Math.pow(1 + rate, months) - 1) / rate) : monthlyTax * months;
           const totalPaid = monthlyTax * months;
           const gains = fv - totalPaid;
           // Real purchasing power after inflation
-          const realFv = fv / Math.pow(1 + inflation, 20);
+          const realFv = fv / Math.pow(1 + inflRate, oppYears);
           const inflationLoss = fv - realFv;
 
           // Breakdown by type
@@ -2532,22 +2535,46 @@ function App() {
           ];
 
           // Year-by-year for chart
-          const yearPoints = Array.from({ length: 21 }, (_, yr) => {
+          const yearPoints = Array.from({ length: oppYears + 1 }, (_, yr) => {
             const m = yr * 12;
-            const value = monthlyTax * ((Math.pow(1 + rate, m) - 1) / rate);
+            const value = rate > 0 ? monthlyTax * ((Math.pow(1 + rate, m) - 1) / rate) : monthlyTax * m;
             const paid = monthlyTax * m;
-            const real = value / Math.pow(1 + inflation, yr);
+            const real = value / Math.pow(1 + inflRate, yr);
             return { yr, value, paid, real };
           });
-          const maxVal = yearPoints[20].value;
+          const lastPt = yearPoints[oppYears];
+          const maxVal = lastPt.value;
           const w = 520, h = 240, pad = { top: 16, right: 20, bottom: 36, left: 56 };
-          const xS = yr => pad.left + (yr / 20) * (w - pad.left - pad.right);
-          const yS = v => pad.top + (1 - v / maxVal) * (h - pad.top - pad.bottom);
+          const xS = yr => pad.left + (yr / oppYears) * (w - pad.left - pad.right);
+          const yS = v => pad.top + (1 - v / (maxVal || 1)) * (h - pad.top - pad.bottom);
           const linePath = (key) => yearPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
 
           return (
             <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div className="ctrl-row">
+                    <div className="ctrl-label">
+                      <span className="ctrl-name">Zeitraum</span>
+                      <span className="ctrl-value mono">{oppYears} Jahre</span>
+                    </div>
+                    <input type="range" min="1" max="40" value={oppYears} onChange={e => setOppYears(+e.target.value)} />
+                  </div>
+                  <div className="ctrl-row">
+                    <div className="ctrl-label">
+                      <span className="ctrl-name">Rendite (nominal)</span>
+                      <span className="ctrl-value mono">{oppInterest}% / Jahr</span>
+                    </div>
+                    <input type="range" min="0" max="12" step="0.5" value={oppInterest} onChange={e => setOppInterest(+e.target.value)} />
+                  </div>
+                  <div className="ctrl-row">
+                    <div className="ctrl-label">
+                      <span className="ctrl-name">Inflation</span>
+                      <span className="ctrl-value mono">{oppInflation}% / Jahr</span>
+                    </div>
+                    <input type="range" min="0" max="8" step="0.5" value={oppInflation} onChange={e => setOppInflation(+e.target.value)} />
+                  </div>
+                </div>
                 <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
                     {inclSocial ? 'Monatlich an den Staat (inkl. AG-Anteil)' : 'Monatlich Einkommensteuer + Soli'}
@@ -2574,14 +2601,14 @@ function App() {
 
                 <div style={{ background: 'rgba(74,190,100,0.06)', borderRadius: 14, padding: '28px', border: '1px solid rgba(74,190,100,0.25)' }}>
                   <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
-                    Nach 20 Jahren bei 7,5% Rendite
+                    Nach {oppYears} Jahren bei {oppInterest}% Rendite
                   </div>
                   <div style={{ fontFamily: 'var(--mono)', fontSize: 48, fontWeight: 500, color: 'var(--green)', lineHeight: 1, letterSpacing: '-0.02em' }}>
                     {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(2)} Mio.` : `${fmt(fv)}`} €
                   </div>
                   <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
-                      <span>Eingezahlt (240 Monate)</span>
+                      <span>Eingezahlt ({months} Monate)</span>
                       <span className="mono">{fmt(totalPaid)} €</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
@@ -2589,7 +2616,7 @@ function App() {
                       <span className="mono green">+ {fmt(gains)} €</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, borderTop: '1px solid rgba(74,190,100,0.2)', paddingTop: 8 }}>
-                      <span style={{ color: 'var(--red)' }}>− Inflation (2%/J.)</span>
+                      <span style={{ color: 'var(--red)' }}>− Inflation ({oppInflation}%/J.)</span>
                       <span className="mono red">− {fmt(inflationLoss)} €</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, borderTop: '1px solid rgba(74,190,100,0.2)', paddingTop: 8, fontWeight: 600 }}>
@@ -2601,14 +2628,14 @@ function App() {
 
                 <div style={{ padding: '18px 22px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                   <strong style={{ color: 'var(--text)' }}>Zum Vergleich:</strong>{' '}
-                  Stattdessen zahlst du in 20 Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und finanzierst damit ein Rentenversprechen (ob es in 20 Jahren noch eingelöst wird, weiß niemand), Grundsicherung, Infrastruktur (Straßen, Schiene, Digital), Forschung, Energiewende — aber auch Militär, Schuldzinsen und EU-Transfers.
+                  Stattdessen zahlst du in {oppYears} Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und finanzierst damit ein Rentenversprechen (ob es in 20 Jahren noch eingelöst wird, weiß niemand), Grundsicherung, Infrastruktur (Straßen, Schiene, Digital), Forschung, Energiewende — aber auch Militär, Schuldzinsen und EU-Transfers.
                   Es geht nicht um die Abschaffung von Steuern, sondern darum, die <strong style={{ color: 'var(--text)' }}>Opportunitätskosten</strong> zu verdeutlichen. Ob das ein gutes Geschäft ist, entscheidest du.
                 </div>
               </div>
 
               <div>
                 <div style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
-                  Vermögensentwicklung über 20 Jahre
+                  Vermögensentwicklung über {oppYears} Jahre
                 </div>
                 <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: 'visible' }}>
                   <defs>
@@ -2628,41 +2655,42 @@ function App() {
                       </g>
                     );
                   })}
-                  {yearPoints.map((p, i) => (
-                    i % 2 === 0 && <text key={i} x={xS(p.yr)} y={h - 4} fill="#555" fontSize="10" textAnchor="middle">{p.yr}J</text>
-                  ))}
-                  <path d={`${linePath('value')} L${xS(20)},${yS(0)} L${xS(0)},${yS(0)} Z`} fill="url(#oppGrad)" />
+                  {yearPoints.map((p, i) => {
+                    const step = oppYears <= 10 ? 1 : oppYears <= 20 ? 2 : oppYears <= 30 ? 5 : 10;
+                    return (i % step === 0 || i === oppYears) && <text key={i} x={xS(p.yr)} y={h - 4} fill="#555" fontSize="10" textAnchor="middle">{p.yr}J</text>;
+                  })}
+                  <path d={`${linePath('value')} L${xS(oppYears)},${yS(0)} L${xS(0)},${yS(0)} Z`} fill="url(#oppGrad)" />
                   {/* Gap between nominal and real */}
                   <path
-                    d={`${linePath('value')} L${xS(20)},${yS(yearPoints[20].real)} ${[...yearPoints].reverse().map((p,i)=>`${i===0?'M':'L'}${xS(p.yr)},${yS(p.real)}`).join(' ')} Z`}
+                    d={`${linePath('value')} L${xS(oppYears)},${yS(lastPt.real)} ${[...yearPoints].reverse().map((p,i)=>`${i===0?'M':'L'}${xS(p.yr)},${yS(p.real)}`).join(' ')} Z`}
                     fill="var(--red)" opacity="0.06"
                   />
                   <path d={linePath('paid')} fill="none" stroke="var(--text)" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.4" />
                   <path d={linePath('value')} fill="none" stroke="var(--green)" strokeWidth="2.5" />
                   <path d={linePath('real')} fill="none" stroke="var(--gold)" strokeWidth="2" strokeDasharray="6,3" />
                   {/* End markers */}
-                  <circle cx={xS(20)} cy={yS(yearPoints[20].value)} r="4" fill="var(--green)" />
-                  <circle cx={xS(20)} cy={yS(yearPoints[20].real)} r="3" fill="var(--gold)" />
-                  <circle cx={xS(20)} cy={yS(yearPoints[20].paid)} r="4" fill="var(--text)" opacity="0.5" />
+                  <circle cx={xS(oppYears)} cy={yS(lastPt.value)} r="4" fill="var(--green)" />
+                  <circle cx={xS(oppYears)} cy={yS(lastPt.real)} r="3" fill="var(--gold)" />
+                  <circle cx={xS(oppYears)} cy={yS(lastPt.paid)} r="4" fill="var(--text)" opacity="0.5" />
                   {/* Labels at end */}
-                  <text x={xS(20) + 8} y={yS(yearPoints[20].value) + 4} fill="var(--green)" fontSize="11" fontFamily="var(--mono)">
+                  <text x={xS(oppYears) + 8} y={yS(lastPt.value) + 4} fill="var(--green)" fontSize="11" fontFamily="var(--mono)">
                     {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(1)}M` : `${(fv / 1000).toFixed(0)}k`}
                   </text>
-                  <text x={xS(20) + 8} y={yS(yearPoints[20].real) + 4} fill="var(--gold)" fontSize="10" fontFamily="var(--mono)">
+                  <text x={xS(oppYears) + 8} y={yS(lastPt.real) + 4} fill="var(--gold)" fontSize="10" fontFamily="var(--mono)">
                     {realFv >= 1_000_000 ? `${(realFv / 1_000_000).toFixed(1)}M` : `${(realFv / 1000).toFixed(0)}k`} real
                   </text>
-                  <text x={xS(20) + 8} y={yS(yearPoints[20].paid) + 4} fill="#666" fontSize="11" fontFamily="var(--mono)">
+                  <text x={xS(oppYears) + 8} y={yS(lastPt.paid) + 4} fill="#666" fontSize="11" fontFamily="var(--mono)">
                     {(totalPaid / 1000).toFixed(0)}k
                   </text>
                 </svg>
                 <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 11, color: 'var(--text-dim)', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <div style={{ width: 14, height: 2, background: 'var(--green)', borderRadius: 1 }} />
-                    <span>Nominal (7,5%)</span>
+                    <span>Nominal ({oppInterest}%)</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <div style={{ width: 14, height: 2, background: 'var(--gold)', borderRadius: 1 }} />
-                    <span>Real (nach 2% Inflation)</span>
+                    <span>Real (nach {oppInflation}% Inflation)</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <div style={{ width: 14, height: 2, background: 'var(--text)', opacity: 0.4, borderRadius: 1 }} />
@@ -2672,8 +2700,8 @@ function App() {
 
                 <div className="resp-grid-2col" style={{ marginTop: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   {[
-                    { label: 'Nach 10 Jahren', value: yearPoints[10].value, paid: yearPoints[10].paid, real: yearPoints[10].real },
-                    { label: 'Nach 20 Jahren', value: yearPoints[20].value, paid: yearPoints[20].paid, real: yearPoints[20].real },
+                    { label: `Nach ${Math.floor(oppYears / 2)} Jahren`, value: yearPoints[Math.floor(oppYears / 2)].value, paid: yearPoints[Math.floor(oppYears / 2)].paid, real: yearPoints[Math.floor(oppYears / 2)].real },
+                    { label: `Nach ${oppYears} Jahren`, value: lastPt.value, paid: lastPt.paid, real: lastPt.real },
                   ].map((item, i) => (
                     <div key={i} style={{ background: 'var(--bg2)', borderRadius: 10, padding: '16px 18px', border: '1px solid var(--border)' }}>
                       <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{item.label}</div>
