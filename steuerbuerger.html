@@ -146,6 +146,7 @@ svg text { font-family: var(--mono); }
 #savings { background: var(--bg); }
 #inflation { background: var(--bg); }
 #opportunity { background: var(--bg); }
+#rethink { background: var(--bg); }
 #actions { background: var(--bg); }
 .savings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
 .savings-controls { display: flex; flex-direction: column; gap: 24px; }
@@ -1670,7 +1671,7 @@ function App() {
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'actions'];
+  const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
 
   const taxes = calcAll(salary);
 
@@ -2688,12 +2689,206 @@ function App() {
         <OutlookSection taxes={taxes} />
       </section>
 
+      {/* SECTION: RETHINK */}
+      <section id="rethink">
+        <div className="section-label">Gedankenexperiment</div>
+        <h2>Was wäre, wenn wir<br /><span className="red">Steuern & Geld neu denken?</span></h2>
+        <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          Das Steuersystem bestraft Arbeit. Das Geldsystem entwertet Ersparnisse.
+          Was, wenn beides <strong style={{ color: 'var(--text)' }}>grundlegend anders</strong> funktionieren könnte?
+          Keine Utopien — sondern reale Vorschläge, funktionierende Experimente und akademische Grundlagen.
+        </div>
+
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
+          Steuern neu denken
+        </div>
+
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🧾</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>FairTax — nur Konsum besteuern</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              <strong style={{ color: 'var(--text)' }}>Keine Einkommensteuer. Keine Lohnsteuer. Keine Sozialabgaben.</strong> Stattdessen eine
+              einzige Konsumsteuer (~23–30%) auf Endprodukte. Jeder Bürger bekommt ein monatliches
+              „Prebate" das den Steuerbetrag bis zum Existenzminimum erstattet — damit trifft es Geringverdiener nicht.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Effekt: Wer spart und investiert, zahlt nichts. Wer konsumiert, zahlt. Keine Steuererklärung mehr nötig.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}>Vorschlag: <a href="https://fairtax.org" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Americans for Fair Taxation</a> · <a href="https://www.congress.gov/bill/118th-congress/house-bill/25" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>H.R. 25 (US-Kongress)</a></div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🏗️</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Bodenwertsteuer — Land statt Arbeit besteuern</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              Besteuere nur den <strong style={{ color: 'var(--text)' }}>Wert des Bodens</strong> — nicht Gebäude, nicht Einkommen.
+              Boden kann man nicht verstecken, nicht ins Ausland verschieben, nicht vermehren.
+              Wer Grundstücke hortet, zahlt. Wer baut und produktiv nutzt, wird belohnt.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Effekt: Keine Spekulation auf leere Grundstücke. Wohnen wird günstiger. Arbeit wird steuerfrei.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}>Theorie: <a href="https://en.wikipedia.org/wiki/Progress_and_Poverty" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Henry George — „Progress and Poverty" (1879)</a> · <a href="https://en.wikipedia.org/wiki/Georgism" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Georgismus</a></div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>💸</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Mikro-Transaktionssteuer — 0,1% auf alles</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              Eine winzige Steuer (z.B. 0,1%) auf <strong style={{ color: 'var(--text)' }}>jede finanzielle Transaktion</strong> —
+              Überweisungen, Aktienhandel, Derivate. Bei Billionen an täglichem Volumen reicht ein Bruchteil
+              eines Prozents, um alle anderen Steuern zu ersetzen.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Effekt: Hochfrequenzhandel wird unattraktiv. Normalbürger merken es kaum. Kein Finanzamt nötig.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}>Vorschlag: <a href="https://en.wikipedia.org/wiki/Automated_payment_transaction_tax" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>APT Tax (Edgar Feige)</a> · <a href="https://en.wikipedia.org/wiki/European_Union_financial_transaction_tax" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>EU-Finanztransaktionssteuer</a></div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🇪🇪</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Estland-Modell — einfach, digital, fair</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              <strong style={{ color: 'var(--text)' }}>20% Flat Tax</strong> auf alles — fertig. Steuererklärung dauert 3 Minuten, komplett digital.
+              Unternehmen zahlen <strong style={{ color: 'var(--text)' }}>0% auf einbehaltene Gewinne</strong> — nur ausgeschüttete Gewinne werden besteuert.
+              Das belohnt Reinvestition statt Entnahme.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Effekt: Massiv mehr Unternehmensgründungen. Kein Steuerbürokratie-Wahnsinn. Seit 2000 in Estland Realität.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}>Realität seit 2000 · <a href="https://e-estonia.com/solutions/business-and-finance/e-tax" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>e-Estonia: e-Tax</a> · <a href="https://en.wikipedia.org/wiki/Taxation_in_Estonia" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Taxation in Estonia</a></div>
+          </div>
+        </div>
+
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 32 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🌿</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Pigouvian Tax — besteuere Schaden, nicht Leistung</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              Statt Arbeit zu besteuern: <strong style={{ color: 'var(--text)' }}>besteuere, was Schaden verursacht</strong> —
+              CO₂-Ausstoß, Umweltverschmutzung, Zucker, Plastikmüll. Die Steuer selbst korrigiert das Marktversagen.
+              Wer sauber lebt und arbeitet, zahlt weniger.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Effekt: Steuer wird zum Lenkungsinstrument. Einnahmen sinken, wenn das Ziel erreicht ist — so soll es sein.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}>Theorie: <a href="https://en.wikipedia.org/wiki/Pigouvian_tax" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Arthur Pigou — Pigouvian Tax (1920)</a> · Teilweise umgesetzt: CO₂-Preis, Tabaksteuer</div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🔄</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Ausgabensteuer — besteuere was rausgeht</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              Besteuere nicht was du <em>verdienst</em>, sondern was du <strong style={{ color: 'var(--text)' }}>ausgibst</strong>.
+              Einkommen minus Ersparnisse = Steuerbasis. Wer investiert und spart, zahlt nichts.
+              Progressive Steuersätze auf den Konsum erhalten die Umverteilung.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Effekt: Massiver Sparanreiz. Kapitalbildung explodiert. Luxuskonsum wird teurer, Grundbedarf bleibt günstig.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}>Theorie: <a href="https://en.wikipedia.org/wiki/Expenditure_tax" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Nicholas Kaldor — „An Expenditure Tax" (1955)</a> · Befürworter: Robert Frank (Cornell)</div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20, marginTop: 48 }}>
+          Geld neu denken
+        </div>
+
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>₿</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Bitcoin — Geld ohne Staat</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              <strong style={{ color: 'var(--text)' }}>21 Millionen — für immer.</strong> Keine Zentralbank kann die Menge erhöhen,
+              kein Politiker kann es drucken. Bitcoin ist das erste Geldsystem, bei dem die Regeln
+              in Code statt in Politik geschrieben sind. Während der Euro seit 1999 über 36% Kaufkraft
+              verloren hat, ist Bitcoin von 0 auf ein globales Netzwerk mit über 1 Billion $ Marktwert gewachsen.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Kernidee: Geld ist zu wichtig, um es Politikern zu überlassen. Feste Geldmenge = keine Inflation durch Geldmengenausweitung.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}><a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Satoshi Nakamoto — Bitcoin Whitepaper (2008)</a> · Seit 2009 in Betrieb · <a href="https://en.wikipedia.org/wiki/Bitcoin_in_El_Salvador" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>El Salvador: gesetzliches Zahlungsmittel seit 2021</a></div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🏦</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Free Banking — Wettbewerb statt Monopol</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              Was, wenn nicht eine Zentralbank das Geld kontrolliert, sondern <strong style={{ color: 'var(--text)' }}>verschiedene Währungen im Wettbewerb</strong> stehen?
+              Schlechtes Geld verliert Nutzer, gutes Geld gewinnt. Schottland hatte 100 Jahre Free Banking (1716–1845) —
+              eine der stabilsten Finanzperioden der Geschichte. Keine Inflation, keine Bankenkrisen.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Kernidee: Wettbewerb funktioniert bei Autos, Handys, Versicherungen — warum nicht bei Geld?
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}><a href="https://en.wikipedia.org/wiki/The_Denationalization_of_Money" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Friedrich Hayek — „Denationalisation of Money" (1976)</a> · <a href="https://en.wikipedia.org/wiki/Friedrich_Hayek" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Nobelpreis für Wirtschaft 1974</a></div>
+          </div>
+        </div>
+
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 32 }}>
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>⏳</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Freigeld — Geld das zum Ausgeben drängt</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              Der Gegenansatz zu Bitcoin: Geld, das <strong style={{ color: 'var(--text)' }}>an Wert verliert, wenn man es hortet</strong> (Demurrage).
+              Klingt verrückt? Wurde 1932 in <strong style={{ color: 'var(--text)' }}>Wörgl, Österreich</strong> getestet — mit durchschlagendem Erfolg:
+              Arbeitslosigkeit sank um 25%, Steuereinnahmen stiegen, während die Weltwirtschaftskrise tobte. Wurde von der Zentralbank verboten.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Kernidee: Geld soll zirkulieren, nicht gehortet werden. Das Experiment von Wörgl zeigt: es kann funktionieren.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}><a href="https://en.wikipedia.org/wiki/Silvio_Gesell" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Silvio Gesell — „Die Natürliche Wirtschaftsordnung" (1916)</a> · <a href="https://en.wikipedia.org/wiki/W%C3%B6rgl#The_W%C3%B6rgl_Experiment" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Wörgl-Experiment 1932</a> · <a href="https://www.chiemgauer.info" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Chiemgauer (Bayern)</a></div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 16, padding: 28, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 28 }}>🪙</span>
+              <h4 style={{ fontSize: 16, margin: 0 }}>Goldstandard 2.0 — digitale Deckung</h4>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+              Von 1944 bis 1971 war der Dollar an Gold gebunden (Bretton Woods).
+              Seitdem: <strong style={{ color: 'var(--text)' }}>unbegrenzte Geldschöpfung</strong> — die Wurzel der Inflation.
+              Neue Vorschläge kombinieren die Disziplin des Goldstandards mit digitaler Technologie:
+              Geld gedeckt durch reale Werte, transparent auf einer Blockchain verifizierbar.
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', padding: '8px 12px', background: 'var(--bg3)', borderRadius: 8, lineHeight: 1.6 }}>
+              Kernidee: Geld braucht einen Anker. Ohne Deckung druckt jede Regierung früher oder später zu viel.
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 10, opacity: 0.6 }}><a href="https://en.wikipedia.org/wiki/Bretton_Woods_system" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Bretton Woods (1944–1971)</a> · <a href="https://saifedean.com/thebitcoinstandard" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Saifedean Ammous — „The Bitcoin Standard" (2018)</a></div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720, fontStyle: 'italic' }}>
+          Alle diese Modelle haben Vor- und Nachteile — keines ist perfekt. Aber sie zeigen: Es gibt Alternativen zu einem System,
+          das Arbeit bestraft und Ersparnisse entwertet. Die Frage ist nicht ob, sondern wann wir bereit sind, neu zu denken.
+        </div>
+      </section>
+
       {/* SECTION: ACTIONS */}
       <section id="actions">
         <div className="section-label">Deine Hebel</div>
-        <h2>Das System ändert sich nicht.<br /><span className="green">Aber du kannst.</span></h2>
+        <h2>Bis sich das System ändert:<br /><span className="green">Was du heute tun kannst.</span></h2>
         <div style={{ marginBottom: 48, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
-          Du kannst dich im System anders positionieren. Hier sind die wirksamsten Hebel — vom Naheliegenden bis zum Radikalen.
+          Systemwandel braucht Zeit. Dein Geld wartet nicht. Hier sind die wirksamsten Hebel, die du jetzt schon nutzen kannst.
         </div>
 
         <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginBottom: 20 }}>
