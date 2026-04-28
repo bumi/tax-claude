@@ -174,9 +174,6 @@ svg text { font-family: var(--mono); }
 .scroll-hint::after { content: ''; display: block; width: 40px; height: 1px; background: var(--border); }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes welcomeFadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes welcomeCardIn { from { opacity: 0; transform: translateY(40px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes welcomeFadeOut { to { opacity: 0; pointer-events: none; } }
 .fade-in { animation: fadeInUp 0.6s ease forwards; }
 
 /* ── RESPONSIVE ─────────────────────────────────────────── */
@@ -766,8 +763,8 @@ function VatSection({ taxes, spendPct, setSpendPct }) {
   const saving = net - spending;
   const vatInSpending = spending * 19 / 119;
   const netPurchasing = spending - vatInSpending;
-  const totalStateTake = taxes.incomeTax + taxes.soli + taxes.social + vatInSpending;
-  const trueTakeRate = (totalStateTake / taxes.gross * 100);
+  const totalStateTake = taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial + vatInSpending;
+  const trueTakeRate = (totalStateTake / taxes.laborCost * 100);
 
   const euroCount = 100;
   const stateCells = Math.round(trueTakeRate);
@@ -809,16 +806,16 @@ function VatSection({ taxes, spendPct, setSpendPct }) {
       </div>
       <div className="vat-comparison">
         <div className="true-rate">
-          <div className="section-label">Einkommensteuer + Soli + Sozialabgaben + MwSt</div>
+          <div className="section-label">AG-Sozialabgaben + Einkommensteuer + Soli + AN-Sozialabgaben + MwSt</div>
           <div className="true-rate-number">{trueTakeRate.toFixed(0)}%</div>
           <div className="true-rate-label">
-            Von je <strong>100 € Brutto</strong> behältst du wirklich nur{' '}
+            Von je <strong>100 € Arbeitskosten</strong> behältst du wirklich nur{' '}
             <strong style={{ color: 'var(--green)' }}>{(100 - trueTakeRate).toFixed(0)} €</strong>
           </div>
         </div>
         <div>
           <div style={{ marginBottom: 10, fontSize: 13, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
-            JEDER EURO DEINES BRUTTOGEHALTS:
+            JEDER EURO DEINER ARBEITSKOSTEN:
           </div>
           <div className="euro-grid">
             {Array.from({ length: euroCount }).map((_, i) => {
@@ -1700,112 +1697,12 @@ function OutlookSection({ taxes }) {
 }
 
 // ── WELCOME POPUP ─────────────────────────────────────────────────────────────
-function WelcomePopup({ onEnter }) {
-  const [leaving, setLeaving] = useState(false);
-  const handleEnter = () => {
-    setLeaving(true);
-    setTimeout(onEnter, 500);
-  };
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      background: 'rgba(4,5,8,0.97)',
-      display: 'flex', justifyContent: 'center',
-      padding: '24px',
-      overflowY: 'auto', WebkitOverflowScrolling: 'touch',
-      animation: leaving ? 'welcomeFadeOut 0.5s ease forwards' : 'welcomeFadeIn 0.4s ease forwards',
-    }}>
-      <div style={{
-        maxWidth: 640, width: '100%', margin: 'auto 0',
-        animation: 'welcomeCardIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards',
-      }}>
-        {/* Badge */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(192,57,43,0.15)', border: '1px solid rgba(192,57,43,0.4)', borderRadius: 100, padding: '6px 16px', marginBottom: 28 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--red)' }} />
-          <span style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--red)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Steuerbürger · Deutschland 2024</span>
-        </div>
-
-        {/* Headline */}
-        <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: 20 }}>
-          Weißt du, wohin<br />
-          <span style={{ color: 'var(--red)' }}>dein Gehalt wirklich fließt?</span>
-        </h1>
-
-        <p style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 32 }}>
-          Einkommensteuer, Sozialabgaben, Mehrwertsteuer, Inflation — zusammen nehmen sie dir mehr als du denkst.
-          Hier siehst du <strong style={{ color: 'var(--text)' }}>wohin dein Geld wirklich fließt</strong> — und was du dagegen tun kannst.
-        </p>
-
-        {/* Stats */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 12, overflow: 'hidden', marginBottom: 36 }}>
-          {[
-            {
-              num: 'bis 60%',
-              text: 'deines Gehalts gehen an den Staat — bevor du auch nur einen Cent ausgibst.',
-            },
-            {
-              num: '−36%',
-              text: 'Kaufkraft hat dein Geld seit 1999 verloren. 100 € von damals sind heute 63 € wert.',
-            },
-            {
-              num: '+253%',
-              text: 'ist die Geldmenge im Euroraum gewachsen. Dein Gehalt nicht.',
-            },
-            {
-              num: '100→52',
-              text: 'Mrd. € — Militärausgaben verdoppeln sich bis 2029. Bildung bleibt bei 22 Mrd.',
-            },
-            {
-              num: '💡',
-              text: 'Gedankenexperiment: Was wäre, wenn du deine Steuern selbst investieren könntest? Interaktiver Rechner mit Vermögensaufbau, Entnahmeplan und realer Kaufkraft.',
-              gold: true,
-            },
-            {
-              num: '→',
-              text: 'Muss das so sein? Inspirationen und Ideen, wie es auch anders gehen könnte.',
-              green: true,
-            },
-          ].map((s, i) => (
-            <div key={i} style={{
-              display: 'flex', alignItems: 'center', gap: 20,
-              background: s.green ? 'rgba(46,204,113,0.06)' : s.gold ? 'rgba(241,196,15,0.06)' : (i % 2 === 0 ? 'var(--bg2)' : 'var(--bg3)'),
-              padding: '18px 24px',
-            }}>
-              <div style={{ fontFamily: 'var(--mono)', fontSize: 28, fontWeight: 500, color: s.green ? 'var(--green)' : s.gold ? 'var(--gold)' : 'var(--red)', minWidth: 100, flexShrink: 0, lineHeight: 1 }}>{s.num}</div>
-              <div style={{ fontSize: 14, color: s.green ? 'var(--green)' : s.gold ? 'var(--gold)' : 'var(--text-dim)', lineHeight: 1.6 }}>{s.text}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-          <button
-            onClick={handleEnter}
-            style={{
-              padding: '16px 36px', borderRadius: 100, border: 'none',
-              background: 'var(--text)', color: 'var(--bg)',
-              fontFamily: 'var(--sans)', fontSize: 16, fontWeight: 600,
-              cursor: 'pointer', letterSpacing: '-0.01em',
-              transition: 'transform 0.15s, opacity 0.15s',
-            }}
-            onMouseEnter={e => e.target.style.opacity = '0.88'}
-            onMouseLeave={e => e.target.style.opacity = '1'}
-          >
-            Zeig mir meine Zahlen →
-          </button>
-          <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>Interaktiv · Bundeshaushalt 2024 · mit Handlungsoptionen</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 function App() {
   const [salary, setSalary] = useState(4500);
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
-  const [showWelcome, setShowWelcome] = useState(true);
   const [inclSocial, setInclSocial] = useState(false);
   const [spendPct, setSpendPct] = useState(80);
   const [oppYears, setOppYears] = useState(20);
@@ -1813,6 +1710,7 @@ function App() {
   const [oppInflation, setOppInflation] = useState(2);
   const [oppShowReal, setOppShowReal] = useState(false);
   const [oppDynamic, setOppDynamic] = useState(false);
+  const [showOutlook, setShowOutlook] = useState(false);
   const sectionIds = ['hero', 'breakdown', 'geldfluss', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
 
   const taxes = calcAll(salary);
@@ -1845,7 +1743,6 @@ function App() {
 
   return (
     <>
-      {showWelcome && <WelcomePopup onEnter={() => setShowWelcome(false)} />}
       <NavDots active={activeSection} sections={sectionIds} />
 
       {/* SECTION 1: HERO */}
@@ -3265,9 +3162,50 @@ function App() {
 
       {/* SECTION 6: OUTLOOK */}
       <section id="outlook">
-        <div className="section-label">Sondervermögen · EU · Ausblick</div>
-        <h2>Was kommt<br /><span className="red">noch auf dich zu?</span></h2>
-        <OutlookSection taxes={taxes} />
+        {!showOutlook ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <button onClick={() => setShowOutlook(true)} style={{
+              background: 'none', border: '1px solid var(--border)', borderRadius: 14,
+              padding: '32px 40px', cursor: 'pointer', maxWidth: 520, width: '100%',
+              transition: 'border-color 0.2s, background 0.2s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--red)'; e.currentTarget.style.background = 'rgba(232,65,42,0.04)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'none'; }}
+            >
+              <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', marginBottom: 10, fontFamily: 'var(--sans)' }}>
+                Was kommt <span className="red">noch auf dich zu?</span>
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                Sondervermögen, EU-Sonderprogramme, neue Schulden, Rentenlücke, …
+              </div>
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="section-label">Sondervermögen · EU · Ausblick</div>
+            <h2>Was kommt<br /><span className="red">noch auf dich zu?</span></h2>
+
+            <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '28px 32px', marginBottom: 48, lineHeight: 1.8, fontSize: 14, color: 'var(--text-dim)' }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>
+                Begriffe hinterfragt
+              </div>
+              <p style={{ margin: '0 0 14px' }}>
+                <strong style={{ color: 'var(--text)' }}>„Sondervermögen"</strong> klingt nach Reichtum — nach einem Topf voller Geld, den der Staat für uns bereitstellt. In Wirklichkeit ist ein Sondervermögen das genaue Gegenteil: Es sind <strong style={{ color: 'var(--red)' }}>Sonderschulden</strong>. Der Staat nimmt Kredite auf, die am regulären Haushalt und der Schuldenbremse vorbei laufen. Die Rückzahlung — inklusive Zinsen — tragen künftige Steuerzahler.
+              </p>
+              <p style={{ margin: '0 0 14px' }}>
+                <strong style={{ color: 'var(--text)' }}>„Sonderprogramme"</strong> folgen der gleichen Logik: Was als gezielte Investition beworben wird, ist kreditfinanzierte Ausgabenpolitik. Ob EU-Wiederaufbaufonds oder nationale Konjunkturpakete — am Ende steht eine Verbindlichkeit, kein Vermögenswert.
+              </p>
+              <p style={{ margin: '0 0 14px' }}>
+                <strong style={{ color: 'var(--text)' }}>Warum diese Bezeichnung?</strong> In der politischen Kommunikation wirkt „Vermögen" positiv und „Schulden" abschreckend. Der Begriff ist bewusst gewählt — er verschleiert, dass hier eine finanzielle Last entsteht, und suggeriert stattdessen eine Bereicherung. Ein klassisches Beispiel für politisches Framing.
+              </p>
+              <p style={{ margin: 0, fontSize: 13, padding: '12px 16px', background: 'rgba(232,65,42,0.06)', borderRadius: 8, border: '1px solid rgba(232,65,42,0.15)' }}>
+                <strong style={{ color: 'var(--text)' }}>Fazit:</strong> Jeder Euro „Sondervermögen" ist ein Euro Schulden, den du oder deine Kinder über Steuern zurückzahlen werden — plus Zinsen. Wenn der Staat von Vermögen spricht, lohnt es sich nachzufragen: Wer bezahlt das eigentlich?
+              </p>
+            </div>
+
+            <OutlookSection taxes={taxes} />
+          </>
+        )}
       </section>
 
       {/* SECTION: RETHINK */}
