@@ -586,7 +586,7 @@ function MarginalChart({ monthly }) {
 
 function SpendingModal({ cat, taxes, onClose }) {
   const details = SPENDING_DETAILS[cat.name];
-  const annualShare = (taxes.annualIT + taxes.annualSoli) * cat.pct / 100;
+  const annualShare = Math.round(taxes.annualIT * 0.425 + taxes.annualSoli) * cat.pct / 100; // Bundesanteil
   const monthlyShare = annualShare / 12;
 
   useEffect(() => {
@@ -700,7 +700,7 @@ function SpendingModal({ cat, taxes, onClose }) {
 }
 
 function SpendingTreemap({ taxes, onSelect }) {
-  const ann = taxes.annualIT + taxes.annualSoli;
+  const ann = Math.round(taxes.annualIT * 0.425 + taxes.annualSoli); // Bundesanteil: 42,5% ESt + 100% Soli
   const rows = [
     { cols: SPENDING.slice(0, 4) },
     { cols: SPENDING.slice(4, 7) },
@@ -1057,7 +1057,7 @@ function SpendingComparison({ taxes }) {
   const [withSonder, setWithSonder] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const data = withSonder ? COMPARE_DATA.sonder : COMPARE_DATA.base;
-  const annualTax = taxes.annualIT + taxes.annualSoli;
+  const annualTax = Math.round(taxes.annualIT * 0.425 + taxes.annualSoli); // Bundesanteil
   const totalBundeshaushalt = 476; // Mrd.
 
   const getPersonal = (amountMrd) => {
@@ -1088,6 +1088,9 @@ function SpendingComparison({ taxes }) {
             Schulen, Straßen & Gesundheit<br />
             <span style={{ color: 'var(--red)' }}>vs. Militär & Schulden</span>
           </h3>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6, marginTop: 10, maxWidth: 560 }}>
+            Achtung: Dieser Vergleich zeigt den <strong style={{ color: 'var(--text)' }}>Bundeshaushalt</strong>. Bildung wird in Deutschland großteils von den Ländern finanziert — der Bund gibt dafür nur 3% aus. Militär und Schuldzinsen sind dagegen fast ausschließlich Bundessache. Wo liegt der Fokus?
+          </div>
         </div>
         {/* Toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 0, background: 'var(--bg3)', borderRadius: 100, padding: 4, border: '1px solid var(--border)', flexShrink: 0 }}>
@@ -1217,6 +1220,65 @@ function SpendingComparison({ taxes }) {
         {' '}<button onClick={() => setWithSonder(!withSonder)} style={{ background: 'none', border: 'none', color: 'var(--text)', textDecoration: 'underline', cursor: 'pointer', fontFamily: 'var(--sans)', fontSize: 13 }}>
           {withSonder ? 'Regulären Haushalt anzeigen' : 'Sondervermögen einberechnen →'}
         </button>
+      </div>
+
+      {/* BIP-Vergleich international */}
+      <div style={{ marginTop: 24, background: 'var(--bg2)', borderRadius: 14, padding: '24px 28px', border: '1px solid var(--border)' }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
+          Anteil am BIP · Internationaler Vergleich (2024)
+        </div>
+        <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 20 }}>
+          Wie viel Prozent der Wirtschaftsleistung investieren Länder in Bildung vs. Militär?
+        </div>
+        <div style={{ display: 'grid', gap: 12 }}>
+          {[
+            { land: '🇩🇪 Deutschland', bildung: 4.6, militaer: 1.9, note: 'Platz ~30 von 38 OECD-Ländern bei Bildung' },
+            { land: '🇩🇪 DE 2029 (geplant)', bildung: 4.6, militaer: 3.5, planned: true, note: '~153 Mrd. € inkl. Sondervermögen — Bildung unverändert' },
+            { land: '🇳🇦 Namibia', bildung: 9.0, militaer: 2.7, note: 'weltweit Top 5 bei Bildungsausgaben' },
+            { land: '🇮🇸 Island', bildung: 7.1, militaer: 0, note: 'kein stehendes Militär' },
+            { land: '🇳🇴 Norwegen', bildung: 7.0, militaer: 2.1 },
+            { land: '🇩🇰 Dänemark', bildung: 6.4, militaer: 2.4 },
+          ].map((c, i) => {
+            const maxPct = 10;
+            return (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: 12, alignItems: 'center' }}>
+                <div style={{ fontSize: 13, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? 'var(--text)' : 'var(--text-dim)', fontStyle: c.planned ? 'italic' : 'normal' }}>
+                  {c.land}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ height: 14, width: `${c.bildung / maxPct * 100}%`, background: '#2980b9', borderRadius: 3, transition: 'width 0.5s' }} />
+                    <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: '#2980b9', whiteSpace: 'nowrap' }}>
+                      {c.bildung}% Bildung
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{
+                      height: 14, width: `${c.militaer / maxPct * 100}%`, borderRadius: 3, transition: 'width 0.5s',
+                      background: c.planned
+                        ? 'repeating-linear-gradient(90deg, var(--red) 0px, var(--red) 6px, transparent 6px, transparent 10px)'
+                        : 'var(--red)',
+                    }} />
+                    <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--red)', whiteSpace: 'nowrap' }}>
+                      {c.militaer}% Militär{c.planned ? ' ⬆' : ''}
+                    </span>
+                  </div>
+                  {c.note && (
+                    <div style={{ fontSize: 11, color: 'var(--text-dim)', fontStyle: 'italic' }}>{c.note}</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ marginTop: 16, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+          Deutschland investiert weniger in Bildung als der OECD-Durchschnitt — und steigert gleichzeitig die Militärausgaben auf 3,5% des BIP bis 2029. Skandinavische Länder zeigen: beides geht.
+          <span style={{ fontFamily: 'var(--mono)', fontSize: 11 }}> Quellen:{' '}
+            <a href="https://www.oecd.org/en/publications/education-at-a-glance-2024_c00cad36-en.html" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>OECD Education at a Glance 2024</a>,{' '}
+            <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>SIPRI 2024</a>,{' '}
+            <a href="https://www.bundesfinanzministerium.de/Content/DE/Pressemitteilungen/2025/2025-06-24-2-regierungsentwurf-bundeshaushalt-2025.html" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>Finanzplan des Bundes 2025–2029</a>
+          </span>
+        </div>
       </div>
 
       {/* Geplante Entwicklung — kompakt */}
@@ -2175,8 +2237,9 @@ function App() {
         <div className="section-label">Bundeshaushalt 2024 · 476 Milliarden Euro</div>
         <h2>Wofür werden<br />deine Steuern ausgegeben?</h2>
         <div className="spending-intro">
-          Deine jährlichen Steuern: <strong className="red">{fmt(taxes.annualIT + taxes.annualSoli)} €</strong>.
-          So verteilt der Bund dein Geld (proportional zu deinem Anteil):
+          Deine Einkommensteuer ({fmt(taxes.annualIT + taxes.annualSoli)} €/Jahr) wird aufgeteilt: <strong style={{ color: 'var(--text)' }}>42,5% Bund</strong>, 42,5% Länder, 15% Gemeinden (Art. 106 GG).
+          Davon gehen <strong className="red">{fmt(Math.round(taxes.annualIT * 0.425 + taxes.annualSoli))} €</strong> an den Bund (42,5% ESt + 100% Soli).
+          So verteilt der Bund diesen Anteil:
         </div>
         <SpendingTreemap taxes={taxes} onSelect={setSelectedCat} />
         {selectedCat && (
