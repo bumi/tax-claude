@@ -2673,6 +2673,38 @@ function App() {
                   Kaufkraft übrig — <strong style={{ color: 'var(--red)' }}>{last.lost.toLocaleString('de-DE')} €</strong> hat die Inflation still und leise aufgefressen.
                   Und das ganz ohne Steuern auf Erträge, denn es gab keine.
                 </div>
+
+                {/* Investitionszwang-Box */}
+                <div style={{ marginTop: 24, padding: '24px 28px', background: 'var(--bg2)', borderRadius: 12, border: '1px solid rgba(232,65,42,0.2)' }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 12, lineHeight: 1.4 }}>
+                    Sparen reicht nicht mehr. Du musst spekulieren.
+                  </div>
+                  <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8 }}>
+                    Wer spart, verliert — garantiert. Also musst du in Aktien, Immobilien, Fonds.
+                    Nicht um reicher zu werden, sondern <strong style={{ color: 'var(--red)' }}>um nicht ärmer zu werden</strong>.
+                    Das Geldsystem zwingt dich, Risiko einzugehen — ob du willst oder nicht.
+                  </div>
+                  <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8, marginTop: 10 }}>
+                    Gleichzeitig zwingt es Unternehmen, Profite und Aktienkurse stetig zu steigern — um Anlegern den Return zu liefern, der ihr Risiko rechtfertigt.
+                    Der Druck zu Wachstum, Kostensenkung und Effizienz ist systemisch. <strong style={{ color: 'var(--text)' }}>Nachhaltigkeit zählt erst, wenn sie sich rechnet.</strong>
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: 200, padding: '14px 16px', background: 'var(--bg3)', borderRadius: 8, borderLeft: '3px solid var(--red)' }}>
+                      <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Damals</div>
+                      <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+                        Nach 1945 wirkten reales Wachstum, Wiederaufbau, Bevölkerungswachstum und niedrige Realzinsen zusammen.
+                        <strong style={{ color: 'var(--text)' }}>Schulden schmolzen ab</strong>, weil die Wirtschaft schneller wuchs als das Geld an Wert verlor.
+                      </div>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 200, padding: '14px 16px', background: 'var(--bg3)', borderRadius: 8, borderLeft: '3px solid var(--gold)' }}>
+                      <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Heute</div>
+                      <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+                        Alternde Gesellschaften, schwächeres Wachstum, hohe Schulden. Die Bedingungen von damals sind weg —
+                        <strong style={{ color: 'var(--text)' }}> das Geldsystem setzt trotzdem auf Entwertung</strong>. Wie lange noch?
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             );
           })()}
