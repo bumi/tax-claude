@@ -173,6 +173,7 @@ svg text { font-family: var(--mono); }
 .scroll-hint { position: absolute; bottom: 32px; left: 60px; font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.15em; display: flex; align-items: center; gap: 12px; }
 .scroll-hint::after { content: ''; display: block; width: 40px; height: 1px; background: var(--border); }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes disclaimerGlow { 0% { color: rgba(255,255,255,0.9); } 100% { color: var(--text-dim); } }
 @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .fade-in { animation: fadeInUp 0.6s ease forwards; }
 
@@ -1747,11 +1748,12 @@ function App() {
 
       {/* SECTION 1: HERO */}
       <div style={{
-        fontSize: 11, color: 'var(--text-dim)', textAlign: 'center',
+        fontSize: 13, color: 'var(--text-dim)', textAlign: 'center',
         padding: '8px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
         fontFamily: 'var(--mono)', letterSpacing: '0.02em', lineHeight: 1.5,
+        animation: 'disclaimerGlow 1.5s ease-out forwards',
       }}>
-        Vereinfacht &amp; überspitzt — diese Seite zeigt, wofür dein Gehalt wirklich verwendet wird. Vieles ist komplex, intransparent und schwer vergleichbar. Muss das so sein? Schau hin, hinterfrage es.
+        Vereinfacht &amp; überspitzt — diese Seite zeigt, wofür dein Gehalt wirklich verwendet wird und soll dir Inspirationen geben und zum Hinterfragen anregen.
         <br />Recherchiert &amp; gebaut mit <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#d97746', textDecoration: 'none' }}>Claude</a>
       </div>
       <section id="hero">
@@ -2471,20 +2473,6 @@ function App() {
             + Sozialabgaben einbeziehen (AN + AG)
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <button onClick={() => setOppDynamic(!oppDynamic)} style={{
-            width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative',
-            background: oppDynamic ? 'var(--green)' : 'rgba(255,255,255,0.1)', transition: 'background 0.2s',
-          }}>
-            <div style={{
-              width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
-              position: 'absolute', top: 3, left: oppDynamic ? 23 : 3, transition: 'left 0.2s',
-            }} />
-          </button>
-          <span style={{ fontSize: 14, color: oppDynamic ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
-            Dynamik: Einzahlung steigt jährlich um Inflation
-          </span>
-        </div>
         {(() => {
           const monthlyTax = inclSocial
             ? taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial
@@ -2583,6 +2571,20 @@ function App() {
                       <span className="ctrl-value mono">{oppInflation}% / Jahr</span>
                     </div>
                     <input type="range" min="0" max="8" step="0.5" value={oppInflation} onChange={e => setOppInflation(+e.target.value)} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                    <button onClick={() => setOppDynamic(!oppDynamic)} style={{
+                      width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative',
+                      background: oppDynamic ? 'var(--green)' : 'rgba(255,255,255,0.1)', transition: 'background 0.2s',
+                    }}>
+                      <div style={{
+                        width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
+                        position: 'absolute', top: 3, left: oppDynamic ? 23 : 3, transition: 'left 0.2s',
+                      }} />
+                    </button>
+                    <span style={{ fontSize: 13, color: oppDynamic ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+                      Dynamik: Einzahlung steigt jährlich um Inflation
+                    </span>
                   </div>
                 </div>
                 <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)' }}>
