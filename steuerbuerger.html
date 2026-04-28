@@ -641,12 +641,12 @@ function SpendingModal({ cat, taxes, onClose }) {
           border: `1px solid ${cat.color}44`,
         }}>
           <div>
-            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Dein Beitrag / Monat</div>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: cat.color }}>{fmt(monthlyShare, 0)} €</div>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Dein Beitrag / Jahr</div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: cat.color }}>{fmt(annualShare, 0)} €</div>
           </div>
           <div>
-            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Dein Beitrag / Jahr</div>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: 'var(--text-dim)' }}>{fmt(annualShare, 0)} €</div>
+            <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Dein Beitrag / Monat</div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: 'var(--text-dim)' }}>{fmt(monthlyShare, 0)} €</div>
           </div>
         </div>
 
@@ -667,7 +667,7 @@ function SpendingModal({ cat, taxes, onClose }) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                       <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>{item.name}</span>
                       <span style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)' }}>
-                        {fmt(monthlyShare * item.pct / 100, 0)} €&nbsp;
+                        {fmt(annualShare * item.pct / 100, 0)} €/Jahr&nbsp;
                         <span style={{ color: 'var(--text-dim)', fontSize: 11 }}>({item.pct}%)</span>
                       </span>
                     </div>
@@ -706,7 +706,7 @@ function SpendingTreemap({ taxes, onSelect }) {
     { cols: SPENDING.slice(4, 7) },
     { cols: SPENDING.slice(7) },
   ];
-  const share = (pct) => (ann * pct / 100 / 12);
+  const share = (pct) => (ann * pct / 100);
   return (
     <div>
       <div style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--mono)', marginBottom: 10, letterSpacing: '0.05em' }}>
@@ -725,7 +725,7 @@ function SpendingTreemap({ taxes, onSelect }) {
               >
                 <div className="tm-cell-pct">{cat.pct.toFixed(0)}%</div>
                 <div className="tm-cell-name">{cat.name}</div>
-                <div className="tm-cell-amount">{fmt(taxes.annualGross > 0 ? share(cat.pct) : 0, 0)} €/Mo.</div>
+                <div className="tm-cell-amount">{fmt(taxes.annualGross > 0 ? share(cat.pct) : 0, 0)} €/Jahr</div>
                 <div style={{ position: 'absolute', bottom: 8, right: 10, fontSize: 10, opacity: 0.5, fontFamily: 'var(--mono)' }}>→</div>
               </div>
             ))}
@@ -733,7 +733,7 @@ function SpendingTreemap({ taxes, onSelect }) {
         ))}
       </div>
       <div className="personal-share">
-        <div className="personal-title">Dein monatlicher Beitrag — klicken für Details</div>
+        <div className="personal-title">Dein jährlicher Beitrag — klicken für Details</div>
         <div className="ps-rows">
           {SPENDING.map((cat, i) => (
             <div
@@ -749,7 +749,7 @@ function SpendingTreemap({ taxes, onSelect }) {
                 {cat.name}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span className="ps-amount">{fmt(share(cat.pct), 0)} €</span>
+                <span className="ps-amount">{fmt(share(cat.pct), 0)} €/Jahr</span>
                 <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>→</span>
               </div>
             </div>
@@ -873,7 +873,7 @@ function SavingsChart({ taxes }) {
     // After CGT: gains portion taxed
     const principal = annualSaving * yr;
     const gains = Math.max(0, nominal - principal);
-    const taxableGains = Math.max(0, gains - FREIBETRAG * yr);
+    const taxableGains = Math.max(0, gains - FREIBETRAG);
     const afterTax = nominal - taxableGains * CGT_RATE;
     const afterTaxReal = afterTax / Math.pow(1 + inflation / 100, yr);
     return { yr, nominal, real, afterTax, afterTaxReal, principal };
@@ -951,6 +951,10 @@ function SavingsChart({ taxes }) {
             <div className="erosion-label">
               deines nominalen Vermögens werden durch Steuern + Inflation aufgezehrt
             </div>
+          </div>
+          <div style={{ marginTop: 16, padding: '14px 18px', background: 'var(--bg3)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <strong style={{ color: 'var(--text)' }}>Was bedeutet das?</strong> Um nach Abgeltungssteuer und Inflation überhaupt die Kaufkraft zu erhalten, muss deine Bruttorendite deutlich über der Inflationsrate liegen — nur um bei Null rauszukommen. Alles darunter bedeutet: dein Geld verliert real an Wert, obwohl es nominal wächst.
+            Dreh an den Reglern oben und beobachte die <span className="green" style={{ fontWeight: 600 }}>Reale Kaufkraft</span> — du wirst sehen, wie schwer es ist, durch Sparen und Investieren tatsächlich Vermögen aufzubauen.
           </div>
         </div>
       </div>
@@ -1061,7 +1065,7 @@ function SpendingComparison({ taxes }) {
   const totalBundeshaushalt = 476; // Mrd.
 
   const getPersonal = (amountMrd) => {
-    return (annualTax / (totalBundeshaushalt * 1e9) * amountMrd * 1e9 / 12);
+    return (annualTax / (totalBundeshaushalt * 1e9) * amountMrd * 1e9);
   };
 
   const maxAmount = Math.max(...data.items.map(i => i.amount));
@@ -1142,7 +1146,7 @@ function SpendingComparison({ taxes }) {
             </div>
           ))}
           <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(41,128,185,0.1)', borderRadius: 8, border: '1px solid rgba(41,128,185,0.25)', fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-            <strong style={{ color: '#2980b9' }}>Dein Anteil: {fmt(getPersonal(civilTotal), 0)} €/Mo.</strong><br/>
+            <strong style={{ color: '#2980b9' }}>Dein Anteil: {fmt(getPersonal(civilTotal), 0)} €/Jahr</strong><br/>
             für Bildung, Gesundheit &amp; Infrastruktur zusammen
           </div>
         </div>
@@ -1185,7 +1189,7 @@ function SpendingComparison({ taxes }) {
             </div>
           ))}
           <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(192,57,43,0.1)', borderRadius: 8, border: '1px solid rgba(192,57,43,0.25)', fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-            <strong style={{ color: 'var(--red)' }}>Dein Anteil: {fmt(getPersonal(stateTotal), 0)} €/Mo.</strong><br/>
+            <strong style={{ color: 'var(--red)' }}>Dein Anteil: {fmt(getPersonal(stateTotal), 0)} €/Jahr</strong><br/>
             für Militär &amp; Zinsen auf Staatsschulden
           </div>
         </div>
@@ -1325,7 +1329,7 @@ function SpendingComparison({ taxes }) {
                       <span style={{ width: 36, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textAlign: 'right', flexShrink: 0 }}>{c.v29}</span>
                       <span style={{
                         width: 42, fontSize: 10, fontFamily: 'var(--mono)', textAlign: 'right', flexShrink: 0, fontWeight: 600,
-                        color: isHot ? 'var(--red)' : pct < -5 ? 'var(--green)' : 'var(--text-dim)',
+                        color: pct !== 0 ? '#2980b9' : 'var(--text-dim)',
                       }}>{pctStr}</span>
                     </div>
                   );
