@@ -1037,7 +1037,7 @@ const RATIOS = [
   {
     a: "Bildung & Forschung", b: "Militär",
     context: "Für jeden Euro Bildung gibt der Bund X Euro fürs Militär aus.",
-    note: "Bildung ist großteils Ländersache — Bundesanteil ist daher viel kleiner als der reale Gesamtaufwand.",
+    note: "Bildung ist großteils Ländersache — Bundesanteil ist daher viel kleiner als der reale Gesamtaufwand. Aber sollte Bildung als Zukunftsinvestition nicht eher Bundessache sein?",
   },
   {
     a: "Gesundheit", b: "Militär",
@@ -1953,7 +1953,7 @@ function App() {
           <strong style={{ color: 'var(--red)' }}> 15,97 Cent MwSt.</strong> (bei 19%) —
           du wirst noch beim Ausgeben deines Nettos besteuert.
           <span style={{ fontSize: 13, display: 'block', marginTop: 8, color: 'var(--text-dim)' }}>
-            Hinweis: Lebensmittel, Bücher u.a. werden mit 7% besteuert. Die Berechnung unten nutzt den Regelsteuersatz von 19% — der reale MwSt-Anteil liegt dadurch etwas niedriger.
+            Hinweis: Lebensmittel, Bücher u.a. werden mit 7% besteuert, Kaltmiete ist MwSt-frei (0%). Die Berechnung unten nutzt den Regelsteuersatz von 19% — der reale MwSt-Anteil liegt dadurch etwas niedriger. Es geht hier nur um Konsum und dient zur Veranschaulichung.
           </span>
         </div>
         <VatSection taxes={taxes} />
@@ -2270,7 +2270,7 @@ function App() {
 
                 <div style={{ padding: '18px 22px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                   <strong style={{ color: 'var(--text)' }}>Zum Vergleich:</strong>{' '}
-                  Stattdessen zahlst du in 20 Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und bekommst dafür vielleicht irgendwann Rente (sofern das System bis dahin noch funktioniert), finanzierst Militärausgaben, Schuldzinsen und EU-Transfers.
+                  Stattdessen zahlst du in 20 Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und finanzierst damit ein Rentenversprechen (ob es in 20 Jahren noch eingelöst wird, weiß niemand), Grundsicherung, Infrastruktur (Straßen, Schiene, Digital), Forschung, Energiewende — aber auch Militär, Schuldzinsen und EU-Transfers.
                   Es geht nicht um die Abschaffung von Steuern, sondern darum, die <strong style={{ color: 'var(--text)' }}>Opportunitätskosten</strong> zu verdeutlichen. Ob das ein gutes Geschäft ist, entscheidest du.
                 </div>
               </div>
