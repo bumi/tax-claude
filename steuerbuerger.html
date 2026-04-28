@@ -139,8 +139,8 @@ svg text { font-family: var(--mono); }
 .true-rate { text-align: center; padding: 40px; background: var(--bg2); border-radius: 12px; border: 1px solid var(--border); }
 .true-rate-number { font-family: var(--mono); font-size: 96px; font-weight: 500; color: var(--red); line-height: 1; }
 .true-rate-label { font-size: 16px; color: var(--text-dim); margin-top: 12px; }
-.euro-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin-top: 24px; }
-.euro-cell { aspect-ratio: 1; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.euro-grid { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; margin-top: 12px; max-width: 320px; }
+.euro-cell { aspect-ratio: 1; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 8px; }
 
 /* SAVINGS SECTION */
 #savings { background: var(--bg); }
@@ -222,7 +222,7 @@ svg text { font-family: var(--mono); }
   .marginal-chart { padding: 16px; }
   .true-rate-number { font-size: 64px; }
   .true-rate { padding: 24px 16px; }
-  .euro-grid { grid-template-columns: repeat(10, 1fr); gap: 2px; }
+  .euro-grid { grid-template-columns: repeat(20, 1fr); gap: 1px; }
   .savings-controls { gap: 16px; }
   .savings-breakdown { padding: 16px; }
   .chart-wrap { padding: 16px; }
@@ -239,8 +239,6 @@ svg text { font-family: var(--mono); }
   .tm-cell-amount { font-size: 12px; }
   .resp-grid, .resp-grid-2 { grid-template-columns: 1fr !important; }
   .resp-grid-2col { grid-template-columns: 1fr 1fr !important; }
-  .claude-badge { font-size: 10px !important; padding: 5px 10px 5px 8px !important; top: 8px !important; right: 8px !important; }
-  .claude-badge svg { width: 12px !important; height: 12px !important; }
   svg { max-width: 100%; }
 }
 </style>
@@ -577,6 +575,10 @@ function MarginalChart({ monthly }) {
         <circle cx={curX} cy={curY} r="5" fill="var(--text)" />
         <text x={curX + 7} y={curY - 8} fill="var(--text)" fontSize="11">du</text>
       </svg>
+      <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+        Zur Veranschaulichung werden hier Steuern und Sozialabgaben zusammen dargestellt. Sozialabgaben sind keine Steuern im engeren Sinne — sie fließen in soziale Absicherung (Rente, Arbeitslosigkeit) und das Gesundheitssystem (Kranken- und Pflegeversicherung).
+        Ab ca. 5.200 €/Mo. sinkt die Kurve wieder: Sozialabgaben sind bei der Beitragsbemessungsgrenze gedeckelt (KV/PV: 62.100 €, RV/AV: 90.600 €/Jahr). Wer mehr verdient, zahlt prozentual weniger Sozialabgaben — <strong style={{ color: 'var(--text)' }}>Gutverdiener werden relativ entlastet</strong>.
+      </div>
     </div>
   );
 }
@@ -807,7 +809,7 @@ function VatSection({ taxes }) {
       </div>
       <div className="vat-comparison">
         <div className="true-rate">
-          <div className="section-label">Dein realer Steuersatz (Steuer + Sozial + MwSt)</div>
+          <div className="section-label">Einkommensteuer + Soli + Sozialabgaben + MwSt</div>
           <div className="true-rate-number">{trueTakeRate.toFixed(0)}%</div>
           <div className="true-rate-label">
             Von je <strong>100 € Brutto</strong> behältst du wirklich nur{' '}
@@ -1042,7 +1044,7 @@ const RATIOS = [
   {
     a: "Gesundheit", b: "Militär",
     context: "Für jeden Euro GKV-Zuschuss gibt der Bund X Euro fürs Militär aus.",
-    note: "Der GKV-Bundeszuschuss deckt nur den Fehlbetrag der Krankenversicherung ab.",
+    note: "Der GKV-Bundeszuschuss deckt nur den Fehlbetrag der Krankenversicherung ab. Du zahlst Beiträge vom Brutto und Steuern, die den Rest finanzieren — warum nicht ein transparentes System?",
   },
   {
     a: "Bildung & Forschung", b: "Zinsen & Schulden",
@@ -1676,6 +1678,7 @@ function App() {
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [inclSocial, setInclSocial] = useState(false);
   const sectionIds = ['hero', 'breakdown', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
 
   const taxes = calcAll(salary);
@@ -1711,33 +1714,17 @@ function App() {
       {showWelcome && <WelcomePopup onEnter={() => setShowWelcome(false)} />}
       <NavDots active={activeSection} sections={sectionIds} />
 
-      {/* Claude badge */}
-      <a
-        href="https://claude.ai"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="claude-badge"
-        style={{
-          position: 'fixed', top: 16, right: 16, zIndex: 900,
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          background: 'rgba(18,18,20,0.85)', backdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.08)', borderRadius: 100,
-          padding: '7px 14px 7px 10px',
-          textDecoration: 'none', color: 'var(--text-dim)',
-          fontSize: 11, fontFamily: 'var(--mono)', letterSpacing: '0.04em',
-          transition: 'border-color 0.2s, color 0.2s',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(217,119,70,0.5)'; e.currentTarget.style.color = '#d97746'; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'var(--text-dim)'; }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-          <path d="M12 2L14.09 8.26L20 9.27L15.55 13.97L16.91 20L12 16.9L7.09 20L8.45 13.97L4 9.27L9.91 8.26L12 2Z" fill="#d97746" opacity="0.8" />
-        </svg>
-        Recherchiert &amp; gebaut mit Claude
-      </a>
-
       {/* SECTION 1: HERO */}
       <section id="hero">
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          fontSize: 11, color: 'var(--text-dim)', textAlign: 'center',
+          padding: '8px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
+          fontFamily: 'var(--mono)', letterSpacing: '0.02em', lineHeight: 1.5,
+        }}>
+          Vereinfacht &amp; überspitzt — diese Seite zeigt, wofür dein Gehalt wirklich verwendet wird. Vieles ist komplex, intransparent und schwer vergleichbar. Muss das so sein? Schau hin, hinterfrage es.
+          <br />Recherchiert &amp; gebaut mit <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#d97746', textDecoration: 'none' }}>Claude</a>
+        </div>
         <div className="section-label">Steuerbürger · Deutschland 2024</div>
         <h1>Wohin fließt<br /><span className="red">dein Gehalt?</span></h1>
         <div className="hero-grid">
@@ -2175,12 +2162,35 @@ function App() {
       {/* SECTION: OPPORTUNITY COST */}
       <section id="opportunity">
         <div className="section-label">Gedankenexperiment</div>
-        <h2>Was wäre, wenn du<br /><span className="red">keine Einkommensteuer &amp; Sozialabgaben</span> zahlen müsstest?</h2>
-        <div style={{ marginBottom: 40, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
-          Stell dir vor, du könntest den Betrag, der jeden Monat durch Einkommensteuer und Sozialabgaben abfließt, stattdessen mit <strong style={{ color: 'var(--text)' }}>7,5% Rendite</strong> anlegen (historischer Durchschnitt MSCI World). Der Staat nimmt trotzdem weiterhin hunderte Milliarden über <strong style={{ color: 'var(--text)' }}>Konsumsteuern</strong> ein — Mehrwertsteuer, Kfz-Steuer, Energiesteuer, Tabaksteuer und dutzende weitere. Was hättest du nach 20 Jahren?
+        <h2>Was wäre, wenn du<br /><span className="red">keine Einkommensteuer{inclSocial ? ' & Sozialabgaben' : ''}</span> zahlen müsstest?</h2>
+        <div style={{ marginBottom: 24, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          Stell dir vor, du könntest den Betrag, der jeden Monat durch Einkommensteuer{inclSocial ? ' und Sozialabgaben' : ''} abfließt, stattdessen mit <strong style={{ color: 'var(--text)' }}>7,5% Rendite</strong> anlegen (historischer Durchschnitt MSCI World). Der Staat nimmt trotzdem weiterhin hunderte Milliarden über <strong style={{ color: 'var(--text)' }}>Konsumsteuern</strong> ein. Rein zur Inspiration — wie es anders gehen könnte, zeigt die Sektion <a href="#rethink" style={{ color: 'var(--gold)' }}>Steuern &amp; Geld neu denken</a>.
+        </div>
+        {/* Toggle: Sozialabgaben einbeziehen */}
+        <div style={{ marginBottom: 36, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            onClick={() => setInclSocial(!inclSocial)}
+            style={{
+              width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: inclSocial ? 'var(--red)' : 'var(--bg3)',
+              position: 'relative', transition: 'background 0.2s',
+            }}
+          >
+            <div style={{
+              width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
+              position: 'absolute', top: 3,
+              left: inclSocial ? 23 : 3,
+              transition: 'left 0.2s',
+            }} />
+          </button>
+          <span style={{ fontSize: 14, color: inclSocial ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+            + Sozialabgaben einbeziehen (AN + AG)
+          </span>
         </div>
         {(() => {
-          const monthlyTax = taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial;
+          const monthlyTax = inclSocial
+            ? taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial
+            : taxes.incomeTax + taxes.soli;
           const rate = 0.075 / 12;
           const inflation = 0.02;
           const months = 20 * 12;
@@ -2194,10 +2204,10 @@ function App() {
 
           // Breakdown by type
           const items = [
-            { label: 'AG-Sozialabgaben', amount: taxes.employerSocial, color: 'var(--red4)' },
+            ...(inclSocial ? [{ label: 'AG-Sozialabgaben', amount: taxes.employerSocial, color: 'var(--red4)' }] : []),
             { label: 'Einkommensteuer', amount: taxes.incomeTax, color: 'var(--red)' },
-            { label: 'Sozialabgaben (AN)', amount: taxes.social, color: 'var(--red2)' },
             ...(taxes.soli > 0 ? [{ label: 'Soli', amount: taxes.soli, color: 'var(--red3)' }] : []),
+            ...(inclSocial ? [{ label: 'Sozialabgaben (AN)', amount: taxes.social, color: 'var(--red2)' }] : []),
           ];
 
           // Year-by-year for chart
@@ -2219,7 +2229,7 @@ function App() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
-                    Monatlich an den Staat (inkl. AG-Anteil)
+                    {inclSocial ? 'Monatlich an den Staat (inkl. AG-Anteil)' : 'Monatlich Einkommensteuer + Soli'}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
                     {items.map((item, i) => (
@@ -2237,7 +2247,7 @@ function App() {
                     </div>
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-                    Das sind <strong style={{ color: 'var(--text)' }}>{fmt(monthlyTax * 12)} €</strong> pro Jahr, die nicht für dich arbeiten.
+                    Das sind <strong style={{ color: 'var(--text)' }}>{fmt(monthlyTax * 12)} €</strong> pro Jahr, bei denen nicht du entscheidest, wie sie verwendet werden, sondern der Staat.
                   </div>
                 </div>
 
