@@ -1749,6 +1749,7 @@ function App() {
   const [oppYears, setOppYears] = useState(20);
   const [oppInterest, setOppInterest] = useState(7.5);
   const [oppInflation, setOppInflation] = useState(2);
+  const [oppShowReal, setOppShowReal] = useState(false);
   const sectionIds = ['hero', 'breakdown', 'geldfluss', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
 
   const taxes = calcAll(salary);
@@ -2534,7 +2535,28 @@ function App() {
             ...(inclSocial ? [{ label: 'Sozialabgaben (AN)', amount: taxes.social, color: 'var(--red2)' }] : []),
           ];
 
-          // Year-by-year for chart
+          // Withdrawal simulation
+          const annualNet = taxes.net * 12;
+          const nominalRate = oppInterest / 100;
+          let wdCapital = fv;
+          let withdrawYears = 0;
+          const maxSim = 200;
+          const withdrawPoints = [{ yr: oppYears, value: fv, real: realFv }];
+          while (wdCapital > 0 && withdrawYears < maxSim) {
+            const yearsSinceStart = oppYears + withdrawYears;
+            const withdrawal = annualNet * Math.pow(1 + inflRate, yearsSinceStart);
+            wdCapital = wdCapital * (1 + nominalRate) - withdrawal;
+            withdrawYears++;
+            if (wdCapital < 0) wdCapital = 0;
+            withdrawPoints.push({ yr: oppYears + withdrawYears, value: wdCapital, real: wdCapital / Math.pow(1 + inflRate, oppYears + withdrawYears) });
+          }
+          const infiniteWithdraw = withdrawYears >= maxSim;
+          const totalYears = oppYears + (infiniteWithdraw ? Math.min(withdrawYears, oppYears) : withdrawYears);
+          // Cap withdrawal display to reasonable length
+          const wdDisplayYears = infiniteWithdraw ? oppYears : withdrawYears;
+          const wdDisplayPoints = infiniteWithdraw ? withdrawPoints.slice(0, oppYears + 1) : withdrawPoints;
+
+          // Year-by-year for chart (saving phase)
           const yearPoints = Array.from({ length: oppYears + 1 }, (_, yr) => {
             const m = yr * 12;
             const value = rate > 0 ? monthlyTax * ((Math.pow(1 + rate, m) - 1) / rate) : monthlyTax * m;
@@ -2543,11 +2565,16 @@ function App() {
             return { yr, value, paid, real };
           });
           const lastPt = yearPoints[oppYears];
-          const maxVal = lastPt.value;
+
+          // Combined chart range
+          const chartTotalYears = oppYears + wdDisplayYears;
+          const allValues = [...yearPoints.map(p => p.value), ...wdDisplayPoints.map(p => p.value)];
+          const maxVal = Math.max(...allValues) || 1;
           const w = 520, h = 240, pad = { top: 16, right: 20, bottom: 36, left: 56 };
-          const xS = yr => pad.left + (yr / oppYears) * (w - pad.left - pad.right);
-          const yS = v => pad.top + (1 - v / (maxVal || 1)) * (h - pad.top - pad.bottom);
+          const xS = yr => pad.left + (yr / chartTotalYears) * (w - pad.left - pad.right);
+          const yS = v => pad.top + (1 - v / maxVal) * (h - pad.top - pad.bottom);
           const linePath = (key) => yearPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
+          const wdLinePath = (key) => wdDisplayPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
 
           return (
             <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
@@ -2626,22 +2653,48 @@ function App() {
                   </div>
                 </div>
 
+                {/* Entnahmeplan */}
+                <div style={{ background: 'rgba(241,196,15,0.06)', borderRadius: 14, padding: '28px', border: '1px solid rgba(241,196,15,0.25)' }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                    Entnahmeplan · Wie lange reicht das Kapital?
+                  </div>
+                  <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 16 }}>
+                    Wenn du ab Jahr {oppYears} jährlich dein heutiges Nettogehalt ({fmt(annualNet)} €/Jahr, inflationsbereinigt) entnimmst und der Rest weiter {oppInterest}% Rendite erwirtschaftet:
+                  </div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 42, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
+                    {infiniteWithdraw ? '∞' : withdrawYears} {infiniteWithdraw ? '' : 'Jahre'}
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 8, lineHeight: 1.6 }}>
+                    {infiniteWithdraw
+                      ? 'Das Kapital reicht unbegrenzt — die Rendite übersteigt die inflationsbereinigte Entnahme.'
+                      : `Nach ${withdrawYears} Jahren Entnahme wäre das Kapital aufgebraucht. Das entspricht einem Gesamtzeitraum von ${oppYears + withdrawYears} Jahren (${oppYears}J Ansparphase + ${withdrawYears}J Entnahme).`
+                    }
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, padding: '10px 14px', background: 'rgba(241,196,15,0.08)', borderRadius: 8, lineHeight: 1.6 }}>
+                    <strong style={{ color: 'var(--gold)' }}>Hinweis:</strong> Die Entnahme wird jährlich um {oppInflation}% erhöht, um die Inflation auszugleichen. Im ersten Entnahmejahr entnimmst du {fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears)))} €, im letzten {!infiniteWithdraw && withdrawYears > 0 ? `${fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears + withdrawYears - 1)))} €` : '—'} — damit bleibt die Kaufkraft immer auf dem Niveau deines heutigen Nettogehalts.
+                  </div>
+                </div>
+
                 <div style={{ padding: '18px 22px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                   <strong style={{ color: 'var(--text)' }}>Zum Vergleich:</strong>{' '}
-                  Stattdessen zahlst du in {oppYears} Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und finanzierst damit ein Rentenversprechen (ob es in 20 Jahren noch eingelöst wird, weiß niemand), Grundsicherung, Infrastruktur (Straßen, Schiene, Digital), Forschung, Energiewende — aber auch Militär, Schuldzinsen und EU-Transfers.
+                  Stattdessen zahlst du in {oppYears} Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und finanzierst damit ein Rentenversprechen (ob es in {oppYears} Jahren noch eingelöst wird, weiß niemand), Grundsicherung, Infrastruktur (Straßen, Schiene, Digital), Forschung, Energiewende — aber auch Militär, Schuldzinsen und EU-Transfers.
                   Es geht nicht um die Abschaffung von Steuern, sondern darum, die <strong style={{ color: 'var(--text)' }}>Opportunitätskosten</strong> zu verdeutlichen. Ob das ein gutes Geschäft ist, entscheidest du.
                 </div>
               </div>
 
               <div>
                 <div style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
-                  Vermögensentwicklung über {oppYears} Jahre
+                  Ansparphase ({oppYears}J) + Entnahme ({infiniteWithdraw ? '∞' : `${wdDisplayYears}J`})
                 </div>
                 <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: 'visible' }}>
                   <defs>
                     <linearGradient id="oppGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="var(--green)" stopOpacity="0.2" />
                       <stop offset="100%" stopColor="var(--green)" stopOpacity="0" />
+                    </linearGradient>
+                    <linearGradient id="wdGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="var(--gold)" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                   {[0, 0.25, 0.5, 0.75, 1].map((f, i) => {
@@ -2655,48 +2708,78 @@ function App() {
                       </g>
                     );
                   })}
-                  {yearPoints.map((p, i) => {
-                    const step = oppYears <= 10 ? 1 : oppYears <= 20 ? 2 : oppYears <= 30 ? 5 : 10;
-                    return (i % step === 0 || i === oppYears) && <text key={i} x={xS(p.yr)} y={h - 4} fill="#555" fontSize="10" textAnchor="middle">{p.yr}J</text>;
+                  {/* X-axis ticks for full range */}
+                  {Array.from({ length: chartTotalYears + 1 }, (_, i) => {
+                    const step = chartTotalYears <= 10 ? 1 : chartTotalYears <= 20 ? 2 : chartTotalYears <= 40 ? 5 : 10;
+                    return (i % step === 0 || i === chartTotalYears) && <text key={i} x={xS(i)} y={h - 4} fill="#555" fontSize="10" textAnchor="middle">{i}J</text>;
                   })}
+                  {/* Saving phase fill */}
                   <path d={`${linePath('value')} L${xS(oppYears)},${yS(0)} L${xS(0)},${yS(0)} Z`} fill="url(#oppGrad)" />
-                  {/* Gap between nominal and real */}
-                  <path
-                    d={`${linePath('value')} L${xS(oppYears)},${yS(lastPt.real)} ${[...yearPoints].reverse().map((p,i)=>`${i===0?'M':'L'}${xS(p.yr)},${yS(p.real)}`).join(' ')} Z`}
-                    fill="var(--red)" opacity="0.06"
-                  />
+                  {/* Withdrawal phase fill */}
+                  <path d={`${wdLinePath('value')} L${xS(wdDisplayPoints[wdDisplayPoints.length-1].yr)},${yS(0)} L${xS(oppYears)},${yS(0)} Z`} fill="url(#wdGrad)" />
+                  {/* Phase separator */}
+                  <line x1={xS(oppYears)} y1={pad.top} x2={xS(oppYears)} y2={h - pad.bottom} stroke="var(--text-dim)" strokeWidth="1" strokeDasharray="4,3" opacity="0.4" />
+                  <text x={xS(oppYears)} y={pad.top - 4} fill="var(--text-dim)" fontSize="9" textAnchor="middle" fontFamily="var(--mono)">Entnahme →</text>
+                  {/* Saving phase lines */}
                   <path d={linePath('paid')} fill="none" stroke="var(--text)" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.4" />
                   <path d={linePath('value')} fill="none" stroke="var(--green)" strokeWidth="2.5" />
-                  <path d={linePath('real')} fill="none" stroke="var(--gold)" strokeWidth="2" strokeDasharray="6,3" />
-                  {/* End markers */}
+                  {/* Real purchasing power lines (optional) */}
+                  {oppShowReal && <path d={linePath('real')} fill="none" stroke="var(--blue)" strokeWidth="2" strokeDasharray="6,3" />}
+                  {/* Withdrawal phase line */}
+                  <path d={wdLinePath('value')} fill="none" stroke="var(--gold)" strokeWidth="2.5" />
+                  {oppShowReal && <path d={wdLinePath('real')} fill="none" stroke="var(--blue)" strokeWidth="2" strokeDasharray="6,3" />}
+                  {/* End markers - saving phase peak */}
                   <circle cx={xS(oppYears)} cy={yS(lastPt.value)} r="4" fill="var(--green)" />
-                  <circle cx={xS(oppYears)} cy={yS(lastPt.real)} r="3" fill="var(--gold)" />
-                  <circle cx={xS(oppYears)} cy={yS(lastPt.paid)} r="4" fill="var(--text)" opacity="0.5" />
-                  {/* Labels at end */}
-                  <text x={xS(oppYears) + 8} y={yS(lastPt.value) + 4} fill="var(--green)" fontSize="11" fontFamily="var(--mono)">
+                  {oppShowReal && <circle cx={xS(oppYears)} cy={yS(lastPt.real)} r="3" fill="var(--blue)" />}
+                  {/* End marker - withdrawal end */}
+                  {wdDisplayPoints.length > 1 && (
+                    <circle cx={xS(wdDisplayPoints[wdDisplayPoints.length-1].yr)} cy={yS(wdDisplayPoints[wdDisplayPoints.length-1].value)} r="3" fill="var(--gold)" />
+                  )}
+                  {oppShowReal && wdDisplayPoints.length > 1 && (
+                    <circle cx={xS(wdDisplayPoints[wdDisplayPoints.length-1].yr)} cy={yS(wdDisplayPoints[wdDisplayPoints.length-1].real)} r="3" fill="var(--blue)" />
+                  )}
+                  {/* Label at peak */}
+                  <text x={xS(oppYears) - 4} y={yS(lastPt.value) - 8} fill="var(--green)" fontSize="10" textAnchor="end" fontFamily="var(--mono)">
                     {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(1)}M` : `${(fv / 1000).toFixed(0)}k`}
                   </text>
-                  <text x={xS(oppYears) + 8} y={yS(lastPt.real) + 4} fill="var(--gold)" fontSize="10" fontFamily="var(--mono)">
-                    {realFv >= 1_000_000 ? `${(realFv / 1_000_000).toFixed(1)}M` : `${(realFv / 1000).toFixed(0)}k`} real
-                  </text>
-                  <text x={xS(oppYears) + 8} y={yS(lastPt.paid) + 4} fill="#666" fontSize="11" fontFamily="var(--mono)">
-                    {(totalPaid / 1000).toFixed(0)}k
-                  </text>
+                  {oppShowReal && (
+                    <text x={xS(oppYears) - 4} y={yS(lastPt.real) - 8} fill="var(--blue)" fontSize="10" textAnchor="end" fontFamily="var(--mono)">
+                      {realFv >= 1_000_000 ? `${(realFv / 1_000_000).toFixed(1)}M` : `${(realFv / 1000).toFixed(0)}k`} real
+                    </text>
+                  )}
                 </svg>
-                <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 11, color: 'var(--text-dim)', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 14, height: 2, background: 'var(--green)', borderRadius: 1 }} />
-                    <span>Nominal ({oppInterest}%)</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 14, fontSize: 12, color: 'var(--text-dim)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 20, height: 3, background: 'var(--green)', borderRadius: 1, flexShrink: 0 }} />
+                    <span><strong style={{ color: 'var(--green)' }}>Vermögen (Ansparphase)</strong> — monatliche Einzahlung + {oppInterest}% Rendite</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 14, height: 2, background: 'var(--gold)', borderRadius: 1 }} />
-                    <span>Real (nach {oppInflation}% Inflation)</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 20, height: 3, background: 'var(--gold)', borderRadius: 1, flexShrink: 0 }} />
+                    <span><strong style={{ color: 'var(--gold)' }}>Restkapital (Entnahme)</strong> — jährlich {fmt(annualNet)} € entnommen (inflationsbereinigt)</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 14, height: 2, background: 'var(--text)', opacity: 0.4, borderRadius: 1 }} />
-                    <span>Eingezahlt</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 20, height: 0, borderTop: '2px dashed var(--text)', opacity: 0.4, flexShrink: 0 }} />
+                    <span>Summe der Einzahlungen (ohne Rendite)</span>
                   </div>
+                  {oppShowReal && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 20, height: 0, borderTop: '2px dashed var(--blue)', flexShrink: 0 }} />
+                      <span><strong style={{ color: 'var(--blue)' }}>Reale Kaufkraft</strong> — was das Geld nach {oppInflation}% Inflation/Jahr tatsächlich wert ist</span>
+                    </div>
+                  )}
                 </div>
+                <button
+                  onClick={() => setOppShowReal(!oppShowReal)}
+                  style={{
+                    marginTop: 12, padding: '6px 14px', borderRadius: 6, cursor: 'pointer',
+                    fontFamily: 'var(--mono)', fontSize: 11, transition: 'all 0.2s',
+                    background: oppShowReal ? 'var(--blue)' : 'var(--bg3)',
+                    color: oppShowReal ? '#fff' : 'var(--text-dim)',
+                    border: oppShowReal ? '1px solid var(--blue)' : '1px solid var(--border)',
+                  }}
+                >
+                  {oppShowReal ? '✓ Reale Kaufkraft angezeigt' : 'Reale Kaufkraft einblenden'}
+                </button>
 
                 <div className="resp-grid-2col" style={{ marginTop: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   {[
