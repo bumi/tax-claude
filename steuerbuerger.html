@@ -1676,12 +1676,20 @@ function App() {
 
   useEffect(() => {
     const handler = () => {
-      const scrollY = window.scrollY;
-      const height = window.innerHeight;
-      const idx = Math.min(sectionIds.length - 1, Math.round(scrollY / height));
-      setActiveSection(idx);
+      const mid = window.innerHeight / 2;
+      let closest = 0;
+      let closestDist = Infinity;
+      sectionIds.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const dist = Math.abs(rect.top + rect.height / 2 - mid);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
+      });
+      setActiveSection(closest);
     };
     window.addEventListener('scroll', handler, { passive: true });
+    handler();
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
