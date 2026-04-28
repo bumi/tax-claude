@@ -857,6 +857,7 @@ function SavingsChart({ taxes }) {
   const [years, setYears] = useState(20);
   const [interest, setInterest] = useState(5);
   const [inflation, setInflation] = useState(2);
+  const [dynamic, setDynamic] = useState(false);
 
   const monthlySaving = taxes.net * savePct / 100;
   const annualSaving = monthlySaving * 12;
@@ -865,13 +866,14 @@ function SavingsChart({ taxes }) {
   const FREIBETRAG = 1000; // annual
 
   const points = Array.from({ length: years + 1 }, (_, yr) => {
-    // Nominal: compound with interest, no tax yet
     let nominal = 0;
-    for (let y = 0; y < yr; y++) nominal = (nominal + annualSaving) * (1 + interest / 100);
-    // Real: deflate by inflation
+    let principal = 0;
+    for (let y = 0; y < yr; y++) {
+      const contribution = dynamic ? annualSaving * Math.pow(1 + inflation / 100, y) : annualSaving;
+      principal += contribution;
+      nominal = (nominal + contribution) * (1 + interest / 100);
+    }
     const real = nominal / Math.pow(1 + inflation / 100, yr);
-    // After CGT: gains portion taxed
-    const principal = annualSaving * yr;
     const gains = Math.max(0, nominal - principal);
     const taxableGains = Math.max(0, gains - FREIBETRAG);
     const afterTax = nominal - taxableGains * CGT_RATE;
@@ -919,10 +921,30 @@ function SavingsChart({ taxes }) {
           </div>
           <input type="range" min="0" max="8" step="0.5" value={inflation} onChange={e => setInflation(+e.target.value)} />
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 8px' }}>
+          <button onClick={() => setDynamic(!dynamic)} style={{
+            width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative',
+            background: dynamic ? 'var(--green)' : 'rgba(255,255,255,0.1)', transition: 'background 0.2s',
+          }}>
+            <div style={{
+              width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
+              position: 'absolute', top: 3, left: dynamic ? 23 : 3, transition: 'left 0.2s',
+            }} />
+          </button>
+          <span style={{ fontSize: 13, color: dynamic ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+            Dynamik: Sparrate steigt jährlich um Inflation
+          </span>
+        </div>
         <div className="savings-breakdown">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-              <span style={{ color: 'var(--text-dim)' }}>Eingezahlt ({years} J.)</span>
+            {dynamic && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+                <span style={{ color: 'var(--text-dim)' }}>Eingezahlt (heutige Kaufkraft)</span>
+                <span className="mono">{fmt(annualSaving * years)} €</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: dynamic ? 12 : 14, color: dynamic ? 'var(--text-dim)' : undefined }}>
+              <span style={{ color: 'var(--text-dim)' }}>Eingezahlt{dynamic ? ' (nominal)' : ` (${years} J.)`}</span>
               <span className="mono">{fmt(last.principal)} €</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
@@ -941,15 +963,29 @@ function SavingsChart({ taxes }) {
               <span className="green">Reale Kaufkraft</span>
               <span className="mono green">{fmt(last.afterTaxReal)} €</span>
             </div>
+            {dynamic && (() => {
+              const realGain = last.afterTaxReal - annualSaving * years;
+              const isPos = realGain >= 0;
+              return (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: isPos ? 'var(--green)' : 'var(--red)', marginTop: -4 }}>
+                  <span>{isPos ? 'Realer Gewinn' : 'Realer Verlust'}</span>
+                  <span className="mono">{isPos ? '+' : '−'} {fmt(Math.abs(realGain))} €</span>
+                </div>
+              );
+            })()}
           </div>
           <div className="final-erosion" style={{ marginTop: 20 }}>
             <div className="erosion-number">
               {last.afterTaxReal > 0 && last.principal > 0
-                ? `${((1 - last.afterTaxReal / last.nominal) * 100).toFixed(0)}%`
+                ? dynamic
+                  ? `${last.afterTaxReal >= annualSaving * years ? '+' : ''}${((last.afterTaxReal / (annualSaving * years) - 1) * 100).toFixed(0)}%`
+                  : `${((1 - last.afterTaxReal / last.nominal) * 100).toFixed(0)}%`
                 : '—'}
             </div>
             <div className="erosion-label">
-              deines nominalen Vermögens werden durch Steuern + Inflation aufgezehrt
+              {dynamic
+                ? 'realer Kaufkraftgewinn nach Steuern + Inflation'
+                : 'deines nominalen Vermögens werden durch Steuern + Inflation aufgezehrt'}
             </div>
           </div>
           <div style={{ marginTop: 16, padding: '14px 18px', background: 'var(--bg3)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
@@ -1776,6 +1812,7 @@ function App() {
   const [oppInterest, setOppInterest] = useState(7.5);
   const [oppInflation, setOppInflation] = useState(2);
   const [oppShowReal, setOppShowReal] = useState(false);
+  const [oppDynamic, setOppDynamic] = useState(false);
   const sectionIds = ['hero', 'breakdown', 'geldfluss', 'spending', 'vat', 'hidden-taxes', 'savings', 'opportunity', 'inflation', 'outlook', 'rethink', 'actions'];
 
   const taxes = calcAll(salary);
@@ -2537,16 +2574,36 @@ function App() {
             + Sozialabgaben einbeziehen (AN + AG)
           </span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+          <button onClick={() => setOppDynamic(!oppDynamic)} style={{
+            width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative',
+            background: oppDynamic ? 'var(--green)' : 'rgba(255,255,255,0.1)', transition: 'background 0.2s',
+          }}>
+            <div style={{
+              width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
+              position: 'absolute', top: 3, left: oppDynamic ? 23 : 3, transition: 'left 0.2s',
+            }} />
+          </button>
+          <span style={{ fontSize: 14, color: oppDynamic ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+            Dynamik: Einzahlung steigt jährlich um Inflation
+          </span>
+        </div>
         {(() => {
           const monthlyTax = inclSocial
             ? taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial
             : taxes.incomeTax + taxes.soli;
           const rate = oppInterest / 100 / 12;
           const inflRate = oppInflation / 100;
+          const monthlyInflRate = Math.pow(1 + inflRate, 1/12) - 1;
           const months = oppYears * 12;
-          // Future value of annuity: PMT × ((1+r)^n - 1) / r
-          const fv = rate > 0 ? monthlyTax * ((Math.pow(1 + rate, months) - 1) / rate) : monthlyTax * months;
-          const totalPaid = monthlyTax * months;
+          // Future value: step through monthly, with optional dynamic contributions
+          let fv = 0;
+          let totalPaid = 0;
+          for (let m = 0; m < months; m++) {
+            const contribution = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, m) : monthlyTax;
+            totalPaid += contribution;
+            fv = (fv + contribution) * (1 + rate);
+          }
           const gains = fv - totalPaid;
           // Real purchasing power after inflation
           const realFv = fv / Math.pow(1 + inflRate, oppYears);
@@ -2584,8 +2641,12 @@ function App() {
           // Year-by-year for chart (saving phase)
           const yearPoints = Array.from({ length: oppYears + 1 }, (_, yr) => {
             const m = yr * 12;
-            const value = rate > 0 ? monthlyTax * ((Math.pow(1 + rate, m) - 1) / rate) : monthlyTax * m;
-            const paid = monthlyTax * m;
+            let value = 0, paid = 0;
+            for (let i = 0; i < m; i++) {
+              const c = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, i) : monthlyTax;
+              paid += c;
+              value = (value + c) * (1 + rate);
+            }
             const real = value / Math.pow(1 + inflRate, yr);
             return { yr, value, paid, real };
           });
@@ -2659,8 +2720,14 @@ function App() {
                     {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(2)} Mio.` : `${fmt(fv)}`} €
                   </div>
                   <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
-                      <span>Eingezahlt ({months} Monate)</span>
+                    {oppDynamic && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
+                        <span>Eingezahlt (heutige Kaufkraft)</span>
+                        <span className="mono">{fmt(monthlyTax * 12 * oppYears)} €</span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: oppDynamic ? 12 : 13, color: 'var(--text-dim)' }}>
+                      <span>Eingezahlt{oppDynamic ? ' (nominal)' : ` (${months} Monate)`}</span>
                       <span className="mono">{fmt(totalPaid)} €</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
@@ -2675,6 +2742,16 @@ function App() {
                       <span style={{ color: 'var(--gold)' }}>Reale Kaufkraft</span>
                       <span className="mono" style={{ color: 'var(--gold)' }}>{realFv >= 1_000_000 ? `${(realFv / 1_000_000).toFixed(2)} Mio.` : `${fmt(realFv)}`} €</span>
                     </div>
+                    {oppDynamic && (() => {
+                      const realGain = realFv - monthlyTax * 12 * oppYears;
+                      const isPos = realGain >= 0;
+                      return (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: isPos ? 'var(--gold)' : 'var(--red)', marginTop: -2 }}>
+                          <span>{isPos ? 'Realer Gewinn' : 'Realer Verlust'}</span>
+                          <span className="mono">{isPos ? '+' : '−'} {fmt(Math.abs(realGain))} €</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
