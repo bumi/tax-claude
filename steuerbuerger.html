@@ -1985,34 +1985,6 @@ function App() {
           </div>
         </div>
 
-        {/* Benzin Steuer-auf-Steuer Beispiel */}
-        <div style={{ marginBottom: 32, padding: '24px 28px', background: 'var(--bg2)', borderRadius: 14, border: '1px solid rgba(192,57,43,0.3)' }}>
-          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
-            Beispiel · Steuer auf Steuer: 1 Liter Super E10
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px 24px', fontSize: 14 }}>
-            {[
-              { label: 'Produktpreis (Rohöl, Raffinerie, Transport, Marge)', value: '~0,55 €', color: 'var(--text)' },
-              { label: '+ Energiesteuer', value: '0,6545 €', color: 'var(--red)' },
-              { label: '+ CO₂-Preis (2024: 45 €/t)', value: '~0,108 €', color: 'var(--red)' },
-              { label: '= Zwischensumme', value: '~1,31 €', color: 'var(--text-dim)' },
-              { label: '+ 19% MwSt auf alles (inkl. der anderen Steuern!)', value: '~0,25 €', color: 'var(--red)' },
-              { label: 'Endpreis an der Zapfsäule', value: '~1,56 €', color: 'var(--text)' },
-            ].map((r, i) => (
-              <React.Fragment key={i}>
-                <div style={{ color: 'var(--text-dim)', borderBottom: i === 5 ? 'none' : '1px solid var(--border)', paddingBottom: 6, paddingTop: i === 0 ? 0 : 6, fontWeight: i === 5 ? 700 : 400 }}>{r.label}</div>
-                <div style={{ fontFamily: 'var(--mono)', color: r.color, textAlign: 'right', borderBottom: i === 5 ? 'none' : '1px solid var(--border)', paddingBottom: 6, paddingTop: i === 0 ? 0 : 6, fontWeight: i === 5 ? 700 : 400 }}>{r.value}</div>
-              </React.Fragment>
-            ))}
-          </div>
-          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: 'var(--red)' }}>~65%</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-              des Benzinpreises sind Steuern und Abgaben — und die MwSt wird <strong style={{ color: 'var(--text)' }}>auf die anderen Steuern draufgeschlagen</strong> (Steuer auf Steuer).
-            </div>
-          </div>
-        </div>
-
         {/* Konsum & Genuss + Vermögen */}
         <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 32 }}>
           <div>
@@ -2087,9 +2059,9 @@ function App() {
                 icon: '⛽',
                 title: 'Autofahren',
                 calc: '~14.000 km/Jahr (~1.000 L)',
-                tax: '~654 €',
-                sub: '65,45 Ct/L Energiesteuer + CO₂-Preis + MwSt obendrauf',
-                perMonth: '~55 €/Mo',
+                tax: '~1.080 €',
+                sub: 'Bei 2 €/L E10: ~1,08 € Steuern pro Liter (Energiesteuer 65 Ct + CO₂ 11 Ct + MwSt 32 Ct = 54% Steueranteil)',
+                perMonth: '~90 €/Mo',
               },
               {
                 icon: '🛡️',
