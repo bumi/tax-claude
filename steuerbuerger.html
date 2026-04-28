@@ -1807,16 +1807,15 @@ function App() {
       <NavDots active={activeSection} sections={sectionIds} />
 
       {/* SECTION 1: HERO */}
+      <div style={{
+        fontSize: 11, color: 'var(--text-dim)', textAlign: 'center',
+        padding: '8px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
+        fontFamily: 'var(--mono)', letterSpacing: '0.02em', lineHeight: 1.5,
+      }}>
+        Vereinfacht &amp; überspitzt — diese Seite zeigt, wofür dein Gehalt wirklich verwendet wird. Vieles ist komplex, intransparent und schwer vergleichbar. Muss das so sein? Schau hin, hinterfrage es.
+        <br />Recherchiert &amp; gebaut mit <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#d97746', textDecoration: 'none' }}>Claude</a>
+      </div>
       <section id="hero">
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0,
-          fontSize: 11, color: 'var(--text-dim)', textAlign: 'center',
-          padding: '8px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
-          fontFamily: 'var(--mono)', letterSpacing: '0.02em', lineHeight: 1.5,
-        }}>
-          Vereinfacht &amp; überspitzt — diese Seite zeigt, wofür dein Gehalt wirklich verwendet wird. Vieles ist komplex, intransparent und schwer vergleichbar. Muss das so sein? Schau hin, hinterfrage es.
-          <br />Recherchiert &amp; gebaut mit <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#d97746', textDecoration: 'none' }}>Claude</a>
-        </div>
         <div className="section-label">Steuerbürger · Deutschland 2024</div>
         <h1>Wohin fließt<br /><span className="red">dein Gehalt?</span></h1>
         <div className="hero-grid">
