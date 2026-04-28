@@ -1058,6 +1058,7 @@ const RATIOS = [
 ];
 
 function SpendingComparison({ taxes }) {
+  const [showDetails, setShowDetails] = useState(false);
   const [withSonder, setWithSonder] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const data = withSonder ? COMPARE_DATA.sonder : COMPARE_DATA.base;
@@ -1082,6 +1083,24 @@ function SpendingComparison({ taxes }) {
 
   return (
     <div style={{ marginTop: 60, borderTop: '1px solid var(--border)', paddingTop: 48 }}>
+      {!showDetails ? (
+        <div style={{ textAlign: 'center', padding: '32px 0' }}>
+          <button
+            onClick={() => setShowDetails(true)}
+            style={{
+              padding: '12px 28px', borderRadius: 100, cursor: 'pointer',
+              fontFamily: 'var(--sans)', fontSize: 14, fontWeight: 600,
+              background: 'var(--bg3)', color: 'var(--text)',
+              border: '1px solid var(--border)', transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--text)'; e.currentTarget.style.color = 'var(--bg)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg3)'; e.currentTarget.style.color = 'var(--text)'; }}
+          >
+            Mehr Details und Vergleiche →
+          </button>
+        </div>
+      ) : (
+      <>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 36, flexWrap: 'wrap', gap: 16 }}>
         <div>
@@ -1346,6 +1365,8 @@ function SpendingComparison({ taxes }) {
           );
         })()}
       </div>
+      </>
+      )}
     </div>
   );
 }
