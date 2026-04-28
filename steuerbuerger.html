@@ -1691,8 +1691,8 @@ function WelcomePopup({ onEnter }) {
 
         {/* Headline */}
         <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: 20 }}>
-          Du arbeitest jeden Tag<br />
-          <span style={{ color: 'var(--red)' }}>bis mittags für den Staat.</span>
+          Weißt du, wohin<br />
+          <span style={{ color: 'var(--red)' }}>dein Gehalt wirklich fließt?</span>
         </h1>
 
         <p style={{ fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 32 }}>
@@ -1720,18 +1720,23 @@ function WelcomePopup({ onEnter }) {
               text: 'Mrd. € — Militärausgaben verdoppeln sich bis 2029. Bildung bleibt bei 22 Mrd.',
             },
             {
+              num: '💡',
+              text: 'Gedankenexperiment: Was wäre, wenn du deine Steuern selbst investieren könntest? Interaktiver Rechner mit Vermögensaufbau, Entnahmeplan und realer Kaufkraft.',
+              gold: true,
+            },
+            {
               num: '→',
-              text: 'Aber es gibt Alternativen — 6 radikale Steuersysteme, 4 neue Geldmodelle und 6 konkrete Hebel, die du heute schon nutzen kannst.',
+              text: 'Muss das so sein? Inspirationen und Ideen, wie es auch anders gehen könnte.',
               green: true,
             },
           ].map((s, i) => (
             <div key={i} style={{
               display: 'flex', alignItems: 'center', gap: 20,
-              background: s.green ? 'rgba(46,204,113,0.06)' : (i % 2 === 0 ? 'var(--bg2)' : 'var(--bg3)'),
+              background: s.green ? 'rgba(46,204,113,0.06)' : s.gold ? 'rgba(241,196,15,0.06)' : (i % 2 === 0 ? 'var(--bg2)' : 'var(--bg3)'),
               padding: '18px 24px',
             }}>
-              <div style={{ fontFamily: 'var(--mono)', fontSize: 28, fontWeight: 500, color: s.green ? 'var(--green)' : 'var(--red)', minWidth: 100, flexShrink: 0, lineHeight: 1 }}>{s.num}</div>
-              <div style={{ fontSize: 14, color: s.green ? 'var(--green)' : 'var(--text-dim)', lineHeight: 1.6 }}>{s.text}</div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 28, fontWeight: 500, color: s.green ? 'var(--green)' : s.gold ? 'var(--gold)' : 'var(--red)', minWidth: 100, flexShrink: 0, lineHeight: 1 }}>{s.num}</div>
+              <div style={{ fontSize: 14, color: s.green ? 'var(--green)' : s.gold ? 'var(--gold)' : 'var(--text-dim)', lineHeight: 1.6 }}>{s.text}</div>
             </div>
           ))}
         </div>
