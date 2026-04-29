@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vermögensrechner — Wie wächst dein Geld?</title>
+<meta name="description" content="Interaktiver Zinseszins-Rechner: Wie viel Vermögen baut sich auf, wenn du monatlich sparst? Mit Entnahmeplan, Inflation und realer Kaufkraft.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vermögensrechner — Wie wächst dein Geld?">
+<meta property="og:description" content="Interaktiver Zinseszins-Rechner mit Entnahmeplan, Inflation und realer Kaufkraft.">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Vermögensrechner — Wie wächst dein Geld?">
+<meta name="twitter:description" content="Interaktiver Zinseszins-Rechner mit Entnahmeplan, Inflation und realer Kaufkraft.">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080a0d;
+  --bg2: #0f1217;
+  --bg3: #161b22;
+  --border: rgba(255,255,255,0.08);
+  --text: #eee8dd;
+  --text-dim: #7a7a7a;
+  --red: oklch(0.60 0.22 22);
+  --red2: oklch(0.55 0.20 35);
+  --red3: oklch(0.50 0.18 50);
+  --red4: oklch(0.62 0.14 60);
+  --green: oklch(0.68 0.18 142);
+  --gold: oklch(0.75 0.14 75);
+  --blue: oklch(0.65 0.15 250);
+  --mono: 'DM Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+}
+html { scroll-behavior: smooth; background: var(--bg); color: var(--text); font-family: var(--sans); }
+body { overflow-x: hidden; }
+
+section { min-height: 100vh; padding: 80px 60px; display: flex; flex-direction: column; justify-content: center; position: relative; }
+.section-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px; }
+h2 { font-size: clamp(32px, 4vw, 56px); font-weight: 600; line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 40px; }
+.mono { font-family: var(--mono); }
+.red { color: var(--red); }
+.green { color: var(--green); }
+.dim { color: var(--text-dim); }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: var(--border); border-radius: 2px; outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--text); cursor: pointer; transition: transform 0.15s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+input[type=number] { font-family: var(--mono); font-size: 48px; font-weight: 500; background: none; border: none; color: var(--green); width: 220px; outline: none; letter-spacing: -0.02em; -moz-appearance: textfield; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.ctrl-row { display: flex; flex-direction: column; gap: 8px; }
+.ctrl-label { display: flex; justify-content: space-between; font-size: 14px; }
+.ctrl-name { color: var(--text-dim); }
+.ctrl-value { font-family: var(--mono); color: var(--text); }
+
+.resp-grid { display: grid; }
+
+.footer { padding: 40px 60px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.footer-note { font-size: 12px; color: var(--text-dim); max-width: 600px; line-height: 1.7; }
+.footer-year { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+
+@media (max-width: 900px) {
+  section { padding: 60px 28px; min-height: auto; }
+  .resp-grid { grid-template-columns: 1fr !important; }
+  .footer { padding: 32px 28px; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .footer-note { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  section { padding: 48px 16px; }
+  h2 { margin-bottom: 24px; }
+  input[type=number] { font-size: 36px; width: 160px; }
+  .resp-grid { grid-template-columns: 1fr !important; }
+  .resp-grid-2col { grid-template-columns: 1fr 1fr !important; }
+  svg { max-width: 100%; }
+  .footer { padding: 24px 16px; }
+}
+</style>
+
+<script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+function fmt(n, digits=0) {
+  return new Intl.NumberFormat('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
+}
+
+function App() {
+  const [monthlySaving, setMonthlySaving] = useState(500);
+  const [oppYears, setOppYears] = useState(20);
+  const [oppInterest, setOppInterest] = useState(7.5);
+  const [oppInflation, setOppInflation] = useState(2);
+  const [oppShowReal, setOppShowReal] = useState(false);
+  const [oppDynamic, setOppDynamic] = useState(false);
+  const [withdrawalAmount, setWithdrawalAmount] = useState(2000);
+
+  const monthlyTax = monthlySaving;
+  const rate = oppInterest / 100 / 12;
+  const inflRate = oppInflation / 100;
+  const monthlyInflRate = Math.pow(1 + inflRate, 1/12) - 1;
+  const months = oppYears * 12;
+
+  // Future value
+  let fv = 0;
+  let totalPaid = 0;
+  for (let m = 0; m < months; m++) {
+    const contribution = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, m) : monthlyTax;
+    totalPaid += contribution;
+    fv = (fv + contribution) * (1 + rate);
+  }
+  const gains = fv - totalPaid;
+  const realFv = fv / Math.pow(1 + inflRate, oppYears);
+  const inflationLoss = fv - realFv;
+
+  // Withdrawal simulation
+  const annualWithdrawal = withdrawalAmount * 12;
+  const nominalRate = oppInterest / 100;
+  let wdCapital = fv;
+  let withdrawYears = 0;
+  const maxSim = 200;
+  const withdrawPoints = [{ yr: oppYears, value: fv, real: realFv }];
+  while (wdCapital > 0 && withdrawYears < maxSim) {
+    const yearsSinceStart = oppYears + withdrawYears;
+    const withdrawal = annualWithdrawal * Math.pow(1 + inflRate, yearsSinceStart);
+    wdCapital = wdCapital * (1 + nominalRate) - withdrawal;
+    withdrawYears++;
+    if (wdCapital < 0) wdCapital = 0;
+    withdrawPoints.push({ yr: oppYears + withdrawYears, value: wdCapital, real: wdCapital / Math.pow(1 + inflRate, oppYears + withdrawYears) });
+  }
+  const infiniteWithdraw = withdrawYears >= maxSim;
+  const wdDisplayYears = infiniteWithdraw ? oppYears : withdrawYears;
+  const wdDisplayPoints = infiniteWithdraw ? withdrawPoints.slice(0, oppYears + 1) : withdrawPoints;
+
+  // Year-by-year for chart (saving phase)
+  const yearPoints = Array.from({ length: oppYears + 1 }, (_, yr) => {
+    const m = yr * 12;
+    let value = 0, paid = 0;
+    for (let i = 0; i < m; i++) {
+      const c = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, i) : monthlyTax;
+      paid += c;
+      value = (value + c) * (1 + rate);
+    }
+    const real = value / Math.pow(1 + inflRate, yr);
+    return { yr, value, paid, real };
+  });
+  const lastPt = yearPoints[oppYears];
+
+  // Combined chart range
+  const chartTotalYears = oppYears + wdDisplayYears;
+  const allValues = [...yearPoints.map(p => p.value), ...wdDisplayPoints.map(p => p.value)];
+  const maxVal = Math.max(...allValues) || 1;
+  const w = 520, h = 240, pad = { top: 16, right: 20, bottom: 36, left: 56 };
+  const xS = yr => pad.left + (yr / chartTotalYears) * (w - pad.left - pad.right);
+  const yS = v => pad.top + (1 - v / maxVal) * (h - pad.top - pad.bottom);
+  const linePath = (key) => yearPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
+  const wdLinePath = (key) => wdDisplayPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${xS(p.yr)},${yS(p[key])}`).join(' ');
+
+  return (
+    <>
+      <section>
+        <div className="section-label">Vermögensrechner</div>
+        <h2>Wie wächst dein Geld<br />bei <span className="green">{fmt(monthlySaving)} € monatlich</span>?</h2>
+        <div style={{ marginBottom: 36, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          Berechne, wie viel Vermögen sich aufbaut, wenn du regelmäßig einen festen Betrag investierst — und wie lange es im Ruhestand reicht.
+        </div>
+
+        <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+            {/* Monthly savings input */}
+            <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+                Monatlicher Sparbetrag
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
+                <input
+                  type="number"
+                  min="0"
+                  step="50"
+                  value={monthlySaving}
+                  onChange={e => setMonthlySaving(Math.max(0, +e.target.value))}
+                />
+                <span style={{ fontFamily: 'var(--mono)', fontSize: 24, color: 'var(--text-dim)' }}>€ / Monat</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {[100, 250, 500, 1000, 2000].map(v => (
+                  <button
+                    key={v}
+                    onClick={() => setMonthlySaving(v)}
+                    style={{
+                      padding: '6px 14px', borderRadius: 100, cursor: 'pointer',
+                      fontFamily: 'var(--sans)', fontSize: 13, transition: 'all 0.2s',
+                      border: monthlySaving === v ? '1px solid var(--text)' : '1px solid var(--border)',
+                      background: 'transparent',
+                      color: monthlySaving === v ? 'var(--text)' : 'var(--text-dim)',
+                    }}
+                  >
+                    {fmt(v)} €
+                  </button>
+                ))}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, lineHeight: 1.6 }}>
+                Das sind <strong style={{ color: 'var(--text)' }}>{fmt(monthlySaving * 12)} €</strong> pro Jahr.
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div className="ctrl-row">
+                <div className="ctrl-label">
+                  <span className="ctrl-name">Zeitraum</span>
+                  <span className="ctrl-value mono">{oppYears} Jahre</span>
+                </div>
+                <input type="range" min="1" max="40" value={oppYears} onChange={e => setOppYears(+e.target.value)} />
+              </div>
+              <div className="ctrl-row">
+                <div className="ctrl-label">
+                  <span className="ctrl-name">Rendite (nominal)</span>
+                  <span className="ctrl-value mono">{oppInterest}% / Jahr</span>
+                </div>
+                <input type="range" min="0" max="12" step="0.5" value={oppInterest} onChange={e => setOppInterest(+e.target.value)} />
+              </div>
+              <div className="ctrl-row">
+                <div className="ctrl-label">
+                  <span className="ctrl-name">Inflation</span>
+                  <span className="ctrl-value mono">{oppInflation}% / Jahr</span>
+                </div>
+                <input type="range" min="0" max="8" step="0.5" value={oppInflation} onChange={e => setOppInflation(+e.target.value)} />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
+                <button onClick={() => setOppDynamic(!oppDynamic)} style={{
+                  width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative',
+                  background: oppDynamic ? 'var(--green)' : 'rgba(255,255,255,0.1)', transition: 'background 0.2s',
+                }}>
+                  <div style={{
+                    width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
+                    position: 'absolute', top: 3, left: oppDynamic ? 23 : 3, transition: 'left 0.2s',
+                  }} />
+                </button>
+                <span style={{ fontSize: 13, color: oppDynamic ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+                  Dynamik: Einzahlung steigt jährlich um Inflation
+                </span>
+              </div>
+            </div>
+
+            {/* Future Value Card */}
+            <div style={{ background: 'rgba(74,190,100,0.06)', borderRadius: 14, padding: '28px', border: '1px solid rgba(74,190,100,0.25)' }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                Nach {oppYears} Jahren bei {oppInterest}% Rendite
+              </div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 48, fontWeight: 500, color: 'var(--green)', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(2)} Mio.` : `${fmt(fv)}`} €
+              </div>
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {oppDynamic && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
+                    <span>Eingezahlt (heutige Kaufkraft)</span>
+                    <span className="mono">{fmt(monthlyTax * 12 * oppYears)} €</span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: oppDynamic ? 12 : 13, color: 'var(--text-dim)' }}>
+                  <span>Eingezahlt{oppDynamic ? ' (nominal)' : ` (${months} Monate)`}</span>
+                  <span className="mono">{fmt(totalPaid)} €</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                  <span style={{ color: 'var(--green)' }}>Rendite (Zinseszins)</span>
+                  <span className="mono green">+ {fmt(gains)} €</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, borderTop: '1px solid rgba(74,190,100,0.2)', paddingTop: 8 }}>
+                  <span style={{ color: 'var(--red)' }}>− Inflation ({oppInflation}%/J.)</span>
+                  <span className="mono red">− {fmt(inflationLoss)} €</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, borderTop: '1px solid rgba(74,190,100,0.2)', paddingTop: 8, fontWeight: 600 }}>
+                  <span style={{ color: 'var(--gold)' }}>Reale Kaufkraft</span>
+                  <span className="mono" style={{ color: 'var(--gold)' }}>{realFv >= 1_000_000 ? `${(realFv / 1_000_000).toFixed(2)} Mio.` : `${fmt(realFv)}`} €</span>
+                </div>
+                {oppDynamic && (() => {
+                  const realGain = realFv - monthlyTax * 12 * oppYears;
+                  const isPos = realGain >= 0;
+                  return (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: isPos ? 'var(--gold)' : 'var(--red)', marginTop: -2 }}>
+                      <span>{isPos ? 'Realer Gewinn' : 'Realer Verlust'}</span>
+                      <span className="mono">{isPos ? '+' : '−'} {fmt(Math.abs(realGain))} €</span>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Entnahmeplan */}
+            <div style={{ background: 'rgba(241,196,15,0.06)', borderRadius: 14, padding: '28px', border: '1px solid rgba(241,196,15,0.25)' }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                Entnahmeplan · Wie lange reicht das Kapital?
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 16 }}>
+                Wenn du ab Jahr {oppYears} monatlich <strong style={{ color: 'var(--text)' }}>{fmt(withdrawalAmount)} €</strong> (inflationsbereinigt) entnimmst und der Rest weiter {oppInterest}% Rendite erwirtschaftet:
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <div className="ctrl-row">
+                  <div className="ctrl-label">
+                    <span className="ctrl-name">Monatliche Entnahme</span>
+                    <span className="ctrl-value mono">{fmt(withdrawalAmount)} € / Monat</span>
+                  </div>
+                  <input type="range" min="100" max="10000" step="100" value={withdrawalAmount} onChange={e => setWithdrawalAmount(+e.target.value)} />
+                </div>
+              </div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 42, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
+                {infiniteWithdraw ? '∞' : withdrawYears} {infiniteWithdraw ? '' : 'Jahre'}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 8, lineHeight: 1.6 }}>
+                {infiniteWithdraw
+                  ? 'Das Kapital reicht unbegrenzt — die Rendite übersteigt die inflationsbereinigte Entnahme.'
+                  : `Nach ${withdrawYears} Jahren Entnahme wäre das Kapital aufgebraucht. Das entspricht einem Gesamtzeitraum von ${oppYears + withdrawYears} Jahren (${oppYears}J Ansparphase + ${withdrawYears}J Entnahme).`
+                }
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, padding: '10px 14px', background: 'rgba(241,196,15,0.08)', borderRadius: 8, lineHeight: 1.6 }}>
+                <strong style={{ color: 'var(--gold)' }}>Hinweis:</strong> Die Entnahme wird jährlich um {oppInflation}% erhöht, um die Inflation auszugleichen. Im ersten Entnahmejahr entnimmst du {fmt(Math.round(annualWithdrawal * Math.pow(1 + inflRate, oppYears)))} €/Jahr, damit bleibt die Kaufkraft immer auf dem Niveau deines gewählten Entnahmebetrags.
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right column: Chart */}
+          <div>
+            <div style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+              Ansparphase ({oppYears}J) + Entnahme ({infiniteWithdraw ? '∞' : `${wdDisplayYears}J`})
+            </div>
+            <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: 'visible' }}>
+              <defs>
+                <linearGradient id="oppGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--green)" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="var(--green)" stopOpacity="0" />
+                </linearGradient>
+                <linearGradient id="wdGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--gold)" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="var(--gold)" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {[0, 0.25, 0.5, 0.75, 1].map((f, i) => {
+                const v = Math.round(maxVal * f / 10000) * 10000;
+                return (
+                  <g key={i}>
+                    <line x1={pad.left} x2={w - pad.right} y1={yS(v)} y2={yS(v)} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                    <text x={pad.left - 6} y={yS(v) + 4} fill="#555" fontSize="10" textAnchor="end">
+                      {v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : `${(v / 1000).toFixed(0)}k`}
+                    </text>
+                  </g>
+                );
+              })}
+              {Array.from({ length: chartTotalYears + 1 }, (_, i) => {
+                const step = chartTotalYears <= 10 ? 1 : chartTotalYears <= 20 ? 2 : chartTotalYears <= 40 ? 5 : 10;
+                return (i % step === 0 || i === chartTotalYears) && <text key={i} x={xS(i)} y={h - 4} fill="#555" fontSize="10" textAnchor="middle">{i}J</text>;
+              })}
+              {/* Saving phase fill */}
+              <path d={`${linePath('value')} L${xS(oppYears)},${yS(0)} L${xS(0)},${yS(0)} Z`} fill="url(#oppGrad)" />
+              {/* Withdrawal phase fill */}
+              <path d={`${wdLinePath('value')} L${xS(wdDisplayPoints[wdDisplayPoints.length-1].yr)},${yS(0)} L${xS(oppYears)},${yS(0)} Z`} fill="url(#wdGrad)" />
+              {/* Phase separator */}
+              <line x1={xS(oppYears)} y1={pad.top} x2={xS(oppYears)} y2={h - pad.bottom} stroke="var(--text-dim)" strokeWidth="1" strokeDasharray="4,3" opacity="0.4" />
+              <text x={xS(oppYears)} y={pad.top - 4} fill="var(--text-dim)" fontSize="9" textAnchor="middle" fontFamily="var(--mono)">Entnahme →</text>
+              {/* Saving phase lines */}
+              <path d={linePath('paid')} fill="none" stroke="var(--text)" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.4" />
+              <path d={linePath('value')} fill="none" stroke="var(--green)" strokeWidth="2.5" />
+              {oppShowReal && <path d={linePath('real')} fill="none" stroke="var(--blue)" strokeWidth="2" strokeDasharray="6,3" />}
+              {/* Withdrawal phase line */}
+              <path d={wdLinePath('value')} fill="none" stroke="var(--gold)" strokeWidth="2.5" />
+              {oppShowReal && <path d={wdLinePath('real')} fill="none" stroke="var(--blue)" strokeWidth="2" strokeDasharray="6,3" />}
+              {/* End markers */}
+              <circle cx={xS(oppYears)} cy={yS(lastPt.value)} r="4" fill="var(--green)" />
+              {oppShowReal && <circle cx={xS(oppYears)} cy={yS(lastPt.real)} r="3" fill="var(--blue)" />}
+              {wdDisplayPoints.length > 1 && (
+                <circle cx={xS(wdDisplayPoints[wdDisplayPoints.length-1].yr)} cy={yS(wdDisplayPoints[wdDisplayPoints.length-1].value)} r="3" fill="var(--gold)" />
+              )}
+              {oppShowReal && wdDisplayPoints.length > 1 && (
+                <circle cx={xS(wdDisplayPoints[wdDisplayPoints.length-1].yr)} cy={yS(wdDisplayPoints[wdDisplayPoints.length-1].real)} r="3" fill="var(--blue)" />
+              )}
+              {/* Label at peak */}
+              <text x={xS(oppYears) - 4} y={yS(lastPt.value) - 8} fill="var(--green)" fontSize="10" textAnchor="end" fontFamily="var(--mono)">
+                {fv >= 1_000_000 ? `${(fv / 1_000_000).toFixed(1)}M` : `${(fv / 1000).toFixed(0)}k`}
+              </text>
+              {oppShowReal && (
+                <text x={xS(oppYears) - 4} y={yS(lastPt.real) - 8} fill="var(--blue)" fontSize="10" textAnchor="end" fontFamily="var(--mono)">
+                  {realFv >= 1_000_000 ? `${(realFv / 1_000_000).toFixed(1)}M` : `${(realFv / 1000).toFixed(0)}k`} real
+                </text>
+              )}
+            </svg>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 14, fontSize: 12, color: 'var(--text-dim)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 20, height: 3, background: 'var(--green)', borderRadius: 1, flexShrink: 0 }} />
+                <span><strong style={{ color: 'var(--green)' }}>Vermögen (Ansparphase)</strong> — monatliche Einzahlung + {oppInterest}% Rendite</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 20, height: 3, background: 'var(--gold)', borderRadius: 1, flexShrink: 0 }} />
+                <span><strong style={{ color: 'var(--gold)' }}>Restkapital (Entnahme)</strong> — monatlich {fmt(withdrawalAmount)} € entnommen (inflationsbereinigt)</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 20, height: 0, borderTop: '2px dashed var(--text)', opacity: 0.4, flexShrink: 0 }} />
+                <span>Summe der Einzahlungen (ohne Rendite)</span>
+              </div>
+              {oppShowReal && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 20, height: 0, borderTop: '2px dashed var(--blue)', flexShrink: 0 }} />
+                  <span><strong style={{ color: 'var(--blue)' }}>Reale Kaufkraft</strong> — was das Geld nach {oppInflation}% Inflation/Jahr tatsächlich wert ist</span>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => setOppShowReal(!oppShowReal)}
+              style={{
+                marginTop: 12, padding: '6px 14px', borderRadius: 6, cursor: 'pointer',
+                fontFamily: 'var(--mono)', fontSize: 11, transition: 'all 0.2s',
+                background: oppShowReal ? 'var(--blue)' : 'var(--bg3)',
+                color: oppShowReal ? '#fff' : 'var(--text-dim)',
+                border: oppShowReal ? '1px solid var(--blue)' : '1px solid var(--border)',
+              }}
+            >
+              {oppShowReal ? '✓ Reale Kaufkraft angezeigt' : 'Reale Kaufkraft einblenden'}
+            </button>
+
+            <div className="resp-grid-2col" style={{ marginTop: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {[
+                { label: `Nach ${Math.floor(oppYears / 2)} Jahren`, value: yearPoints[Math.floor(oppYears / 2)].value, paid: yearPoints[Math.floor(oppYears / 2)].paid, real: yearPoints[Math.floor(oppYears / 2)].real },
+                { label: `Nach ${oppYears} Jahren`, value: lastPt.value, paid: lastPt.paid, real: lastPt.real },
+              ].map((item, i) => (
+                <div key={i} style={{ background: 'var(--bg2)', borderRadius: 10, padding: '16px 18px', border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{item.label}</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 22, color: 'var(--green)', marginBottom: 4 }}>
+                    {item.value >= 1_000_000 ? `${(item.value / 1_000_000).toFixed(2)} Mio.` : `${fmt(item.value)}`} €
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--gold)', fontFamily: 'var(--mono)', marginBottom: 2 }}>
+                    real: {item.real >= 1_000_000 ? `${(item.real / 1_000_000).toFixed(2)} Mio.` : `${fmt(item.real)}`} €
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="footer">
+        <div className="footer-note">
+          Dieser Rechner dient ausschließlich der Veranschaulichung. Keine Anlageberatung. Renditen sind nicht garantiert. Vergangene Wertentwicklung ist kein Indikator für zukünftige Ergebnisse.
+        </div>
+        <div className="footer-year">2024</div>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
