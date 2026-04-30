@@ -33,7 +33,8 @@
   --sans: 'Space Grotesk', sans-serif;
 }
 html { scroll-behavior: smooth; background: var(--bg); color: var(--text); font-family: var(--sans); }
-body { overflow-x: hidden; }
+body { overflow-x: hidden; margin: 0; }
+* { box-sizing: border-box; }
 
 section { min-height: 100vh; padding: 80px 60px; display: flex; flex-direction: column; justify-content: center; position: relative; }
 .section-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px; }
@@ -70,11 +71,17 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
 @media (max-width: 600px) {
   section { padding: 48px 16px; }
   h2 { margin-bottom: 24px; }
-  input[type=number] { font-size: 36px; width: 160px; }
+  input[type=number] { font-size: 32px; width: 140px; }
   .resp-grid { grid-template-columns: 1fr !important; }
   .resp-grid-2col { grid-template-columns: 1fr 1fr !important; }
-  svg { max-width: 100%; }
+  svg { max-width: 100%; height: auto; }
   .footer { padding: 24px 16px; }
+  p { word-wrap: break-word; overflow-wrap: break-word; }
+}
+@media (max-width: 400px) {
+  section { padding: 32px 12px; }
+  h2 { font-size: 28px; }
+  input[type=number] { font-size: 28px; width: 120px; }
 }
 @keyframes disclaimerGlow { 0% { color: rgba(255,255,255,0.9); } 100% { color: var(--text-dim); } }
 </style>
@@ -658,7 +665,7 @@ function App() {
               <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
                 So wird gerechnet
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                 <div>
                   <strong style={{ color: 'var(--text)' }}>Endvermögen</strong> — Jeden Monat wird der Sparbetrag eingezahlt und das gesamte Kapital mit der monatlichen Rendite verzinst: <span className="mono" style={{ fontSize: 12 }}>Kapital = (Kapital + Einzahlung) × (1 + r/12)</span>. {oppDynamic && <>Bei aktivierter Dynamik steigt die monatliche Einzahlung mit der Inflation.</>}
                 </div>
@@ -725,7 +732,7 @@ function App() {
         </div>
 
         <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginBottom: 16 }}>
-          <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.8, marginBottom: 20 }}>
+          <div style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.8, marginBottom: 20 }}>
             Wenn ich aus allem, was ich über Finanzmärkte, Risiko und menschliches Verhalten weiß, ein einziges Portfolio für langfristigen Vermögensaufbau konstruieren müsste — dieses wäre es. <strong>Einfach, günstig, global, robust.</strong>
           </div>
 
@@ -809,7 +816,7 @@ function App() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
             <div><strong style={{ color: 'var(--text)' }}>Warum keine Anleihen?</strong> Bei einem Zeithorizont von 15+ Jahren liefern Aktien historisch fast immer mehr als Anleihen. Die Stabilisator-Funktion übernehmen hier Gold und Cash. Wer über 50 ist oder in unter 10 Jahren ans Geld muss, sollte Anleihen ergänzen und den Aktienanteil reduzieren.</div>
             <div><strong style={{ color: 'var(--text)' }}>Warum keine Immobilien/REITs?</strong> Der Welt-ETF enthält bereits Immobilienunternehmen. Wer zusätzlich eine eigene Immobilie besitzt, ist bereits stark in Immobilien exponiert — weiterer REIT-Anteil wäre Klumpenrisiko.</div>
             <div><strong style={{ color: 'var(--text)' }}>Satelliten — lohnt sich das?</strong> Die Kern-Satelliten-Aufteilung (45% Welt-ETF + Small Caps + Dividenden + Einzelaktien) macht erst ab ~1.000 € Sparrate Sinn. Darunter: alles in den Welt-ETF. Einzelaktien nur, wenn du Geschäftsberichte liest und die Firma besser verstehst als der Markt — sonst kostet Stockpicking langfristig Rendite.</div>
@@ -821,7 +828,7 @@ function App() {
           <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
             Wichtiger Hinweis
           </div>
-          <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
             Dies ist eine KI-generierte Portfoliostruktur auf Basis historischer Daten und Finanztheorie — <strong style={{ color: 'var(--text)' }}>keine individuelle Anlageberatung</strong>. Deine persönliche Situation (Alter, Einkommen, Schulden, Zeithorizont, Risikotoleranz) bestimmt die richtige Allokation. Vergangene Renditen garantieren keine zukünftigen Ergebnisse. Im Zweifel: Honorarberater statt Bankberater.
           </div>
         </div>
@@ -853,12 +860,12 @@ function App() {
         <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginBottom: 16 }}>
 
           {s < 200 ? (
-            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.8 }}>
+            <div style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.8 }}>
               Bei <strong>{fmt(s)} € monatlich</strong> lohnt sich Aufteilung auf mehrere Positionen noch nicht — die Gebühren fressen die Diversifikation auf. <strong>Empfehlung: den gesamten Betrag in einen einzigen Welt-ETF</strong> (MSCI World oder FTSE All-World, thesaurierend, Sparplan). Sobald die Sparrate über 200 € steigt, kann man anfangen, weitere Positionen dazuzunehmen.
             </div>
           ) : (
             <>
-          <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.8, marginBottom: 20 }}>
+          <div style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.8, marginBottom: 20 }}>
             {s < 500
               ? <>Bei <strong>{fmt(s)} € im Monat</strong> und mehreren Positionen werden die Einzelbeträge schnell klein. Die Lösung: <strong>nicht alles jeden Monat kaufen, sondern rotieren.</strong></>
               : <>Bei <strong>{fmt(s)} € im Monat</strong> lässt sich das Portfolio gut aufteilen. {s < 1000 ? <>Trotzdem gilt: Gold und Bitcoin kauft man besser in größeren Abständen — <strong>rotieren statt splitten.</strong></> : <>Ab dieser Sparrate sind auch monatliche Käufe aller Positionen machbar — trotzdem kann Rotation bei Gold und Bitcoin sinnvoll sein.</>}</>
@@ -871,19 +878,19 @@ function App() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
                 <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Jeden Monat</div>
-                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--green)' }}>{fmt(etfMonthly)} €</strong> in den Welt-ETF (Dauerauftrag/Sparplan). Läuft automatisch, kein Aufwand. Das ist die Kernposition — hier fließt das meiste Geld hin, jeden Monat, ohne Nachdenken.</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 14, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--green)' }}>{fmt(etfMonthly)} €</strong> in den Welt-ETF (Dauerauftrag/Sparplan). Läuft automatisch, kein Aufwand. Das ist die Kernposition — hier fließt das meiste Geld hin, jeden Monat, ohne Nachdenken.</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
                 <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Quartal</div>
-                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--gold)' }}>{fmt(btcQuarterly)} €</strong> in Bitcoin (Direktkauf). Alle 3 Monate statt monatlich — größere Beträge, weniger Gebühren, weniger Aufwand. Sofort auf eigene Wallet transferieren.</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 14, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--gold)' }}>{fmt(btcQuarterly)} €</strong> in Bitcoin (Direktkauf). Alle 3 Monate statt monatlich — größere Beträge, weniger Gebühren, weniger Aufwand. Sofort auf eigene Wallet transferieren.</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
                 <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Halbjahr</div>
-                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--gold)' }}>{fmt(goldHalfYearly)} €</strong> in Gold. Physisch: ab ~1g-Barren sinnvoll (ca. 80–100 €), aber besser größere Einheiten (weniger Aufpreis pro Gramm). Oder halbjährlich einen physisch besicherten ETC nachkaufen.</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 14, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--gold)' }}>{fmt(goldHalfYearly)} €</strong> in Gold. Physisch: ab ~1g-Barren sinnvoll (ca. 80–100 €), aber besser größere Einheiten (weniger Aufpreis pro Gramm). Oder halbjährlich einen physisch besicherten ETC nachkaufen.</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
                 <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Automatisch</div>
-                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--text-dim)' }}>{fmt(cashMonthly)} €</strong> auf Tagesgeld. Fließt automatisch auf ein separates Konto. Wächst von alleine und ist jederzeit verfügbar für Nachkäufe oder Notfälle.</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 14, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--text-dim)' }}>{fmt(cashMonthly)} €</strong> auf Tagesgeld. Fließt automatisch auf ein separates Konto. Wächst von alleine und ist jederzeit verfügbar für Nachkäufe oder Notfälle.</div>
               </div>
             </div>
           </div>
@@ -896,7 +903,7 @@ function App() {
             <div style={{ width: cashPct + '%', background: 'var(--text-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>Cash {fmt(cashYearly)} €</div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
             <div><strong style={{ color: 'var(--text)' }}>Warum rotieren?</strong> Bei {fmt(s)} € Sparrate und 5 Positionen wären das {fmt(Math.round(s / 5))} € pro Position. Bei Gold und Bitcoin entstehen dabei unnötig hohe Gebühren (Spreads, Aufpreise auf kleine Einheiten). Besser: seltener kaufen, dafür in sinnvollen Größen.</div>
             <div><strong style={{ color: 'var(--text)' }}>Und Emerging Markets?</strong> Wer einen FTSE All-World nimmt, hat EM bereits enthalten (~10–12%). Wer einen MSCI World nimmt und EM extra will: den gleichen Sparplan-Rhythmus wie den Welt-ETF nehmen, z.B. {fmt(Math.round(s * 0.07))} € zusätzlich monatlich.</div>
             <div><strong style={{ color: 'var(--text)' }}>Die wichtigste Regel:</strong> Automatisieren. Der Welt-ETF-Sparplan läuft per Dauerauftrag am 1. des Monats. Kein Nachdenken, kein Timing, kein Vergessen. Die anderen Positionen kaufst du manuell, aber mit festen Terminen im Kalender (z.B. „1. März, 1. Juni, 1. September, 1. Dezember: Bitcoin kaufen").</div>
@@ -921,7 +928,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 26, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Kern jedes Portfolios. Ein einziger Welt-ETF (z.B. auf den MSCI World oder FTSE All-World) streut über Tausende Unternehmen in dutzenden Ländern. Achte auf geringe Kosten (TER unter 0,3%) und ausreichendes Fondsvolumen. Thesaurierend ist steuerlich einfacher. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Kern jedes Portfolios. Ein einziger Welt-ETF (z.B. auf den MSCI World oder FTSE All-World) streut über Tausende Unternehmen in dutzenden Ländern. Achte auf geringe Kosten (TER unter 0,3%) und ausreichendes Fondsvolumen. Thesaurierend ist steuerlich einfacher. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
           </div>
           {/* Anleihen */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -932,7 +939,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 8, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Stabilisator im Portfolio. Staatsanleihen-ETFs senken die Schwankungen, Unternehmensanleihen liefern mehr Rendite bei mehr Risiko. Kurzlaufende Anleihen sind weniger zinssensitiv — wichtig bei steigenden Zinsen. Alternativ: Tages-/Festgeld als risikoarmer Portfolioteil. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: Vanguard Research — Global Fixed Income">↗</span></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Stabilisator im Portfolio. Staatsanleihen-ETFs senken die Schwankungen, Unternehmensanleihen liefern mehr Rendite bei mehr Risiko. Kurzlaufende Anleihen sind weniger zinssensitiv — wichtig bei steigenden Zinsen. Alternativ: Tages-/Festgeld als risikoarmer Portfolioteil. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: Vanguard Research — Global Fixed Income">↗</span></div>
           </div>
           {/* REITs */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -943,7 +950,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 24, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Immobilien-Exposure ohne Direktkauf über REIT-ETFs. Regelmäßige Ausschüttungen und Inflationsschutz durch Mietanpassungen. Aber: stark zinsabhängig und oft schon im Welt-ETF enthalten — doppelte Gewichtung prüfen. Offene Immobilienfonds sind eine Alternative, aber weniger liquide. <a href="https://www.reit.com/data-research/reit-indexes/ftse-nareit-us-real-estate-index-historical-values-returns" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: NAREIT — FTSE Nareit All Equity REITs Index">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Immobilien-Exposure ohne Direktkauf über REIT-ETFs. Regelmäßige Ausschüttungen und Inflationsschutz durch Mietanpassungen. Aber: stark zinsabhängig und oft schon im Welt-ETF enthalten — doppelte Gewichtung prüfen. Offene Immobilienfonds sind eine Alternative, aber weniger liquide. <a href="https://www.reit.com/data-research/reit-indexes/ftse-nareit-us-real-estate-index-historical-values-returns" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: NAREIT — FTSE Nareit All Equity REITs Index">↗</a></div>
           </div>
           {/* Gold & Rohstoffe */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -954,7 +961,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 20, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Gold als Krisenversicherung, breite Rohstoffe als Inflationshedge. <strong style={{ color: 'var(--text)' }}>Physisches Gold</strong> (Münzen, Barren) ist nach 1 Jahr Haltedauer in DE steuerfrei und hat kein Emittentenrisiko — dafür Lagerkosten. ETCs (börsengehandelt, physisch besichert) sind bequemer, unterliegen aber der Abgeltungssteuer. Rohstoff-ETFs haben zusätzliche Rollkosten bei Futures. <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: World Gold Council">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Gold als Krisenversicherung, breite Rohstoffe als Inflationshedge. <strong style={{ color: 'var(--text)' }}>Physisches Gold</strong> (Münzen, Barren) ist nach 1 Jahr Haltedauer in DE steuerfrei und hat kein Emittentenrisiko — dafür Lagerkosten. ETCs (börsengehandelt, physisch besichert) sind bequemer, unterliegen aber der Abgeltungssteuer. Rohstoff-ETFs haben zusätzliche Rollkosten bei Futures. <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: World Gold Council">↗</a></div>
           </div>
           {/* Krypto */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -965,7 +972,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 40, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Höchste Rendite aller Asset-Klassen seit 2010 — aber Drawdowns bis −77%. <strong style={{ color: 'var(--text)' }}>Direktkauf bevorzugen:</strong> In DE nach 1 Jahr Haltedauer komplett steuerfrei (privates Veräußerungsgeschäft). ETPs sind zwar bequemer, aber Gewinne unterliegen der Abgeltungssteuer und du trägst Emittentenrisiko. Eigene Wallet = eigene Kontrolle, aber auch eigene Verantwortung für Sicherheit (Seed-Phrase!). <a href="https://coinmetrics.io/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: CoinMetrics">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Höchste Rendite aller Asset-Klassen seit 2010 — aber Drawdowns bis −77%. <strong style={{ color: 'var(--text)' }}>Direktkauf bevorzugen:</strong> In DE nach 1 Jahr Haltedauer komplett steuerfrei (privates Veräußerungsgeschäft). ETPs sind zwar bequemer, aber Gewinne unterliegen der Abgeltungssteuer und du trägst Emittentenrisiko. Eigene Wallet = eigene Kontrolle, aber auch eigene Verantwortung für Sicherheit (Seed-Phrase!). <a href="https://coinmetrics.io/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: CoinMetrics">↗</a></div>
           </div>
           {/* Infrastruktur */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -976,7 +983,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 18, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Mautstraßen, Stromnetze, Windparks, Flughäfen. Stabile, oft inflationsgebundene Cashflows. Über Infrastruktur-ETFs zugänglich, aber Achtung: viele enthalten vor allem Versorger und Industrieunternehmen — nicht „echte" Infrastruktur. Politisches Risiko beachten. <a href="https://www.spglobal.com/spdji/en/indices/equity/sp-global-infrastructure-index/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: S&amp;P Global Infrastructure Index">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Mautstraßen, Stromnetze, Windparks, Flughäfen. Stabile, oft inflationsgebundene Cashflows. Über Infrastruktur-ETFs zugänglich, aber Achtung: viele enthalten vor allem Versorger und Industrieunternehmen — nicht „echte" Infrastruktur. Politisches Risiko beachten. <a href="https://www.spglobal.com/spdji/en/indices/equity/sp-global-infrastructure-index/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: S&amp;P Global Infrastructure Index">↗</a></div>
           </div>
           {/* Private Equity */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -987,7 +994,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 32, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Nicht-börsennotierte Unternehmen. Yale allokiert ~40% in PE/VC. Für Privatanleger über „Listed Private Equity"-ETFs möglich, aber die bilden die tatsächliche PE-Rendite nur eingeschränkt ab. Direkt-Plattformen existieren (ab ~10k €), aber Kapital ist über Jahre gebunden und Managerauswahl entscheidet stark über Erfolg oder Misserfolg. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: David Swensen — Pioneering Portfolio Management">↗</span></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Nicht-börsennotierte Unternehmen. Yale allokiert ~40% in PE/VC. Für Privatanleger über „Listed Private Equity"-ETFs möglich, aber die bilden die tatsächliche PE-Rendite nur eingeschränkt ab. Direkt-Plattformen existieren (ab ~10k €), aber Kapital ist über Jahre gebunden und Managerauswahl entscheidet stark über Erfolg oder Misserfolg. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: David Swensen — Pioneering Portfolio Management">↗</span></div>
           </div>
           {/* Farmland / Wald */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -998,7 +1005,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 12, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Niedrige Volatilität, kaum Korrelation zu Aktien. Wald profitiert zusätzlich von CO₂-Zertifikaten. Über Timber-/Forestry-ETFs oder Agrar-ETFs annäherbar, echtes Farmland ist für Privatanleger kaum direkt zugänglich. Eher eine Nische als Portfoliokern. <a href="https://ncreif.org/data/index-returns/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: NCREIF Farmland Index">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Niedrige Volatilität, kaum Korrelation zu Aktien. Wald profitiert zusätzlich von CO₂-Zertifikaten. Über Timber-/Forestry-ETFs oder Agrar-ETFs annäherbar, echtes Farmland ist für Privatanleger kaum direkt zugänglich. Eher eine Nische als Portfoliokern. <a href="https://ncreif.org/data/index-returns/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: NCREIF Farmland Index">↗</a></div>
           </div>
           {/* Emerging Markets */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -1009,7 +1016,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 30, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>China, Indien, Brasilien, Südkorea. Höheres Wachstum, aber auch politische und Währungsrisiken. Ein breiter EM-ETF reicht — wer China-Risiko begrenzen will, kann einen ex-China-Variante wählen. Ein FTSE All-World oder MSCI ACWI enthält bereits ~10–12% Schwellenländer. <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: MSCI Emerging Markets Index">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>China, Indien, Brasilien, Südkorea. Höheres Wachstum, aber auch politische und Währungsrisiken. Ein breiter EM-ETF reicht — wer China-Risiko begrenzen will, kann einen ex-China-Variante wählen. Ein FTSE All-World oder MSCI ACWI enthält bereits ~10–12% Schwellenländer. <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: MSCI Emerging Markets Index">↗</a></div>
           </div>
           {/* Länder- & Regionenwetten */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -1020,7 +1027,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 34, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Die Weltwirtschaft verschiebt sich. <strong style={{ color: 'var(--text)' }}>Indien</strong> wird voraussichtlich die drittgrößte Volkswirtschaft, <strong style={{ color: 'var(--text)' }}>Vietnam</strong> und <strong style={{ color: 'var(--text)' }}>Indonesien</strong> wachsen rasant, <strong style={{ color: 'var(--text)' }}>Afrika</strong> hat die jüngste Bevölkerung der Welt. Einzelne Länder-ETFs ermöglichen gezielte Wetten — aber Vorsicht: hohes Konzentrationsrisiko, Währungsschwankungen und politische Instabilität. Japan galt in den 1980ern als unaufhaltsam und brauchte 34 Jahre, um sein Allzeithoch wiederzusehen.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Die Weltwirtschaft verschiebt sich. <strong style={{ color: 'var(--text)' }}>Indien</strong> wird voraussichtlich die drittgrößte Volkswirtschaft, <strong style={{ color: 'var(--text)' }}>Vietnam</strong> und <strong style={{ color: 'var(--text)' }}>Indonesien</strong> wachsen rasant, <strong style={{ color: 'var(--text)' }}>Afrika</strong> hat die jüngste Bevölkerung der Welt. Einzelne Länder-ETFs ermöglichen gezielte Wetten — aber Vorsicht: hohes Konzentrationsrisiko, Währungsschwankungen und politische Instabilität. Japan galt in den 1980ern als unaufhaltsam und brauchte 34 Jahre, um sein Allzeithoch wiederzusehen.</div>
           </div>
           {/* Small Caps */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -1031,7 +1038,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 30, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Kleine Unternehmen lieferten historisch eine Prämie gegenüber Large Caps (der „Size-Faktor" nach Fama/French). Sie sind volatiler, weniger liquide und weniger analysiert — genau das schafft Chancen. Ein MSCI World enthält keine Small Caps; wer sie will, braucht einen separaten Small-Cap-ETF oder einen All-Cap-Index wie den MSCI ACWI IMI. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Kleine Unternehmen lieferten historisch eine Prämie gegenüber Large Caps (der „Size-Faktor" nach Fama/French). Sie sind volatiler, weniger liquide und weniger analysiert — genau das schafft Chancen. Ein MSCI World enthält keine Small Caps; wer sie will, braucht einen separaten Small-Cap-ETF oder einen All-Cap-Index wie den MSCI ACWI IMI. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
           </div>
           {/* Dividendenaktien */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -1042,7 +1049,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 22, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Unternehmen mit stabilen, wachsenden Dividenden bieten einen psychologischen Vorteil: regelmäßige Ausschüttungen machen Kursrückgänge erträglicher. Aber Dividenden sind nicht „geschenktes Geld" — der Kurs fällt am Ex-Tag um die Ausschüttung. In DE steuerlich nachteilig gegenüber thesaurierenden Fonds, da jede Ausschüttung sofort besteuert wird.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Unternehmen mit stabilen, wachsenden Dividenden bieten einen psychologischen Vorteil: regelmäßige Ausschüttungen machen Kursrückgänge erträglicher. Aber Dividenden sind nicht „geschenktes Geld" — der Kurs fällt am Ex-Tag um die Ausschüttung. In DE steuerlich nachteilig gegenüber thesaurierenden Fonds, da jede Ausschüttung sofort besteuert wird.</div>
           </div>
           {/* Sammlerstücke */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -1053,7 +1060,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 28, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Uhren, Kunst, Wein, Oldtimer, seltene Sneaker — manche Sammlerstücke haben über Jahrzehnte beeindruckende Wertsteigerungen erzielt. Aber: kein laufender Ertrag, hohe Transaktionskosten, Fälschungsrisiko, Lagerung/Versicherung nötig und Liquidität nur bei Nachfrage. Kein Portfoliobaustein im klassischen Sinn — eher Liebhaberei mit möglicher Rendite.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Uhren, Kunst, Wein, Oldtimer, seltene Sneaker — manche Sammlerstücke haben über Jahrzehnte beeindruckende Wertsteigerungen erzielt. Aber: kein laufender Ertrag, hohe Transaktionskosten, Fälschungsrisiko, Lagerung/Versicherung nötig und Liquidität nur bei Nachfrage. Kein Portfoliobaustein im klassischen Sinn — eher Liebhaberei mit möglicher Rendite.</div>
           </div>
           {/* Geldmarkt / Tagesgeld */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
@@ -1064,7 +1071,7 @@ function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}><div style={{ width: 2, height: 3, borderRadius: 1.5, background: 'var(--red)', opacity: 0.6 }}></div><span style={{ fontSize: 9, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>▼</span></div>
               </div>
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Parkposition für den Notgroschen (3–6 Monatsgehälter) oder Kapital, das bald gebraucht wird. Tagesgeld bei Direktbanken mit Einlagensicherung bis 100.000 € oder ein Geldmarkt-ETF (bildet den EZB-Einlagenzins ab). Kein Kursrisiko, aber real nach Inflation oft negativ.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Parkposition für den Notgroschen (3–6 Monatsgehälter) oder Kapital, das bald gebraucht wird. Tagesgeld bei Direktbanken mit Einlagensicherung bis 100.000 € oder ein Geldmarkt-ETF (bildet den EZB-Einlagenzins ab). Kein Kursrisiko, aber real nach Inflation oft negativ.</div>
           </div>
         </div>
 
@@ -1076,42 +1083,42 @@ function App() {
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--green)', marginBottom: 8 }}>1975–2025 · S&amp;P 500</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--green)', marginBottom: 8 }}>~10,5% <span style={{ fontSize: 14, fontWeight: 400 }}>p.a. nominal</span></div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Wer 50 Jahre durchgehalten hat, wurde trotz zahlreicher Krisen belohnt. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Wer 50 Jahre durchgehalten hat, wurde trotz zahlreicher Krisen belohnt. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>2000–2010 · S&amp;P 500</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--red)', marginBottom: 8 }}>Real negativ</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Das „verlorene Jahrzehnt" — Dotcom-Crash und Finanzkrise vernichteten ein Jahrzehnt Rendite. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Das „verlorene Jahrzehnt" — Dotcom-Crash und Finanzkrise vernichteten ein Jahrzehnt Rendite. <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Ibbotson SBBI Yearbook">↗</a></div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>1980–2000 · Gold</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--red)', marginBottom: 8 }}>Seitwärts/Verlust</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Nach dem Höchststand 1980 verlor Gold inflationsbereinigt über zwei Jahrzehnte an Wert. <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: World Gold Council">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Nach dem Höchststand 1980 verlor Gold inflationsbereinigt über zwei Jahrzehnte an Wert. <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: World Gold Council">↗</a></div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--green)', marginBottom: 8 }}>2000–2020 · Gold</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--green)', marginBottom: 8 }}>~9% <span style={{ fontSize: 14, fontWeight: 400 }}>p.a.</span></div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Vervielfachung — Gold wurde zur Top-Anlageklasse dieser zwei Jahrzehnte. <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: World Gold Council">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Vervielfachung — Gold wurde zur Top-Anlageklasse dieser zwei Jahrzehnte. <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: World Gold Council">↗</a></div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--green)', marginBottom: 8 }}>1982–2020 · US-Anleihen</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--green)', marginBottom: 8 }}>Bullenmarkt</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Jahrzehnte sinkender Zinsen sorgten für einen der längsten Bullenmärkte in Anleihen. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: Vanguard Research — Global Fixed Income">↗</span></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Jahrzehnte sinkender Zinsen sorgten für einen der längsten Bullenmärkte in Anleihen. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: Vanguard Research — Global Fixed Income">↗</span></div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>2022 · 60/40 Portfolio</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--red)', marginBottom: 8 }}>Beide fielen</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Aktien und Anleihen fielen gleichzeitig — die Korrelation, auf die sich Jahrzehnte verlassen wurde, brach. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: Vanguard Research — Global Fixed Income">↗</span></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Aktien und Anleihen fielen gleichzeitig — die Korrelation, auf die sich Jahrzehnte verlassen wurde, brach. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: Vanguard Research — Global Fixed Income">↗</span></div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--green)', marginBottom: 8 }}>2000–2010 · Emerging Markets</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--green)', marginBottom: 8 }}>Boom</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>Starke Outperformance gegenüber Industrieländern — der BRIC-Hype. <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: MSCI Emerging Markets Index">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>Starke Outperformance gegenüber Industrieländern — der BRIC-Hype. <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: MSCI Emerging Markets Index">↗</a></div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>2010–2020 · Emerging Markets</div>
             <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--red)', marginBottom: 8 }}>Underperformance</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>US-Tech-Aktien dominierten — Schwellenländer blieben weit hinter dem S&amp;P 500 zurück. <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: MSCI Emerging Markets Index">↗</a></div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>US-Tech-Aktien dominierten — Schwellenländer blieben weit hinter dem S&amp;P 500 zurück. <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: MSCI Emerging Markets Index">↗</a></div>
           </div>
         </div>
 
@@ -1123,7 +1130,7 @@ function App() {
           {/* Aktiv vs. Passiv */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--gold)', marginBottom: 12 }}>Aktiv vs. Passiv</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
               <div><strong style={{ color: 'var(--green)' }}>Für Passiv:</strong> Warren Buffett gewann 2007 eine Wette — ein S&amp;P 500 Indexfonds schlug fünf ausgewählte Hedge-Fonds über 10 Jahre deutlich.</div>
               <div><strong style={{ color: 'var(--red)' }}>Für Aktiv:</strong> Renaissance Technologies (Medallion Fund) erzielte ~66% p.a. über Jahrzehnte — aber diesen Zugang hat kein Privatanleger.</div>
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text)' }}>Fazit: Für die meisten Privatanleger spricht viel für passives Investieren. Doch „der Markt" funktioniert nur, weil aktive Teilnehmer Preise finden.</div>
@@ -1132,24 +1139,24 @@ function App() {
           {/* Market Timing vs. Time in Market */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--gold)', marginBottom: 12 }}>Market Timing vs. Time in Market</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
               <div><strong style={{ color: 'var(--green)' }}>Time in Market:</strong> Wer die 10 besten Börsentage in 20 Jahren verpasst, verliert ~50% der Gesamtrendite.</div>
               <div><strong style={{ color: 'var(--red)' }}>Market Timing:</strong> Wer die 10 schlechtesten Tage vermeidet, verdoppelt die Rendite fast. Die besten und schlechtesten Tage liegen oft nah beieinander.</div>
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text)' }}>Fazit: Beides ist in der Praxis kaum möglich — stetiges, regelmäßiges Investieren gewinnt. <a href="https://am.jpmorgan.com/us/en/asset-management/adv/insights/market-insights/guide-to-the-markets/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: J.P. Morgan Guide to the Markets">↗</a></div>
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text)' }}>Fazit: Beides ist in der Praxis kaum möglich — stetiges, regelmäßiges Investieren gewinnt. <a href="https://am.jpmorgan.com/us/en/asset-management/adv/insights/market-insights/guide-to-the-markets/" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: J.P. Morgan Guide to the Markets">↗</a></div>
             </div>
           </div>
           {/* Einzelaktien vs. Indexfonds */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--gold)', marginBottom: 12 }}>Einzelaktien vs. Indexfonds</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
-              <div>Nur ~4% aller Aktien erzeugen den gesamten Aktienmarktgewinn über dem Geldmarkt. Die restlichen 96% performen in Summe nicht besser als kurzfristige Staatsanleihen. <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2900447" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Bessembinder — Do Stocks Outperform Treasury Bills?">↗</a></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              <div>Nur ~4% aller Aktien erzeugen den gesamten Aktienmarktgewinn über dem Geldmarkt. Die restlichen 96% performen in Summe nicht besser als kurzfristige Staatsanleihen. <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2900447" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Bessembinder — Do Stocks Outperform Treasury Bills?">↗</a></div>
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text)' }}>Ein Indexfonds garantiert, diese entscheidenden 4% im Portfolio zu haben. Stockpicking riskiert, sie zu verpassen.</div>
             </div>
           </div>
           {/* Home Bias */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--gold)', marginBottom: 12 }}>Home Bias</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
               <div>Deutsche Anleger übergewichten deutsche Aktien stark — obwohl der DAX nur ~2–3% der Welt-Marktkapitalisierung ausmacht.</div>
               <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, color: 'var(--text)' }}>Klumpenrisiko: Arbeitseinkommen, Immobilie und Aktienportfolio hängen dann alle vom selben Land ab. Ein breit gestreuter Welt-Index reduziert dieses Risiko.</div>
             </div>
@@ -1163,25 +1170,25 @@ function App() {
         <div className="resp-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 12 }}>Kosten fressen Rendite</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
-              1,5% TER (typischer aktiver Fonds) vs. 0,2% TER (ETF) klingt harmlos. Über 30 Jahre ergibt das aber ~30% weniger Endvermögen — ein Drittel deiner Rendite geht an den Fondsmanager. <a href="https://www.vanguardmexico.com/content/dam/intl/americas/documents/latam/en/2022/05/mx-sa-2217207-the-case-for-low-cost-index-fund-investing.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 13, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Vanguard — The Case for Low-Cost Index Funds">↗</a>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              1,5% TER (typischer aktiver Fonds) vs. 0,2% TER (ETF) klingt harmlos. Über 30 Jahre ergibt das aber ~30% weniger Endvermögen — ein Drittel deiner Rendite geht an den Fondsmanager. <a href="https://www.vanguardmexico.com/content/dam/intl/americas/documents/latam/en/2022/05/mx-sa-2217207-the-case-for-low-cost-index-fund-investing.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 14, textDecoration: 'none', opacity: 0.7 }} title="Quelle: Vanguard — The Case for Low-Cost Index Funds">↗</a>
             </div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 12 }}>Hauseigene Produkte</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
               Bankberater verdienen an Ausgabeaufschlägen und Provisionen — nicht an deiner Rendite. Das ist ein struktureller Interessenkonflikt. Sie empfehlen bevorzugt Produkte, an denen die Bank verdient.
             </div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 12 }}>Survivorship Bias</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
               Schlecht performende Fonds werden geschlossen oder mit besseren fusioniert. Die verbleibenden sehen dadurch künstlich besser aus. Die Statistik „80% unserer Fonds schlagen den Markt" verschweigt die bereits verschwundenen.
             </div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 12 }}>Sparplan vs. Einmalanlage</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
               Historisch ist die Einmalanlage in ~68% der Fälle besser als ein Sparplan. Der Grund: Märkte steigen langfristig, und Geld, das früher investiert ist, arbeitet länger. Aber der Sparplan senkt das Timing-Risiko und ist psychologisch leichter durchzuhalten. <span style={{ fontSize: 13, opacity: 0.5 }} title="Quelle: Vanguard — Dollar-cost averaging just means taking risk later, 2012">↗</span>
             </div>
           </div>
@@ -1194,59 +1201,59 @@ function App() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Warren Buffett 🇺🇸</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Sei ängstlich, wenn andere gierig sind, und gierig, wenn andere ängstlich sind.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Kauft antizyklisch und hält Jahrzehnte. Berkshire Hathaway ist fast ausschließlich in US-Aktien investiert — Apple allein macht ~50% des Aktienportfolios aus. Hält konstant ~25% in Cash und kurzlaufenden US-Staatsanleihen (~300 Mrd. $). Seine Anweisung an den Nachlassverwalter: 90% in einen S&amp;P 500 Indexfonds, 10% in Staatsanleihen.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Sei ängstlich, wenn andere gierig sind, und gierig, wenn andere ängstlich sind.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Kauft antizyklisch und hält Jahrzehnte. Berkshire Hathaway ist fast ausschließlich in US-Aktien investiert — Apple allein macht ~50% des Aktienportfolios aus. Hält konstant ~25% in Cash und kurzlaufenden US-Staatsanleihen (~300 Mrd. $). Seine Anweisung an den Nachlassverwalter: 90% in einen S&amp;P 500 Indexfonds, 10% in Staatsanleihen.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Charlie Munger 🇺🇸</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Das große Geld liegt nicht im Kaufen oder Verkaufen, sondern im Warten.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Plädierte für konzentrierte Portfolios mit wenigen, extrem gut verstandenen Positionen — das Gegenteil von breiter Diversifikation. Sein persönliches Portfolio bestand zeitweise aus nur 3–4 Aktien. War früh in BYD (chinesischer Autobauer) investiert — eine seltene Nicht-US-Wette, die sich vervielfachte.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Das große Geld liegt nicht im Kaufen oder Verkaufen, sondern im Warten.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Plädierte für konzentrierte Portfolios mit wenigen, extrem gut verstandenen Positionen — das Gegenteil von breiter Diversifikation. Sein persönliches Portfolio bestand zeitweise aus nur 3–4 Aktien. War früh in BYD (chinesischer Autobauer) investiert — eine seltene Nicht-US-Wette, die sich vervielfachte.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Ray Dalio 🇺🇸</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Diversifiziere gut und du kannst die Rendite ohne das Risiko haben.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Sein „All Weather Portfolio" verteilt Risiko über Aktien (~30%), langfristige Anleihen (~40%), mittelfristige Anleihen (~15%), Gold (~7,5%) und Rohstoffe (~7,5%). Bridgewater investiert global — USA, Europa, Asien. Dalio ist zunehmend bullish auf China und hält Gold als Absicherung gegen Schuldenzyklen und Währungsabwertung.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Diversifiziere gut und du kannst die Rendite ohne das Risiko haben.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Sein „All Weather Portfolio" verteilt Risiko über Aktien (~30%), langfristige Anleihen (~40%), mittelfristige Anleihen (~15%), Gold (~7,5%) und Rohstoffe (~7,5%). Bridgewater investiert global — USA, Europa, Asien. Dalio ist zunehmend bullish auf China und hält Gold als Absicherung gegen Schuldenzyklen und Währungsabwertung.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Li Ka-shing 🇭🇰</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Bevor du investierst, investiere in dich selbst.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Hongkongs reichster Investor. Diversifiziert über Kontinente und Branchen: Immobilien (Asien), Häfen (weltweit, ~30% des globalen Containerverkehrs), Telekommunikation (Europa, Kanada, Australien), Energie (Kanada). Verkaufte ab 2013 massiv China-Immobilien und investierte in Europa — eine Regionenwette, die kontrovers war, aber aufging.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Bevor du investierst, investiere in dich selbst.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Hongkongs reichster Investor. Diversifiziert über Kontinente und Branchen: Immobilien (Asien), Häfen (weltweit, ~30% des globalen Containerverkehrs), Telekommunikation (Europa, Kanada, Australien), Energie (Kanada). Verkaufte ab 2013 massiv China-Immobilien und investierte in Europa — eine Regionenwette, die kontrovers war, aber aufging.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Rakesh Jhunjhunwala 🇮🇳</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Wette auf Indien.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>„Indiens Warren Buffett" investierte fast ausschließlich in indische Aktien — Titan Company (Schmuck/Uhren), Tata Motors, Lupin (Pharma), CRISIL (Ratings). 100% Länderwette auf Indien, 100% Aktien, kein nennenswerter Anteil in Anleihen oder internationalen Assets. Gründete kurz vor seinem Tod die Airline Akasa Air. Ein Survivorship-Bias-Beispiel: Tausende indische Stockpicker scheiterten, er wurde Milliardär.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Wette auf Indien.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>„Indiens Warren Buffett" investierte fast ausschließlich in indische Aktien — Titan Company (Schmuck/Uhren), Tata Motors, Lupin (Pharma), CRISIL (Ratings). 100% Länderwette auf Indien, 100% Aktien, kein nennenswerter Anteil in Anleihen oder internationalen Assets. Gründete kurz vor seinem Tod die Airline Akasa Air. Ein Survivorship-Bias-Beispiel: Tausende indische Stockpicker scheiterten, er wurde Milliardär.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Nassef Sawiris 🇪🇬</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Kaufe, was du verstehst, in Regionen, die andere meiden.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Ägyptens reichster Investor. Kernvermögen in OCI (Baustoffe/Düngemittel, global aktiv — Niederlande, USA, Ägypten, Algerien). Dazu Beteiligungen in Europa: Adidas (~6%-Anteil), Aston Villa FC. Investiert hauptsächlich in Industrie und Sportbusiness, weniger in Tech. Ein Beweis, dass Frontier-Markets-Investoren global mithalten können.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Kaufe, was du verstehst, in Regionen, die andere meiden.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Ägyptens reichster Investor. Kernvermögen in OCI (Baustoffe/Düngemittel, global aktiv — Niederlande, USA, Ägypten, Algerien). Dazu Beteiligungen in Europa: Adidas (~6%-Anteil), Aston Villa FC. Investiert hauptsächlich in Industrie und Sportbusiness, weniger in Tech. Ein Beweis, dass Frontier-Markets-Investoren global mithalten können.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Masayoshi Son 🇯🇵</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Ich investiere in die Zukunft, nicht in die Gegenwart.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>SoftBanks Gründer investiert fast ausschließlich in Tech — Venture Capital und Wachstumsunternehmen über den Vision Fund (~100 Mrd. $). Alibaba-Einstieg: 20 Mio. $, Wert zeitweise über 100 Mrd. $. Aber die Kehrseite: Milliardenverluste mit WeWork, Wirecard, Greensill. Geographischer Fokus: Asien (China, Indien, Südkorea) und USA. Kaum Anleihen, kaum Rohstoffe — nahezu 100% in illiquiden Tech-Beteiligungen.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Ich investiere in die Zukunft, nicht in die Gegenwart.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>SoftBanks Gründer investiert fast ausschließlich in Tech — Venture Capital und Wachstumsunternehmen über den Vision Fund (~100 Mrd. $). Alibaba-Einstieg: 20 Mio. $, Wert zeitweise über 100 Mrd. $. Aber die Kehrseite: Milliardenverluste mit WeWork, Wirecard, Greensill. Geographischer Fokus: Asien (China, Indien, Südkorea) und USA. Kaum Anleihen, kaum Rohstoffe — nahezu 100% in illiquiden Tech-Beteiligungen.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>John Templeton 🇺🇸🇧🇸</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Kaufe am Punkt des maximalen Pessimismus.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Einer der ersten wirklich globalen Investoren. Kaufte in den 1960ern japanische Aktien, als niemand Japan beachtete. Sein Templeton Growth Fund investierte auf allen Kontinenten — Asien, Europa, Lateinamerika, Afrika. Lebte auf den Bahamas, um Distanz zum Wall-Street-Herdentrieb zu halten. Glaubte fest daran, dass die besten Chancen dort liegen, wo noch niemand hinschaut.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Kaufe am Punkt des maximalen Pessimismus.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Einer der ersten wirklich globalen Investoren. Kaufte in den 1960ern japanische Aktien, als niemand Japan beachtete. Sein Templeton Growth Fund investierte auf allen Kontinenten — Asien, Europa, Lateinamerika, Afrika. Lebte auf den Bahamas, um Distanz zum Wall-Street-Herdentrieb zu halten. Glaubte fest daran, dass die besten Chancen dort liegen, wo noch niemand hinschaut.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Howard Marks 🇺🇸</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Man kann nicht die gleichen Dinge tun wie alle anderen und erwarten, besser abzuschneiden.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Oaktree Capital investiert primär in Distressed Debt — Anleihen und Kredite von Unternehmen in Schwierigkeiten, gekauft für Centbeträge. Fokus auf USA und Europa. Marks betont, dass Risiko nicht Volatilität ist, sondern die Wahrscheinlichkeit eines permanenten Verlusts. Seine Memos sind Pflichtlektüre für antizyklisches Denken.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Man kann nicht die gleichen Dinge tun wie alle anderen und erwarten, besser abzuschneiden.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Oaktree Capital investiert primär in Distressed Debt — Anleihen und Kredite von Unternehmen in Schwierigkeiten, gekauft für Centbeträge. Fokus auf USA und Europa. Marks betont, dass Risiko nicht Volatilität ist, sondern die Wahrscheinlichkeit eines permanenten Verlusts. Seine Memos sind Pflichtlektüre für antizyklisches Denken.</div>
           </div>
 
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Aliko Dangote 🇳🇬</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Investiere dort, wo andere Infrastruktur sehen — ich sehe Nachfrage.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Afrikas reichster Mensch. Investiert fast ausschließlich in Afrika — Zement (größter Produzent des Kontinents), Zucker, Mehl, Düngemittel und seit 2023 die größte Ölraffinerie Afrikas. Reine Länderwette auf Afrikas Bevölkerungswachstum und Industrialisierung. Kaum internationale Diversifikation — alles auf einen Kontinent.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Investiere dort, wo andere Infrastruktur sehen — ich sehe Nachfrage.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>Afrikas reichster Mensch. Investiert fast ausschließlich in Afrika — Zement (größter Produzent des Kontinents), Zucker, Mehl, Düngemittel und seit 2023 die größte Ölraffinerie Afrikas. Reine Länderwette auf Afrikas Bevölkerungswachstum und Industrialisierung. Kaum internationale Diversifikation — alles auf einen Kontinent.</div>
           </div>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Cathie Wood 🇺🇸</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Innovation löst Disruption aus, und Disruption schafft Wachstum.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>ARK Invest setzt ausschließlich auf disruptive Innovation: KI, Genomik, Robotik, Krypto, Fintech. 100% Aktien, 0% Anleihen, 0% Rohstoffe. Hauptsächlich US-Tech mit einigen globalen Positionen. ARKK stieg 2020 um +150%, fiel 2022 um −67%. Ein Beispiel dafür, wie Themen-Investing extreme Ergebnisse in beide Richtungen liefern kann.</div>
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Innovation löst Disruption aus, und Disruption schafft Wachstum.</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>ARK Invest setzt ausschließlich auf disruptive Innovation: KI, Genomik, Robotik, Krypto, Fintech. 100% Aktien, 0% Anleihen, 0% Rohstoffe. Hauptsächlich US-Tech mit einigen globalen Positionen. ARKK stieg 2020 um +150%, fiel 2022 um −67%. Ein Beispiel dafür, wie Themen-Investing extreme Ergebnisse in beide Richtungen liefern kann.</div>
           </div>
         </div>
 
@@ -1267,7 +1274,7 @@ function App() {
             {/* Geldmenge M3 Chart */}
             <div>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)', marginBottom: 8 }}>Geldmenge im Euroraum (M3)</div>
-              <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 20, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 20, lineHeight: 1.6 }}>
                 M3 misst alles Geld im Umlauf — Bargeld, Girokonten, Spareinlagen.
                 Je mehr Geld im System ist, desto weniger ist jeder einzelne Euro wert.
               </div>
@@ -1331,7 +1338,7 @@ function App() {
             {/* Kaufkraft-Verlust Chart */}
             <div>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)', marginBottom: 8 }}>Was aus 100 € Kaufkraft wird</div>
-              <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 20, lineHeight: 1.6 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 20, lineHeight: 1.6 }}>
                 100 € aus 1999 kaufen heute nur noch Waren im Wert von ~62 €.
                 Basierend auf tatsächlichen Inflationsraten (Destatis).
               </div>
@@ -1402,7 +1409,7 @@ function App() {
           <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
             <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)', marginBottom: 10 }}>Was noch dazukam</div>
-              <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                 Die Geldmengenausweitung war ein wesentlicher Treiber, aber nicht der einzige.
                 <strong style={{ color: 'var(--text)' }}> Lieferkettenprobleme</strong> (Container-Staus, Chipmangel) und der
                 <strong style={{ color: 'var(--text)' }}> Energiepreisschock</strong> nach dem russischen Angriff auf die Ukraine
@@ -1412,7 +1419,7 @@ function App() {
             </div>
             <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)', marginBottom: 10 }}>Was die Zahlen nicht zeigen</div>
-              <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                 Technologie macht Produktion ständig günstiger — eigentlich müssten viele Preise <strong style={{ color: 'var(--text)' }}>sinken</strong>.
                 Beispiele: Solarstrom <strong style={{ color: 'var(--green)' }}>−90%</strong> seit 2010,
                 Rechenleistung <strong style={{ color: 'var(--green)' }}>−99%</strong> seit 2000,
@@ -1436,26 +1443,26 @@ function App() {
           <div className="resp-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
             <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--gold)', marginBottom: 10 }}>Gold</div>
-              <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                 Seit 5.000 Jahren Wertaufbewahrungsmittel. Die weltweite Goldmenge wächst nur ~1,5% pro Jahr durch Minenförderung — weit unter der Geldmengenausweitung. Gold hat jede Währung, jedes Imperium und jede Krise überlebt. In Deutschland nach 1 Jahr Haltedauer steuerfrei. Kein Emittentenrisiko bei physischem Besitz.
               </div>
             </div>
             <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 10 }}>Bitcoin</div>
-              <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                 Mathematisch auf 21 Millionen Einheiten begrenzt — das härteste Geld, das je existiert hat. Keine Zentralbank kann Bitcoin drucken oder entwerten. Dezentral, zensurresistent, grenzüberschreitend. In Deutschland nach 1 Jahr Haltedauer steuerfrei. Hohe Volatilität, aber langfristig die stärkste Performance aller Asset-Klassen.
               </div>
             </div>
             <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--green)', marginBottom: 10 }}>Rohstoffe &amp; Sachwerte</div>
-              <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                 Öl, Kupfer, Agrarprodukte, Immobilien — physische Güter, die Menschen tatsächlich brauchen. Wenn Geld weniger wert wird, steigen die Preise für reale Güter. Rohstoff-ETFs oder Rohstoff-Aktien bieten Zugang ohne physische Lagerung. Immobilien schützen ebenfalls, sind aber illiquide und klumpenrisikobehaftet.
               </div>
             </div>
           </div>
 
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.8 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8 }}>
               <strong style={{ color: 'var(--text)' }}>Warum das wichtig ist:</strong> Zentralbanken weltweit haben nach 2008 und erneut 2020 die Geldmenge massiv ausgeweitet. Die Folge war die höchste Inflation seit 40 Jahren — in Deutschland bis zu 8,7% im Oktober 2022. Wer sein Vermögen nur in Euro hält, wettet darauf, dass Regierungen und Zentralbanken verantwortungsvoll mit der Geldmenge umgehen. Die Geschichte zeigt: diese Wette geht langfristig verloren. Ein Portfolio, das harte Assets enthält — Gold, Bitcoin, Rohstoffe — ist eine Versicherung gegen genau dieses Risiko.
             </div>
           </div>
@@ -1464,7 +1471,7 @@ function App() {
         {/* SEO-Text */}
         <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: 18, fontFamily: 'var(--sans)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.5, marginBottom: 16 }}>Warum du selbst für deine Altersvorsorge sorgen musst</h2>
-          <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.9, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.9, display: 'flex', flexDirection: 'column', gap: 14 }}>
             <p style={{ margin: 0 }}>Die gesetzliche Rente in Deutschland steht vor einem strukturellen Problem: Immer weniger Beitragszahler finanzieren immer mehr Rentner. Das Rentenniveau sinkt seit Jahren, während die Beiträge steigen. Wer sich allein auf die staatliche Rente verlässt, riskiert Altersarmut — besonders Selbständige, Freelancer und Geringverdiener. Privat vorsorgen ist keine Option mehr, sondern Notwendigkeit.</p>
             <p style={{ margin: 0 }}>Doch der Staat macht es Privatanlegern nicht leicht. Kapitalerträge werden mit der Abgeltungssteuer von 25% plus Solidaritätszuschlag und ggf. Kirchensteuer belastet — effektiv bis zu 28%. Wer mit ETFs, Aktien oder Fonds fürs Alter spart, gibt über ein Viertel seiner Gewinne ab. Dazu kommen intransparente Gebührenstrukturen bei Banken und Versicherungen, die langfristig zehntausende Euro an Rendite kosten. Die Riester-Rente, einst als Lösung beworben, enttäuscht die meisten Sparer durch hohe Kosten und magere Ergebnisse. Die betriebliche Altersvorsorge klingt attraktiv, bindet aber Kapital und ist in der Auszahlungsphase voll steuerpflichtig.</p>
             <p style={{ margin: 0 }}>Eigenverantwortliches Investieren — mit einem klaren Plan, niedrigen Kosten und langfristigem Horizont — ist der effektivste Weg zum Vermögensaufbau. Ein breit diversifiziertes Portfolio aus Welt-ETFs, ergänzt durch Gold, Bitcoin und Cash, kann über Jahrzehnte ein erhebliches Vermögen aufbauen. Der Zinseszinseffekt ist dabei der mächtigste Verbündete: Wer früh anfängt und konsequent investiert, profitiert exponentiell. Schon 500 Euro monatlich in einen kostengünstigen Indexfonds können über 30 Jahre zu einem sechsstelligen Vermögen anwachsen.</p>
@@ -1478,7 +1485,7 @@ function App() {
           <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
             Quellenverzeichnis
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
             <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[2]</span> Ibbotson SBBI Yearbook — Stocks, Bonds, Bills, and Inflation — <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>CFA Institute (PDF)</a></div>
             <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[3]</span> World Gold Council — Historische Goldpreisdaten — <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>gold.org</a></div>
             <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[4]</span> Vanguard Research — „Global Fixed Income: Considerations for U.S. Investors"</div>
