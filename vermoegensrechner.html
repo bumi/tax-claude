@@ -289,7 +289,7 @@ function App() {
         <div className="section-label">Vermögensrechner</div>
         <h2>Wie wächst dein Geld<br />bei <span className="green">{fmt(monthlySaving)} € monatlich</span>?</h2>
         <div style={{ marginBottom: 36, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
-          Berechne, wie viel Vermögen sich aufbaut, wenn du regelmäßig einen festen Betrag investierst — und wie lange es im Ruhestand reicht. Ziel ist es, ein Gefühl für die Wertentwicklung bei verschiedenen Konfigurationen zu bekommen und <strong style={{ color: 'var(--text)' }}>zur eigenen Finanzplanung zu inspirieren.</strong>
+          Berechne, wie viel Vermögen sich aufbaut, wenn du regelmäßig einen festen Betrag investierst — und wie lange es im Ruhestand reicht. Warum das nötig ist? <a href="#inflation" style={{ color: 'var(--red)', textDecoration: 'none' }}>Inflation entwertet dein Geld jedes Jahr</a> — wer nicht investiert, verliert. Ziel ist es, ein Gefühl für die Wertentwicklung zu bekommen und <strong style={{ color: 'var(--text)' }}>zur eigenen Finanzplanung zu inspirieren.</strong>
         </div>
 
         <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
@@ -1331,9 +1331,9 @@ function App() {
       </section>
 
       {/* Inflation & Harte Assets */}
-      <section style={{ minHeight: 'auto' }}>
+      <section id="inflation" style={{ minHeight: 'auto' }}>
         <div className="section-label">Die unsichtbare Steuer</div>
-        <h2>Inflation —<br/><span className="red">warum Sparen allein nicht reicht</span></h2>
+        <h2>Warum dein Geld<br/><span className="red">wachsen muss</span></h2>
 
           <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8, marginBottom: 28 }}>
             Inflation entwertet dein Erspartes — still, stetig, ohne Steuerbescheid. <strong style={{ color: 'var(--text)' }}>100 €</strong> aus dem Jahr 2000 haben heute nur noch eine Kaufkraft von etwa <strong style={{ color: 'var(--red)' }}>60 €</strong>. Wer Geld auf dem Girokonto oder Sparbuch liegen lässt, verliert jedes Jahr real an Vermögen. Die Europäische Zentralbank hat seit 2008 die Geldmenge im Euroraum mehr als verdreifacht — mehr Geld im System bedeutet: jeder einzelne Euro wird weniger wert.
