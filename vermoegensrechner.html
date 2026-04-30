@@ -91,6 +91,30 @@ function fmt(n, digits=0) {
   return new Intl.NumberFormat('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
 }
 
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function generateCrashes(seed, maxYears) {
+  const rng = mulberry32(seed);
+  const crashes = [];
+  for (let yr = 1; yr <= maxYears; yr++) {
+    const roll = rng();
+    if (roll < 0.12) {
+      const magnitude = -(0.15 + rng() * 0.30); // -15% to -45%
+      crashes.push({ yr, magnitude });
+    } else {
+      rng(); // consume second number to keep sequence aligned
+    }
+  }
+  return crashes;
+}
+
 function App() {
   const [monthlySaving, setMonthlySaving] = useState(500);
   const [oppYears, setOppYears] = useState(20);
@@ -99,12 +123,20 @@ function App() {
   const [oppShowReal, setOppShowReal] = useState(false);
   const [oppDynamic, setOppDynamic] = useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState(2000);
+  const [chaosEnabled, setChaosEnabled] = useState(false);
+  const [chaosSeed, setChaosSeed] = useState(() => Math.floor(Math.random() * 2147483647));
+  const [taxEnabled, setTaxEnabled] = useState(true);
 
   const monthlyTax = monthlySaving;
   const rate = oppInterest / 100 / 12;
   const inflRate = oppInflation / 100;
   const monthlyInflRate = Math.pow(1 + inflRate, 1/12) - 1;
   const months = oppYears * 12;
+
+  // Generate crash events (up to 240 years: max 40 saving + max 200 withdrawal)
+  const crashes = chaosEnabled ? generateCrashes(chaosSeed, 240) : [];
+  const crashMap = {};
+  crashes.forEach(c => { crashMap[c.yr] = c.magnitude; });
 
   // Future value
   let fv = 0;
@@ -113,22 +145,69 @@ function App() {
     const contribution = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, m) : monthlyTax;
     totalPaid += contribution;
     fv = (fv + contribution) * (1 + rate);
+    // Apply crash at end of each year
+    if (chaosEnabled && m % 12 === 11) {
+      const yr = Math.floor(m / 12) + 1;
+      if (crashMap[yr]) {
+        fv = fv * (1 + crashMap[yr]);
+      }
+    }
   }
   const gains = fv - totalPaid;
   const realFv = fv / Math.pow(1 + inflRate, oppYears);
   const inflationLoss = fv - realFv;
 
-  // Withdrawal simulation
+  // Abgeltungssteuer: 25% + 5,5% Soli = 26,375% on gains portion
+  // Sparerpauschbetrag: 1.000 € (Single) / 2.000 € (Verheiratet) tax-free gains per year
+  const abgeltungRate = 0.26375;
+  const freibetrag = 1000; // yearly tax-free allowance on capital gains
+
+  // Withdrawal simulation with Abgeltungssteuer
+  // Each withdrawal consists of principal + gains proportionally.
+  // Only the gains portion (minus Freibetrag) is taxed.
   const annualWithdrawal = withdrawalAmount * 12;
   const nominalRate = oppInterest / 100;
   let wdCapital = fv;
+  let wdCostBasis = totalPaid; // track remaining cost basis in the portfolio
   let withdrawYears = 0;
+  let totalTaxPaid = 0;
+  let firstYearTax = 0;
   const maxSim = 200;
   const withdrawPoints = [{ yr: oppYears, value: fv, real: realFv }];
   while (wdCapital > 0 && withdrawYears < maxSim) {
     const yearsSinceStart = oppYears + withdrawYears;
-    const withdrawal = annualWithdrawal * Math.pow(1 + inflRate, yearsSinceStart);
-    wdCapital = wdCapital * (1 + nominalRate) - withdrawal;
+    const absYr = yearsSinceStart + 1; // the year we're simulating
+    // Apply crash BEFORE growth and withdrawal
+    if (chaosEnabled && crashMap[absYr]) {
+      wdCapital = wdCapital * (1 + crashMap[absYr]);
+      // Cost basis doesn't change — crash is an unrealized loss
+    }
+    // Desired net withdrawal (what the user wants to receive after tax)
+    const desiredNet = annualWithdrawal * Math.pow(1 + inflRate, yearsSinceStart);
+    // Gains ratio in portfolio
+    const gainsRatio = wdCapital > 0 ? Math.max(0, 1 - wdCostBasis / wdCapital) : 0;
+    let gross = desiredNet;
+    let yearTax = 0;
+    if (taxEnabled) {
+      // To receive desiredNet after tax, we need to withdraw more (gross)
+      // Tax = (grossWithdrawal * gainsRatio - freibetrag) * abgeltungRate (if positive)
+      // desiredNet = grossWithdrawal - tax
+      // Solve iteratively for simplicity:
+      for (let iter = 0; iter < 10; iter++) {
+        const taxableGains = Math.max(0, gross * gainsRatio - freibetrag);
+        const tax = taxableGains * abgeltungRate;
+        gross = desiredNet + tax;
+      }
+      const taxableGains = Math.max(0, gross * gainsRatio - freibetrag);
+      yearTax = taxableGains * abgeltungRate;
+    }
+    totalTaxPaid += yearTax;
+    if (withdrawYears === 0) firstYearTax = yearTax;
+    // Reduce cost basis proportionally
+    const costBasisReduction = gross * (1 - gainsRatio);
+    wdCostBasis = Math.max(0, wdCostBasis - costBasisReduction);
+    // Capital grows by return, then gross withdrawal is taken out
+    wdCapital = wdCapital * (1 + nominalRate) - gross;
     withdrawYears++;
     if (wdCapital < 0) wdCapital = 0;
     withdrawPoints.push({ yr: oppYears + withdrawYears, value: wdCapital, real: wdCapital / Math.pow(1 + inflRate, oppYears + withdrawYears) });
@@ -136,6 +215,17 @@ function App() {
   const infiniteWithdraw = withdrawYears >= maxSim;
   const wdDisplayYears = infiniteWithdraw ? oppYears : withdrawYears;
   const wdDisplayPoints = infiniteWithdraw ? withdrawPoints.slice(0, oppYears + 1) : withdrawPoints;
+
+  // Calculate initial monthly gross withdrawal for display
+  const initGainsRatio = fv > 0 ? Math.max(0, 1 - totalPaid / fv) : 0;
+  let initGrossAnnual = annualWithdrawal;
+  if (taxEnabled) {
+    for (let iter = 0; iter < 10; iter++) {
+      const tg = Math.max(0, initGrossAnnual * initGainsRatio - freibetrag);
+      initGrossAnnual = annualWithdrawal + tg * abgeltungRate;
+    }
+  }
+  const initGrossMonthly = initGrossAnnual / 12;
 
   // Year-by-year for chart (saving phase)
   const yearPoints = Array.from({ length: oppYears + 1 }, (_, yr) => {
@@ -145,6 +235,12 @@ function App() {
       const c = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, i) : monthlyTax;
       paid += c;
       value = (value + c) * (1 + rate);
+      if (chaosEnabled && i % 12 === 11) {
+        const crashYr = Math.floor(i / 12) + 1;
+        if (crashMap[crashYr]) {
+          value = value * (1 + crashMap[crashYr]);
+        }
+      }
     }
     const real = value / Math.pow(1 + inflRate, yr);
     return { yr, value, paid, real };
@@ -167,7 +263,7 @@ function App() {
         <div className="section-label">Vermögensrechner</div>
         <h2>Wie wächst dein Geld<br />bei <span className="green">{fmt(monthlySaving)} € monatlich</span>?</h2>
         <div style={{ marginBottom: 36, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
-          Berechne, wie viel Vermögen sich aufbaut, wenn du regelmäßig einen festen Betrag investierst — und wie lange es im Ruhestand reicht.
+          Berechne, wie viel Vermögen sich aufbaut, wenn du regelmäßig einen festen Betrag investierst — und wie lange es im Ruhestand reicht. Ziel ist es, ein Gefühl für die Wertentwicklung bei verschiedenen Konfigurationen zu bekommen und <strong style={{ color: 'var(--text)' }}>zur eigenen Finanzplanung zu inspirieren.</strong>
         </div>
 
         <div className="resp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}>
@@ -247,6 +343,53 @@ function App() {
                   Dynamik: Einzahlung steigt jährlich um Inflation
                 </span>
               </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                <button onClick={() => setChaosEnabled(!chaosEnabled)} style={{
+                  width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative',
+                  background: chaosEnabled ? 'var(--red)' : 'rgba(255,255,255,0.1)', transition: 'background 0.2s',
+                }}>
+                  <div style={{
+                    width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
+                    position: 'absolute', top: 3, left: chaosEnabled ? 23 : 3, transition: 'left 0.2s',
+                  }} />
+                </button>
+                <span style={{ fontSize: 13, color: chaosEnabled ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+                  Marktcrashs simulieren
+                </span>
+                {chaosEnabled && (
+                  <button
+                    onClick={() => setChaosSeed(Math.floor(Math.random() * 2147483647))}
+                    title="Neu würfeln"
+                    style={{
+                      background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 6,
+                      padding: '3px 8px', cursor: 'pointer', fontSize: 14, lineHeight: 1,
+                      color: 'var(--text-dim)', transition: 'all 0.2s',
+                    }}
+                  >
+                    🎲
+                  </button>
+                )}
+              </div>
+              {chaosEnabled && crashes.filter(c => c.yr <= oppYears + wdDisplayYears).length > 0 && (
+                <div style={{
+                  marginTop: 8, padding: '10px 14px', background: 'rgba(255,60,60,0.06)',
+                  borderRadius: 8, border: '1px solid rgba(255,60,60,0.15)',
+                }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--red)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+                    Crash-Events
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {crashes.filter(c => c.yr <= oppYears + wdDisplayYears).map((c, i) => (
+                      <span key={i} style={{
+                        fontFamily: 'var(--mono)', fontSize: 11, padding: '2px 8px',
+                        borderRadius: 4, background: 'rgba(255,60,60,0.1)', color: 'var(--red)',
+                      }}>
+                        J{c.yr}: {(c.magnitude * 100).toFixed(0)}%
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Future Value Card */}
@@ -269,8 +412,8 @@ function App() {
                   <span className="mono">{fmt(totalPaid)} €</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                  <span style={{ color: 'var(--green)' }}>Rendite (Zinseszins)</span>
-                  <span className="mono green">+ {fmt(gains)} €</span>
+                  <span style={{ color: gains >= 0 ? 'var(--green)' : 'var(--red)' }}>{gains >= 0 ? 'Rendite (Zinseszins)' : 'Verlust (nach Crashs)'}</span>
+                  <span className="mono" style={{ color: gains >= 0 ? 'var(--green)' : 'var(--red)' }}>{gains >= 0 ? '+' : '−'} {fmt(Math.abs(gains))} €</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, borderTop: '1px solid rgba(74,190,100,0.2)', paddingTop: 8 }}>
                   <span style={{ color: 'var(--red)' }}>− Inflation ({oppInflation}%/J.)</span>
@@ -299,15 +442,29 @@ function App() {
                 Entnahmeplan · Wie lange reicht das Kapital?
               </div>
               <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 16 }}>
-                Wenn du ab Jahr {oppYears} monatlich <strong style={{ color: 'var(--text)' }}>{fmt(withdrawalAmount)} €</strong> (inflationsbereinigt) entnimmst und der Rest weiter {oppInterest}% Rendite erwirtschaftet:
+                Wenn du ab Jahr {oppYears} monatlich <strong style={{ color: 'var(--text)' }}>{fmt(withdrawalAmount)} €{taxEnabled ? ' netto' : ''}</strong> (inflationsbereinigt{taxEnabled ? ', nach Abgeltungssteuer' : ''}) entnimmst und der Rest weiter {oppInterest}% Rendite erwirtschaftet:
               </div>
-              <div style={{ marginBottom: 16 }}>
+              <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div className="ctrl-row">
                   <div className="ctrl-label">
-                    <span className="ctrl-name">Monatliche Entnahme</span>
+                    <span className="ctrl-name">Monatliche Entnahme{taxEnabled ? ' (netto)' : ''}</span>
                     <span className="ctrl-value mono">{fmt(withdrawalAmount)} € / Monat</span>
                   </div>
                   <input type="range" min="100" max="10000" step="100" value={withdrawalAmount} onChange={e => setWithdrawalAmount(+e.target.value)} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <button onClick={() => setTaxEnabled(!taxEnabled)} style={{
+                    width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative',
+                    background: taxEnabled ? 'var(--gold)' : 'rgba(255,255,255,0.1)', transition: 'background 0.2s',
+                  }}>
+                    <div style={{
+                      width: 18, height: 18, borderRadius: '50%', background: 'var(--text)',
+                      position: 'absolute', top: 3, left: taxEnabled ? 23 : 3, transition: 'left 0.2s',
+                    }} />
+                  </button>
+                  <span style={{ fontSize: 13, color: taxEnabled ? 'var(--text)' : 'var(--text-dim)', transition: 'color 0.2s' }}>
+                    Abgeltungssteuer nach Durchschnittskostenmethode berücksichtigen
+                  </span>
                 </div>
               </div>
               <div style={{ fontFamily: 'var(--mono)', fontSize: 42, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
@@ -315,12 +472,42 @@ function App() {
               </div>
               <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 8, lineHeight: 1.6 }}>
                 {infiniteWithdraw
-                  ? 'Das Kapital reicht unbegrenzt — die Rendite übersteigt die inflationsbereinigte Entnahme.'
-                  : `Nach ${withdrawYears} Jahren Entnahme wäre das Kapital aufgebraucht. Das entspricht einem Gesamtzeitraum von ${oppYears + withdrawYears} Jahren (${oppYears}J Ansparphase + ${withdrawYears}J Entnahme).`
+                  ? `Das Kapital reicht unbegrenzt — die Rendite übersteigt die inflationsbereinigte Entnahme${taxEnabled ? ' (inkl. Steuerlast)' : ''}.`
+                  : `Nach ${withdrawYears} Jahren Entnahme wäre das Kapital aufgebraucht.`
                 }
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, padding: '10px 14px', background: 'rgba(241,196,15,0.08)', borderRadius: 8, lineHeight: 1.6 }}>
-                <strong style={{ color: 'var(--gold)' }}>Hinweis:</strong> Die Entnahme wird jährlich um {oppInflation}% erhöht, um die Inflation auszugleichen. Im ersten Entnahmejahr entnimmst du {fmt(Math.round(annualWithdrawal * Math.pow(1 + inflRate, oppYears)))} €/Jahr, damit bleibt die Kaufkraft immer auf dem Niveau deines gewählten Entnahmebetrags.
+              {/* Tax info */}
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
+                  <span>Jährliche Entnahme{taxEnabled ? ' (netto → brutto)' : ''}</span>
+                  <span className="mono">{fmt(annualWithdrawal)} €{taxEnabled && <> → <span style={{ color: 'var(--text)' }}>{fmt(Math.round(initGrossAnnual))} €</span></>}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-dim)' }}>
+                  <span>Gewinnanteil bei Entnahmestart</span>
+                  <span className="mono">{(Math.max(0, 1 - totalPaid / fv) * 100).toFixed(1)}%</span>
+                </div>
+                {taxEnabled && (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                      <span style={{ color: 'var(--red)' }}>Abgeltungssteuer im 1. Entnahmejahr</span>
+                      <span className="mono red">{fmt(Math.round(firstYearTax))} €</span>
+                    </div>
+                    {!infiniteWithdraw && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                        <span style={{ color: 'var(--red)' }}>Abgeltungssteuer gesamt ({withdrawYears}J)</span>
+                        <span className="mono red">{totalTaxPaid >= 1_000_000 ? `${(totalTaxPaid / 1_000_000).toFixed(2)} Mio.` : fmt(Math.round(totalTaxPaid))} €</span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              {taxEnabled && (
+                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, padding: '10px 14px', background: 'rgba(241,196,15,0.08)', borderRadius: 8, lineHeight: 1.6 }}>
+                  <strong style={{ color: 'var(--gold)' }}>Steuer-Hinweis:</strong> Bei jeder Entnahme wird nur der <strong style={{ color: 'var(--text)' }}>Gewinnanteil</strong> besteuert (Abgeltungssteuer 25% + Soli = 26,375%). Der Sparerpauschbetrag von {fmt(freibetrag)} €/Jahr ist berücksichtigt. Die angezeigte Entnahme ist der <strong style={{ color: 'var(--text)' }}>Nettobetrag</strong> — die Brutto-Entnahme ist entsprechend höher. Vereinfachend wird die Durchschnittskostenmethode verwendet — in der Praxis gilt das FiFo-Prinzip, was die Steuerlast zeitlich verschieben kann.
+                </div>
+              )}
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8, padding: '10px 14px', background: 'rgba(241,196,15,0.08)', borderRadius: 8, lineHeight: 1.6 }}>
+                <strong style={{ color: 'var(--gold)' }}>Inflation:</strong> Die Entnahme wird jährlich um {oppInflation}% erhöht, um die Inflation auszugleichen, damit die Kaufkraft auf dem Niveau deines gewählten Entnahmebetrags bleibt.
               </div>
             </div>
 
@@ -371,6 +558,15 @@ function App() {
               {/* Withdrawal phase line */}
               <path d={wdLinePath('value')} fill="none" stroke="var(--gold)" strokeWidth="2.5" />
               {oppShowReal && <path d={wdLinePath('real')} fill="none" stroke="var(--blue)" strokeWidth="2" strokeDasharray="6,3" />}
+              {/* Crash markers */}
+              {chaosEnabled && crashes.filter(c => c.yr <= chartTotalYears).map((c, i) => (
+                <g key={`crash-${i}`}>
+                  <line x1={xS(c.yr)} y1={pad.top} x2={xS(c.yr)} y2={h - pad.bottom} stroke="var(--red)" strokeWidth="1" opacity="0.35" />
+                  <text x={xS(c.yr)} y={h - pad.bottom + 12} fill="var(--red)" fontSize="7" textAnchor="middle" fontFamily="var(--mono)" opacity="0.7">
+                    {(c.magnitude * 100).toFixed(0)}%
+                  </text>
+                </g>
+              ))}
               {/* End markers */}
               <circle cx={xS(oppYears)} cy={yS(lastPt.value)} r="4" fill="var(--green)" />
               {oppShowReal && <circle cx={xS(oppYears)} cy={yS(lastPt.real)} r="3" fill="var(--blue)" />}
@@ -409,6 +605,14 @@ function App() {
                   <span><strong style={{ color: 'var(--blue)' }}>Reale Kaufkraft</strong> — was das Geld nach {oppInflation}% Inflation/Jahr tatsächlich wert ist</span>
                 </div>
               )}
+              {chaosEnabled && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 20, height: 14, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                    <div style={{ width: 1, height: 14, background: 'var(--red)', opacity: 0.5 }} />
+                  </div>
+                  <span><strong style={{ color: 'var(--red)' }}>Marktcrash</strong> — zufälliger Kurseinbruch (−15% bis −45%)</span>
+                </div>
+              )}
             </div>
             <button
               onClick={() => setOppShowReal(!oppShowReal)}
@@ -438,6 +642,68 @@ function App() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Berechnungsmethodik */}
+            <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)', marginTop: 20 }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                So wird gerechnet
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+                <div>
+                  <strong style={{ color: 'var(--text)' }}>Endvermögen</strong> — Jeden Monat wird der Sparbetrag eingezahlt und das gesamte Kapital mit der monatlichen Rendite verzinst: <span className="mono" style={{ fontSize: 12 }}>Kapital = (Kapital + Einzahlung) × (1 + r/12)</span>. {oppDynamic && <>Bei aktivierter Dynamik steigt die monatliche Einzahlung mit der Inflation.</>}
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--text)' }}>Eingezahlt</strong> — Summe aller monatlichen Einzahlungen über {oppYears} Jahre ({months} Monate){oppDynamic ? ', wobei jede Einzahlung nominal um die monatliche Inflationsrate steigt.' : '.'}
+                </div>
+                <div>
+                  <strong style={{ color: gains >= 0 ? 'var(--green)' : 'var(--red)' }}>{gains >= 0 ? 'Rendite' : 'Verlust'}</strong> — Differenz zwischen Endvermögen und Summe der Einzahlungen: <span className="mono" style={{ fontSize: 12 }}>Endvermögen − Eingezahlt</span>. Enthält den kumulierten Zinseszinseffekt{chaosEnabled ? ' abzüglich der Crash-Verluste.' : '.'}
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--red)' }}>Inflation</strong> — Das Endvermögen wird auf heutige Kaufkraft abgezinst: <span className="mono" style={{ fontSize: 12 }}>Inflationsverlust = Endvermögen − Endvermögen ÷ (1 + {oppInflation}%)<sup>{oppYears}</sup></span>.
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--gold)' }}>Reale Kaufkraft</strong> — Was das Endvermögen in heutigen Euro wert ist: <span className="mono" style={{ fontSize: 12 }}>Endvermögen ÷ (1 + {oppInflation}%)<sup>{oppYears}</sup></span>.
+                </div>
+                {chaosEnabled && (
+                  <div>
+                    <strong style={{ color: 'var(--red)' }}>Marktcrashs</strong> — Am Ende jedes Jahres wird mit 12% Wahrscheinlichkeit ein Crash ausgelöst (−15% bis −45%). Der Crash reduziert das gesamte Kapital: <span className="mono" style={{ fontSize: 12 }}>Kapital = Kapital × (1 + Crash)</span>. Die Recovery erfolgt implizit durch die durchschnittliche Rendite der Folgejahre. In der Entnahmephase werden Crashs vor der Jahresentnahme angewendet.
+                  </div>
+                )}
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 10, marginTop: 4 }}>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Entnahmeplan</div>
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--gold)' }}>Entnahmedauer</strong> — Simuliert Jahr für Jahr: Kapital wächst um {oppInterest}% Rendite, dann wird der Brutto-Entnahmebetrag abgezogen. Sobald das Kapital auf 0 fällt, ist die Entnahmedauer erreicht. Übersteigt die Rendite die Entnahme dauerhaft, ist sie unbegrenzt (∞).
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--text)' }}>Netto → Brutto</strong> — Die angezeigte Entnahme ist der Nettobetrag. Da nur der Gewinnanteil besteuert wird, ist die tatsächliche Brutto-Entnahme höher: <span className="mono" style={{ fontSize: 12 }}>Brutto = Netto + Steuer</span>. Die Steuer wird iterativ berechnet, da sie selbst vom Bruttobetrag abhängt.
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--text)' }}>Gewinnanteil</strong> — Bei jeder Entnahme besteht ein Teil aus eingezahltem Kapital (steuerfrei) und ein Teil aus Gewinnen (steuerpflichtig). Das Verhältnis ergibt sich aus: <span className="mono" style={{ fontSize: 12 }}>Gewinnanteil = 1 − Kostenbasis ÷ Kapital</span>. Die Kostenbasis wird bei jeder Entnahme proportional reduziert.
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--red)' }}>Abgeltungssteuer</strong> — Auf den Gewinnanteil jeder Entnahme werden 26,375% fällig (25% + 5,5% Soli). Pro Jahr sind die ersten {fmt(freibetrag)} € Kapitalerträge steuerfrei (Sparerpauschbetrag): <span className="mono" style={{ fontSize: 12 }}>Steuer = max(0, Brutto × Gewinnanteil − {fmt(freibetrag)}) × 26,375%</span>.
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--gold)' }}>Inflationsanpassung</strong> — Die Entnahme wird jedes Jahr um {oppInflation}% erhöht, damit die Kaufkraft konstant bleibt: <span className="mono" style={{ fontSize: 12 }}>Entnahme(Jahr) = {fmt(withdrawalAmount)} € × (1 + {oppInflation}%)<sup>Jahr</sup></span>.
+                </div>
+              </div>
+            </div>
+
+            {/* Disclaimer */}
+            <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)', marginTop: 20 }}>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                Hinweis zur Steuerberechnung
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+                <div>
+                  Diese Berechnung verwendet die <strong style={{ color: 'var(--text)' }}>Durchschnittskostenmethode</strong> (Average Cost Basis): Bei jeder Entnahme wird angenommen, dass Einstandskosten und Gewinne gleichmäßig im Portfolio verteilt sind. In der Praxis wenden Banken in Deutschland das <strong style={{ color: 'var(--text)' }}>FiFo-Prinzip</strong> (First In, First Out) an — zuerst gekaufte Anteile werden zuerst verkauft. Da ältere Anteile typischerweise einen höheren Gewinnanteil haben, kann die tatsächliche Steuerlast in den ersten Entnahmejahren höher ausfallen als hier dargestellt und in späteren Jahren entsprechend niedriger.
+                </div>
+                <div>
+                  Dieser Rechner dient ausschließlich der Veranschaulichung und stellt keine Steuer- oder Anlageberatung dar. Renditen sind nicht garantiert. Vergangene Wertentwicklung ist kein Indikator für zukünftige Ergebnisse. Die Teilfreistellung für Aktienfonds (30%) und Kirchensteuer sind nicht berücksichtigt.
+                </div>
+              </div>
             </div>
           </div>
         </div>
