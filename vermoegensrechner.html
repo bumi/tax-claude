@@ -923,10 +923,67 @@ function App() {
         </div>
           );
         })()}
-        {/* Asset-Klassen & Alternative Investments */}
+        {/* Risiken & Mitigation */}
         <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, marginTop: 32 }}>
-          Asset-Klassen — Jenseits von Aktien &amp; Anleihen
+          Risiken — und wie das Portfolio sie abfedert
         </div>
+
+        <div className="resp-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>Börsencrash (−40% bis −60%)</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              Aktienmärkte können innerhalb von Wochen um die Hälfte fallen — 2008, 2020, historisch alle 10–15 Jahre.
+              <div style={{ marginTop: 8, color: 'var(--text)' }}>→ 10% Cash ermöglicht Nachkäufe im Crash statt Panikverkäufe. Gold steigt oft in Krisen. Wer den Sparplan weiterlaufen lässt, kauft günstig ein.</div>
+            </div>
+          </div>
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>Hohe Inflation / Währungsverfall</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              Zentralbanken entwerten Geld durch Geldmengenausweitung — 2022: 8,7% in Deutschland. Hyperinflation wie in der Türkei oder Argentinien ist auch in Europa nicht undenkbar.
+              <div style={{ marginTop: 8, color: 'var(--text)' }}>→ Gold und Bitcoin sind mengenmäßig begrenzt und können nicht gedruckt werden. Aktien-Unternehmen können Preise erhöhen. Nur Cash verliert — deshalb bewusst auf 10% begrenzt.</div>
+            </div>
+          </div>
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>Geopolitischer Umbruch (USA verliert Dominanz)</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              Die USA machen ~70% des MSCI World aus. Wenn China, Indien oder andere Mächte aufsteigen und US-Unternehmen schrumpfen, verschiebt sich die Weltwirtschaft.
+              <div style={{ marginTop: 8, color: 'var(--text)' }}>→ Ein Welt-ETF gewichtet nach Marktkapitalisierung — passt sich automatisch an. Die EM-Position fängt Wachstum außerhalb der heutigen Industrieländer auf. Gold und Bitcoin sind länderneutral.</div>
+            </div>
+          </div>
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>Verlorenes Jahrzehnt (Nullrendite über 10+ Jahre)</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              2000–2010: S&amp;P 500 lieferte real negative Rendite. Japan: seit 1989 brauchte der Nikkei 34 Jahre für ein neues Allzeithoch.
+              <div style={{ marginTop: 8, color: 'var(--text)' }}>→ Diversifikation über Regionen (nicht nur USA), Asset-Klassen (Gold lief 2000–2010 hervorragend) und Zeit (Sparplan kauft günstig in schwachen Phasen). Ein einzelnes Land kann stagnieren — die Weltwirtschaft nicht dauerhaft.</div>
+            </div>
+          </div>
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>Bitcoin-Totalverlust</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              Regulierungsverbote, technische Schwachstellen oder ein besseres Protokoll könnten Bitcoin wertlos machen.
+              <div style={{ marginTop: 8, color: 'var(--text)' }}>→ Bewusst auf 10% begrenzt. Ein Totalverlust kostet das Portfolio −10% — schmerzhaft, aber verkraftbar. Ein 10x macht +100%. Die Asymmetrie spricht für die Position, nicht dagegen.</div>
+            </div>
+          </div>
+          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>Systemischer Kollaps (Krieg, Pandemie, Finanzsystemversagen)</div>
+            <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+              Weltkrieg, globale Pandemie schlimmer als COVID, Zusammenbruch des Bankensystems — Szenarien, in denen alles gleichzeitig fällt.
+              <div style={{ marginTop: 8, color: 'var(--text)' }}>→ Kein Portfolio schützt vollständig vor dem Ende des Weltwirtschaftssystems. Aber: physisches Gold und Bitcoin (eigene Keys) existieren außerhalb des Bankensystems. In jeder bisherigen Krise der Menschheitsgeschichte haben sich Märkte erholt — wer durchhielt, wurde belohnt.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '20px 24px' }}>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <strong style={{ color: 'var(--text)' }}>Das größte Risiko von allen:</strong> Nicht investieren. Wer aus Angst vor Crashs, Inflation oder Unsicherheit sein Geld auf dem Girokonto lässt, verliert garantiert — leise, stetig, jedes Jahr. Die Inflation ist der einzige Gegner, der mit Sicherheit gewinnt, wenn man nichts tut.
+          </div>
+        </div>
+
+      </section>
+
+      <section style={{ minHeight: 'auto' }}>
+        <div className="section-label">Asset-Klassen</div>
+        <h2>Jenseits von<br/><span className="green">Aktien &amp; Anleihen</span></h2>
 
         <div className="resp-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
           {/* Welt-Aktien */}
@@ -1132,10 +1189,11 @@ function App() {
           </div>
         </div>
 
-        {/* 3. Sich widersprechende Strategien */}
-        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, marginTop: 32 }}>
-          Sich widersprechende Strategien
-        </div>
+      </section>
+
+      <section style={{ minHeight: 'auto' }}>
+        <div className="section-label">Strategien</div>
+        <h2>Beide Seiten haben<br/><span className="red">gute Argumente</span></h2>
         <div className="resp-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
           {/* Aktiv vs. Passiv */}
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
@@ -1173,10 +1231,11 @@ function App() {
           </div>
         </div>
 
-        {/* 4. Was dein Bankberater nicht sagt */}
-        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, marginTop: 32 }}>
-          Was dein Bankberater nicht sagt
-        </div>
+      </section>
+
+      <section style={{ minHeight: 'auto' }}>
+        <div className="section-label">Bankberater</div>
+        <h2>Was dein Bankberater<br/><span className="red">nicht sagt</span></h2>
         <div className="resp-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28 }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--red)', marginBottom: 12 }}>Kosten fressen Rendite</div>
@@ -1204,10 +1263,11 @@ function App() {
           </div>
         </div>
 
-        {/* Stimmen globaler Investoren */}
-        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, marginTop: 32 }}>
-          Stimmen globaler Investoren
-        </div>
+      </section>
+
+      <section style={{ minHeight: 'auto' }}>
+        <div className="section-label">Investoren</div>
+        <h2>Stimmen globaler<br/><span className="green">Investoren</span></h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Warren Buffett 🇺🇸</div>
@@ -1268,12 +1328,12 @@ function App() {
         </div>
 
 
-        {/* Inflation & Harte Assets */}
-        <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
-            Die unsichtbare Steuer
-          </div>
-          <h2 style={{ fontSize: 18, fontFamily: 'var(--sans)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.5, marginBottom: 16 }}>Inflation — <span style={{ color: 'var(--red)' }}>warum Sparen allein nicht reicht</span></h2>
+      </section>
+
+      {/* Inflation & Harte Assets */}
+      <section style={{ minHeight: 'auto' }}>
+        <div className="section-label">Die unsichtbare Steuer</div>
+        <h2>Inflation —<br/><span className="red">warum Sparen allein nicht reicht</span></h2>
 
           <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.8, marginBottom: 28 }}>
             Inflation entwertet dein Erspartes — still, stetig, ohne Steuerbescheid. <strong style={{ color: 'var(--text)' }}>100 €</strong> aus dem Jahr 2000 haben heute nur noch eine Kaufkraft von etwa <strong style={{ color: 'var(--red)' }}>60 €</strong>. Wer Geld auf dem Girokonto oder Sparbuch liegen lässt, verliert jedes Jahr real an Vermögen. Die Europäische Zentralbank hat seit 2008 die Geldmenge im Euroraum mehr als verdreifacht — mehr Geld im System bedeutet: jeder einzelne Euro wird weniger wert.
@@ -1476,7 +1536,6 @@ function App() {
               <strong style={{ color: 'var(--text)' }}>Warum das wichtig ist:</strong> Zentralbanken weltweit haben nach 2008 und erneut 2020 die Geldmenge massiv ausgeweitet. Die Folge war die höchste Inflation seit 40 Jahren — in Deutschland bis zu 8,7% im Oktober 2022. Wer sein Vermögen nur in Euro hält, wettet darauf, dass Regierungen und Zentralbanken verantwortungsvoll mit der Geldmenge umgehen. Die Geschichte zeigt: diese Wette geht langfristig verloren. Ein Portfolio, das harte Assets enthält — Gold, Bitcoin, Rohstoffe — ist eine Versicherung gegen genau dieses Risiko.
             </div>
           </div>
-        </div>
 
         {/* SEO-Text */}
         <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
