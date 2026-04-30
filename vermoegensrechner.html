@@ -76,6 +76,7 @@ input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
   svg { max-width: 100%; }
   .footer { padding: 24px 16px; }
 }
+@keyframes disclaimerGlow { 0% { color: rgba(255,255,255,0.9); } 100% { color: var(--text-dim); } }
 </style>
 
 <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
@@ -259,6 +260,14 @@ function App() {
 
   return (
     <>
+      <div style={{
+        fontSize: 13, color: 'var(--text-dim)', textAlign: 'center',
+        padding: '8px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
+        fontFamily: 'var(--mono)', letterSpacing: '0.02em', lineHeight: 1.5,
+        animation: 'disclaimerGlow 1.5s ease-out forwards',
+      }}>
+        Diese Seite wurde mit KI (<a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#d97746', textDecoration: 'none' }}>Claude</a>) recherchiert &amp; erstellt — als Inspiration, nicht als Anlageberatung. Do your own research.
+      </div>
       <section>
         <div className="section-label">Vermögensrechner</div>
         <h2>Wie wächst dein Geld<br />bei <span className="green">{fmt(monthlySaving)} € monatlich</span>?</h2>
@@ -1242,11 +1251,7 @@ function App() {
             <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Man kann nicht die gleichen Dinge tun wie alle anderen und erwarten, besser abzuschneiden.</div>
             <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Oaktree Capital investiert primär in Distressed Debt — Anleihen und Kredite von Unternehmen in Schwierigkeiten, gekauft für Centbeträge. Fokus auf USA und Europa. Marks betont, dass Risiko nicht Volatilität ist, sondern die Wahrscheinlichkeit eines permanenten Verlusts. Seine Memos sind Pflichtlektüre für antizyklisches Denken.</div>
           </div>
-          <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>George Soros 🇺🇸🇭🇺</div>
-            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Es kommt nicht darauf an, ob man recht hat, sondern wie viel man verdient, wenn man recht hat.</div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>Investiert global in Währungen, Anleihen, Aktien und Rohstoffe — mit starkem Makro-Fokus. Wettet groß auf gesamtwirtschaftliche Verschiebungen: Pfund-Wette 1992 (über 1 Mrd. $ Gewinn an einem Tag), Asien-Krise 1997. Quantum Fund erzielte ~30% p.a. über 30 Jahre. Aber seine Strategie erfordert ein Maß an Risikotoleranz und Timing, das für Privatanleger untragbar ist.</div>
-          </div>
+
           <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 24px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--gold)', marginBottom: 6 }}>Aliko Dangote 🇳🇬</div>
             <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4, fontStyle: 'italic' }}>Investiere dort, wo andere Infrastruktur sehen — ich sehe Nachfrage.</div>
@@ -1259,40 +1264,6 @@ function App() {
           </div>
         </div>
 
-
-        {/* 5. Quellenverzeichnis */}
-        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginTop: 32 }}>
-          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
-            Quellenverzeichnis
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
-
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[2]</span> Ibbotson SBBI Yearbook — Stocks, Bonds, Bills, and Inflation — <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>CFA Institute (PDF)</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[3]</span> World Gold Council — Historische Goldpreisdaten — <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>gold.org</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[4]</span> Vanguard Research — „Global Fixed Income: Considerations for U.S. Investors"</div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[5]</span> MSCI — Emerging Markets Index historische Performance-Daten — <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>msci.com</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[6]</span> J.P. Morgan Asset Management — „Guide to the Markets" — <a href="https://am.jpmorgan.com/us/en/asset-management/adv/insights/market-insights/guide-to-the-markets/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>jpmorgan.com</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[7]</span> Hendrik Bessembinder — „Do Stocks Outperform Treasury Bills?", 2018 — <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2900447" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>SSRN</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[8]</span> Vanguard — „The Case for Low-Cost Index Funds" — <a href="https://www.vanguardmexico.com/content/dam/intl/americas/documents/latam/en/2022/05/mx-sa-2217207-the-case-for-low-cost-index-fund-investing.pdf" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Vanguard (PDF)</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[9]</span> Vanguard — „Dollar-cost averaging just means taking risk later", 2012</div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[10]</span> NAREIT — FTSE Nareit All Equity REITs Index — <a href="https://www.reit.com/data-research/reit-indexes/ftse-nareit-us-real-estate-index-historical-values-returns" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>reit.com</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[11]</span> David Swensen — „Pioneering Portfolio Management", Yale Investments Office, 2000 (aktualisiert 2009)</div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[12]</span> CoinMetrics — Bitcoin historische Preisdaten und Korrelationsanalysen — <a href="https://coinmetrics.io/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>coinmetrics.io</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[13]</span> S&amp;P Global Infrastructure Index — <a href="https://www.spglobal.com/spdji/en/indices/equity/sp-global-infrastructure-index/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>spglobal.com</a></div>
-            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[14]</span> NCREIF Farmland Index — National Council of Real Estate Investment Fiduciaries — <a href="https://ncreif.org/data/index-returns/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>ncreif.org</a></div>
-          </div>
-        </div>
-        {/* SEO-Text */}
-        <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
-          <h2 style={{ fontSize: 18, fontFamily: 'var(--sans)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.5, marginBottom: 16 }}>Warum du selbst für deine Altersvorsorge sorgen musst</h2>
-          <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.9, display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <p style={{ margin: 0 }}>Die gesetzliche Rente in Deutschland steht vor einem strukturellen Problem: Immer weniger Beitragszahler finanzieren immer mehr Rentner. Das Rentenniveau sinkt seit Jahren, während die Beiträge steigen. Wer sich allein auf die staatliche Rente verlässt, riskiert Altersarmut — besonders Selbständige, Freelancer und Geringverdiener. Privat vorsorgen ist keine Option mehr, sondern Notwendigkeit.</p>
-            <p style={{ margin: 0 }}>Doch der Staat macht es Privatanlegern nicht leicht. Kapitalerträge werden mit der Abgeltungssteuer von 25% plus Solidaritätszuschlag und ggf. Kirchensteuer belastet — effektiv bis zu 28%. Wer mit ETFs, Aktien oder Fonds fürs Alter spart, gibt über ein Viertel seiner Gewinne ab. Dazu kommen intransparente Gebührenstrukturen bei Banken und Versicherungen, die langfristig zehntausende Euro an Rendite kosten. Die Riester-Rente, einst als Lösung beworben, enttäuscht die meisten Sparer durch hohe Kosten und magere Ergebnisse. Die betriebliche Altersvorsorge klingt attraktiv, bindet aber Kapital und ist in der Auszahlungsphase voll steuerpflichtig.</p>
-            <p style={{ margin: 0 }}>Eigenverantwortliches Investieren — mit einem klaren Plan, niedrigen Kosten und langfristigem Horizont — ist der effektivste Weg zum Vermögensaufbau. Ein breit diversifiziertes Portfolio aus Welt-ETFs, ergänzt durch Gold, Bitcoin und Cash, kann über Jahrzehnte ein erhebliches Vermögen aufbauen. Der Zinseszinseffekt ist dabei der mächtigste Verbündete: Wer früh anfängt und konsequent investiert, profitiert exponentiell. Schon 500 Euro monatlich in einen kostengünstigen Indexfonds können über 30 Jahre zu einem sechsstelligen Vermögen anwachsen.</p>
-            <p style={{ margin: 0 }}>Die größten Fehler dabei: zu spät anfangen, zu viel für Gebühren bezahlen, und zu oft das Portfolio umschichten. Studien zeigen, dass Anleger, die einen einfachen Sparplan aufsetzen und ihn laufen lassen, langfristig besser abschneiden als die meisten aktiv gemanagten Fonds. Geld anlegen muss nicht kompliziert sein — aber es muss passieren. Jeder Monat ohne Investment ist verlorene Zeit, in der der Zinseszins nicht für dich arbeitet.</p>
-            <p style={{ margin: 0 }}>Dieser Vermögensrechner hilft dir, die Mathematik hinter dem langfristigen Investieren zu verstehen. Berechne dein Endvermögen, vergleiche verschiedene Renditen und Sparraten, und sieh selbst, wie aus kleinen monatlichen Beträgen über Zeit echtes Vermögen entsteht. Geldanlage, Altersvorsorge und finanzielle Unabhängigkeit beginnen mit einer einzigen Entscheidung: heute anfangen.</p>
-          </div>
-        </div>
 
         {/* Inflation & Harte Assets */}
         <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
@@ -1501,6 +1472,40 @@ function App() {
             <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.8 }}>
               <strong style={{ color: 'var(--text)' }}>Warum das wichtig ist:</strong> Zentralbanken weltweit haben nach 2008 und erneut 2020 die Geldmenge massiv ausgeweitet. Die Folge war die höchste Inflation seit 40 Jahren — in Deutschland bis zu 8,7% im Oktober 2022. Wer sein Vermögen nur in Euro hält, wettet darauf, dass Regierungen und Zentralbanken verantwortungsvoll mit der Geldmenge umgehen. Die Geschichte zeigt: diese Wette geht langfristig verloren. Ein Portfolio, das harte Assets enthält — Gold, Bitcoin, Rohstoffe — ist eine Versicherung gegen genau dieses Risiko.
             </div>
+          </div>
+        </div>
+
+        {/* SEO-Text */}
+        <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
+          <h2 style={{ fontSize: 18, fontFamily: 'var(--sans)', color: 'var(--text)', fontWeight: 600, lineHeight: 1.5, marginBottom: 16 }}>Warum du selbst für deine Altersvorsorge sorgen musst</h2>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.9, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <p style={{ margin: 0 }}>Die gesetzliche Rente in Deutschland steht vor einem strukturellen Problem: Immer weniger Beitragszahler finanzieren immer mehr Rentner. Das Rentenniveau sinkt seit Jahren, während die Beiträge steigen. Wer sich allein auf die staatliche Rente verlässt, riskiert Altersarmut — besonders Selbständige, Freelancer und Geringverdiener. Privat vorsorgen ist keine Option mehr, sondern Notwendigkeit.</p>
+            <p style={{ margin: 0 }}>Doch der Staat macht es Privatanlegern nicht leicht. Kapitalerträge werden mit der Abgeltungssteuer von 25% plus Solidaritätszuschlag und ggf. Kirchensteuer belastet — effektiv bis zu 28%. Wer mit ETFs, Aktien oder Fonds fürs Alter spart, gibt über ein Viertel seiner Gewinne ab. Dazu kommen intransparente Gebührenstrukturen bei Banken und Versicherungen, die langfristig zehntausende Euro an Rendite kosten. Die Riester-Rente, einst als Lösung beworben, enttäuscht die meisten Sparer durch hohe Kosten und magere Ergebnisse. Die betriebliche Altersvorsorge klingt attraktiv, bindet aber Kapital und ist in der Auszahlungsphase voll steuerpflichtig.</p>
+            <p style={{ margin: 0 }}>Eigenverantwortliches Investieren — mit einem klaren Plan, niedrigen Kosten und langfristigem Horizont — ist der effektivste Weg zum Vermögensaufbau. Ein breit diversifiziertes Portfolio aus Welt-ETFs, ergänzt durch Gold, Bitcoin und Cash, kann über Jahrzehnte ein erhebliches Vermögen aufbauen. Der Zinseszinseffekt ist dabei der mächtigste Verbündete: Wer früh anfängt und konsequent investiert, profitiert exponentiell. Schon 500 Euro monatlich in einen kostengünstigen Indexfonds können über 30 Jahre zu einem sechsstelligen Vermögen anwachsen.</p>
+            <p style={{ margin: 0 }}>Die größten Fehler dabei: zu spät anfangen, zu viel für Gebühren bezahlen, und zu oft das Portfolio umschichten. Studien zeigen, dass Anleger, die einen einfachen Sparplan aufsetzen und ihn laufen lassen, langfristig besser abschneiden als die meisten aktiv gemanagten Fonds. Geld anlegen muss nicht kompliziert sein — aber es muss passieren. Jeder Monat ohne Investment ist verlorene Zeit, in der der Zinseszins nicht für dich arbeitet.</p>
+            <p style={{ margin: 0 }}>Dieser Vermögensrechner hilft dir, die Mathematik hinter dem langfristigen Investieren zu verstehen. Berechne dein Endvermögen, vergleiche verschiedene Renditen und Sparraten, und sieh selbst, wie aus kleinen monatlichen Beträgen über Zeit echtes Vermögen entsteht. Geldanlage, Altersvorsorge und finanzielle Unabhängigkeit beginnen mit einer einzigen Entscheidung: heute anfangen.</p>
+          </div>
+        </div>
+
+        {/* Quellenverzeichnis */}
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginTop: 48 }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+            Quellenverzeichnis
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[2]</span> Ibbotson SBBI Yearbook — Stocks, Bonds, Bills, and Inflation — <a href="https://rpc.cfainstitute.org/sites/default/files/-/media/documents/book/rf-publication/2021/sbbi-summary-edition-2021.pdf" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>CFA Institute (PDF)</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[3]</span> World Gold Council — Historische Goldpreisdaten — <a href="https://www.gold.org/goldhub/data/gold-prices" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>gold.org</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[4]</span> Vanguard Research — „Global Fixed Income: Considerations for U.S. Investors"</div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[5]</span> MSCI — Emerging Markets Index historische Performance-Daten — <a href="https://www.msci.com/indexes/index/891800" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>msci.com</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[6]</span> J.P. Morgan Asset Management — „Guide to the Markets" — <a href="https://am.jpmorgan.com/us/en/asset-management/adv/insights/market-insights/guide-to-the-markets/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>jpmorgan.com</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[7]</span> Hendrik Bessembinder — „Do Stocks Outperform Treasury Bills?", 2018 — <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2900447" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>SSRN</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[8]</span> Vanguard — „The Case for Low-Cost Index Funds" — <a href="https://www.vanguardmexico.com/content/dam/intl/americas/documents/latam/en/2022/05/mx-sa-2217207-the-case-for-low-cost-index-fund-investing.pdf" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Vanguard (PDF)</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[9]</span> Vanguard — „Dollar-cost averaging just means taking risk later", 2012</div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[10]</span> NAREIT — FTSE Nareit All Equity REITs Index — <a href="https://www.reit.com/data-research/reit-indexes/ftse-nareit-us-real-estate-index-historical-values-returns" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>reit.com</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[11]</span> David Swensen — „Pioneering Portfolio Management", Yale Investments Office, 2000 (aktualisiert 2009)</div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[12]</span> CoinMetrics — Bitcoin historische Preisdaten und Korrelationsanalysen — <a href="https://coinmetrics.io/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>coinmetrics.io</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[13]</span> S&amp;P Global Infrastructure Index — <a href="https://www.spglobal.com/spdji/en/indices/equity/sp-global-infrastructure-index/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>spglobal.com</a></div>
+            <div><span className="mono" style={{ color: 'var(--text)', fontSize: 12 }}>[14]</span> NCREIF Farmland Index — National Council of Real Estate Investment Fiduciaries — <a href="https://ncreif.org/data/index-returns/" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>ncreif.org</a></div>
           </div>
         </div>
 
