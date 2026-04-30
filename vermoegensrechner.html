@@ -724,6 +724,165 @@ function App() {
           </div>
         </div>
 
+        {/* KI-Portfolio-Empfehlung */}
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, marginTop: 32 }}>
+          KI-Portfolio — Langfristiger Vermögensaufbau
+        </div>
+
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginBottom: 16 }}>
+          <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.8, marginBottom: 20 }}>
+            Wenn ich aus allem, was ich über Finanzmärkte, Risiko und menschliches Verhalten weiß, ein einziges Portfolio für langfristigen Vermögensaufbau konstruieren müsste — dieses wäre es. <strong>Einfach, günstig, global, robust.</strong>
+          </div>
+
+          {/* Portfolio-Balken */}
+          <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 32, marginBottom: 20 }}>
+            <div style={{ width: '60%', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>Welt-Aktien 60%</div>
+            <div style={{ width: '10%', background: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>EM 10%</div>
+            <div style={{ width: '10%', background: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>Gold 10%</div>
+            <div style={{ width: '10%', background: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>BTC 10%</div>
+            <div style={{ width: '10%', background: 'var(--text-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>Cash 10%</div>
+          </div>
+
+          <div className="resp-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+            <div style={{ padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 10 }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--green)', marginBottom: 4 }}>60% — Welt-Aktien</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 10 }}>Kern: MSCI World oder FTSE All-World ETF, thesaurierend, TER unter 0,25%. Enthält ~1.500–4.000 Unternehmen aus 23–49 Ländern.</div>
+              <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', marginBottom: 6, opacity: 0.7 }}>Optionale Satelliten (innerhalb der 60%):</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', gap: 8, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                  <span style={{ color: 'var(--green)', fontFamily: 'var(--mono)', fontSize: 11, whiteSpace: 'nowrap' }}>45%</span>
+                  <span>Welt-ETF (Kern — läuft automatisch, breit diversifiziert)</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                  <span style={{ color: 'var(--green)', fontFamily: 'var(--mono)', fontSize: 11, whiteSpace: 'nowrap' }}>5%</span>
+                  <span>Small-Cap-ETF — historische Überrendite kleiner Unternehmen, höhere Volatilität</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                  <span style={{ color: 'var(--green)', fontFamily: 'var(--mono)', fontSize: 11, whiteSpace: 'nowrap' }}>5%</span>
+                  <span>Dividenden-ETF — stabilere Erträge, defensiver, geringere Drawdowns in Krisen</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                  <span style={{ color: 'var(--green)', fontFamily: 'var(--mono)', fontSize: 11, whiteSpace: 'nowrap' }}>5%</span>
+                  <span>Einzelaktien — nur für Fortgeschrittene, max. 3–5 Überzeugungstitel, die man wirklich versteht</span>
+                </div>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-dim)', lineHeight: 1.5, marginTop: 8, opacity: 0.6, fontStyle: 'italic' }}>Minimalistisch: die vollen 60% in einen einzigen Welt-ETF sind völlig ausreichend. Die Satelliten sind optional für Anleger, die aktiv Akzente setzen wollen.</div>
+            </div>
+            <div style={{ padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 10 }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--blue)', marginBottom: 4 }}>10% — Emerging Markets</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>Separater EM-ETF, weil der MSCI World keine Schwellenländer enthält. Indien, Taiwan, Südkorea, Brasilien — die Wachstumsmärkte der nächsten Jahrzehnte. Wer einen FTSE All-World nimmt, hat EM bereits drin und kann diese 10% zum Welt-Anteil addieren.</div>
+            </div>
+            <div style={{ padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 10 }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--gold)', marginBottom: 4 }}>10% — Gold (physisch)</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>Physisches Gold oder physisch besicherter ETC. Versicherung gegen Systemkrisen, Inflation und Währungsabwertung. Korreliert kaum mit Aktien. Physisch bevorzugen: in DE nach 1 Jahr steuerfrei, kein Emittentenrisiko. Wird nicht verkauft — liegt im Tresor und gibt Ruhe.</div>
+            </div>
+            <div style={{ padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 10 }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--red)', marginBottom: 4 }}>10% — Bitcoin (Direktkauf)</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>Direktkauf, eigene Wallet, eigene Keys. In DE nach 1 Jahr Haltedauer steuerfrei — ein enormer Vorteil gegenüber ETPs. Asymmetrische Wette: kann auf null fallen oder sich verzehnfachen. Bei 10% begrenzt ein Totalverlust das Portfolio auf −10%, ein 10x macht +100%.</div>
+            </div>
+            <div style={{ padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 10, gridColumn: '1 / -1' }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--text-dim)', marginBottom: 4 }}>10% — Cash / Geldmarkt</div>
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>Tagesgeld oder Geldmarkt-ETF. Nicht für Rendite — für Flexibilität. Ermöglicht Nachkäufe bei Crashs, deckt Notfälle ab und verhindert, dass du gezwungen bist, im Minus zu verkaufen. Die wichtigste Position im Portfolio ist die, die dich ruhig schlafen lässt.</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+            <div><strong style={{ color: 'var(--text)' }}>Warum keine Anleihen?</strong> Bei einem Zeithorizont von 15+ Jahren liefern Aktien historisch fast immer mehr als Anleihen. Die Stabilisator-Funktion übernehmen hier Gold und Cash. Wer über 50 ist oder in unter 10 Jahren ans Geld muss, sollte Anleihen ergänzen und den Aktienanteil reduzieren.</div>
+            <div><strong style={{ color: 'var(--text)' }}>Warum keine Immobilien/REITs?</strong> Der Welt-ETF enthält bereits Immobilienunternehmen. Wer zusätzlich eine eigene Immobilie besitzt, ist bereits stark in Immobilien exponiert — weiterer REIT-Anteil wäre Klumpenrisiko.</div>
+            <div><strong style={{ color: 'var(--text)' }}>Satelliten — lohnt sich das?</strong> Die Kern-Satelliten-Aufteilung (45% Welt-ETF + Small Caps + Dividenden + Einzelaktien) macht erst ab ~1.000 € Sparrate Sinn. Darunter: alles in den Welt-ETF. Einzelaktien nur, wenn du Geschäftsberichte liest und die Firma besser verstehst als der Markt — sonst kostet Stockpicking langfristig Rendite.</div>
+            <div><strong style={{ color: 'var(--text)' }}>Rebalancing:</strong> Einmal im Jahr die Gewichtungen prüfen. Wenn eine Position mehr als 5 Prozentpunkte von der Zielallokation abweicht, durch Umschichtung der Sparrate korrigieren — nicht durch Verkauf (vermeidet Steuern).</div>
+          </div>
+        </div>
+
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginBottom: 16 }}>
+          <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+            Wichtiger Hinweis
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            Dies ist eine KI-generierte Portfoliostruktur auf Basis historischer Daten und Finanztheorie — <strong style={{ color: 'var(--text)' }}>keine individuelle Anlageberatung</strong>. Deine persönliche Situation (Alter, Einkommen, Schulden, Zeithorizont, Risikotoleranz) bestimmt die richtige Allokation. Vergangene Renditen garantieren keine zukünftigen Ergebnisse. Im Zweifel: Honorarberater statt Bankberater.
+          </div>
+        </div>
+
+        {/* Sparplan-Strategie */}
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, marginTop: 32 }}>
+          Wie deine {fmt(monthlySaving)} € monatlich investieren?
+        </div>
+
+        {(() => {
+          const s = monthlySaving;
+          const yearly = s * 12;
+          const etfMonthly = Math.round(s * 0.7);
+          const btcMonthly = Math.round(s * 0.1);
+          const goldMonthly = Math.round(s * 0.1);
+          const cashMonthly = s - etfMonthly - btcMonthly - goldMonthly;
+          const btcQuarterly = btcMonthly * 3;
+          const goldHalfYearly = goldMonthly * 6;
+          const etfYearly = etfMonthly * 12;
+          const btcYearly = btcMonthly * 12;
+          const goldYearly = goldMonthly * 12;
+          const cashYearly = cashMonthly * 12;
+          const etfPct = Math.round(etfYearly / yearly * 100);
+          const btcPct = Math.round(btcYearly / yearly * 100);
+          const goldPct = Math.round(goldYearly / yearly * 100);
+          const cashPct = 100 - etfPct - btcPct - goldPct;
+
+          return (
+        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginBottom: 16 }}>
+
+          {s < 200 ? (
+            <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.8 }}>
+              Bei <strong>{fmt(s)} € monatlich</strong> lohnt sich Aufteilung auf mehrere Positionen noch nicht — die Gebühren fressen die Diversifikation auf. <strong>Empfehlung: den gesamten Betrag in einen einzigen Welt-ETF</strong> (MSCI World oder FTSE All-World, thesaurierend, Sparplan). Sobald die Sparrate über 200 € steigt, kann man anfangen, weitere Positionen dazuzunehmen.
+            </div>
+          ) : (
+            <>
+          <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.8, marginBottom: 20 }}>
+            {s < 500
+              ? <>Bei <strong>{fmt(s)} € im Monat</strong> und mehreren Positionen werden die Einzelbeträge schnell klein. Die Lösung: <strong>nicht alles jeden Monat kaufen, sondern rotieren.</strong></>
+              : <>Bei <strong>{fmt(s)} € im Monat</strong> lässt sich das Portfolio gut aufteilen. {s < 1000 ? <>Trotzdem gilt: Gold und Bitcoin kauft man besser in größeren Abständen — <strong>rotieren statt splitten.</strong></> : <>Ab dieser Sparrate sind auch monatliche Käufe aller Positionen machbar — trotzdem kann Rotation bei Gold und Bitcoin sinnvoll sein.</>}</>
+            }
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, marginBottom: 20 }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--text)', marginBottom: 12 }}>Deine Sparrate: {fmt(s)} € / Monat</div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
+                <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Jeden Monat</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--green)' }}>{fmt(etfMonthly)} €</strong> in den Welt-ETF (Dauerauftrag/Sparplan). Läuft automatisch, kein Aufwand. Das ist die Kernposition — hier fließt das meiste Geld hin, jeden Monat, ohne Nachdenken.</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
+                <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Quartal</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--gold)' }}>{fmt(btcQuarterly)} €</strong> in Bitcoin (Direktkauf). Alle 3 Monate statt monatlich — größere Beträge, weniger Gebühren, weniger Aufwand. Sofort auf eigene Wallet transferieren.</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
+                <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Halbjahr</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--gold)' }}>{fmt(goldHalfYearly)} €</strong> in Gold. Physisch: ab ~1g-Barren sinnvoll (ca. 80–100 €), aber besser größere Einheiten (weniger Aufpreis pro Gramm). Oder halbjährlich einen physisch besicherten ETC nachkaufen.</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
+                <div style={{ width: 100, padding: '10px 12px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', borderBottom: '1px solid var(--border)' }}>Automatisch</div>
+                <div style={{ flex: 1, padding: '10px 12px', fontSize: 13, color: 'var(--text-dim)', borderBottom: '1px solid var(--border)', lineHeight: 1.5 }}><strong style={{ color: 'var(--text-dim)' }}>{fmt(cashMonthly)} €</strong> auf Tagesgeld. Fließt automatisch auf ein separates Konto. Wächst von alleine und ist jederzeit verfügbar für Nachkäufe oder Notfälle.</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--text)', marginBottom: 12 }}>Jahresübersicht: Wohin fließen die {fmt(yearly)} €?</div>
+          <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', height: 24, marginBottom: 20 }}>
+            <div style={{ width: etfPct + '%', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>ETF {fmt(etfYearly)} €</div>
+            <div style={{ width: goldPct + '%', background: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>Gold</div>
+            <div style={{ width: btcPct + '%', background: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>BTC</div>
+            <div style={{ width: cashPct + '%', background: 'var(--text-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--bg)', fontWeight: 600 }}>Cash {fmt(cashYearly)} €</div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+            <div><strong style={{ color: 'var(--text)' }}>Warum rotieren?</strong> Bei {fmt(s)} € Sparrate und 5 Positionen wären das {fmt(Math.round(s / 5))} € pro Position. Bei Gold und Bitcoin entstehen dabei unnötig hohe Gebühren (Spreads, Aufpreise auf kleine Einheiten). Besser: seltener kaufen, dafür in sinnvollen Größen.</div>
+            <div><strong style={{ color: 'var(--text)' }}>Und Emerging Markets?</strong> Wer einen FTSE All-World nimmt, hat EM bereits enthalten (~10–12%). Wer einen MSCI World nimmt und EM extra will: den gleichen Sparplan-Rhythmus wie den Welt-ETF nehmen, z.B. {fmt(Math.round(s * 0.07))} € zusätzlich monatlich.</div>
+            <div><strong style={{ color: 'var(--text)' }}>Die wichtigste Regel:</strong> Automatisieren. Der Welt-ETF-Sparplan läuft per Dauerauftrag am 1. des Monats. Kein Nachdenken, kein Timing, kein Vergessen. Die anderen Positionen kaufst du manuell, aber mit festen Terminen im Kalender (z.B. „1. März, 1. Juni, 1. September, 1. Dezember: Bitcoin kaufen").</div>
+          </div>
+            </>
+          )}
+        </div>
+          );
+        })()}
         {/* Asset-Klassen & Alternative Investments */}
         <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16, marginTop: 32 }}>
           Asset-Klassen — Jenseits von Aktien &amp; Anleihen
@@ -1071,6 +1230,7 @@ function App() {
             <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.6 }}>ARK Invest setzt ausschließlich auf disruptive Innovation: KI, Genomik, Robotik, Krypto, Fintech. 100% Aktien, 0% Anleihen, 0% Rohstoffe. Hauptsächlich US-Tech mit einigen globalen Positionen. ARKK stieg 2020 um +150%, fiel 2022 um −67%. Ein Beispiel dafür, wie Themen-Investing extreme Ergebnisse in beide Richtungen liefern kann.</div>
           </div>
         </div>
+
 
         {/* 5. Quellenverzeichnis */}
         <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 14, padding: 28, marginTop: 32 }}>
