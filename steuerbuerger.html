@@ -274,6 +274,11 @@ svg text { font-family: var(--mono); }
 </template>
 </head>
 <body>
+<nav style="position:fixed;top:0;left:0;right:0;z-index:200;padding:10px 24px;display:flex;align-items:center;gap:16px;font-family:'DM Mono',monospace;font-size:11px;background:rgba(8,10,13,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.06)">
+  <a href="index.html" style="color:#7a7a7a;text-decoration:none;letter-spacing:0.08em;transition:color 0.2s" onmouseover="this.style.color='#eee8dd'" onmouseout="this.style.color='#7a7a7a'">&larr; Übersicht</a>
+  <span style="color:rgba(255,255,255,0.15)">|</span>
+  <a href="vermoegensrechner.html" style="color:#7a7a7a;text-decoration:none;letter-spacing:0.08em;transition:color 0.2s" onmouseover="this.style.color='#eee8dd'" onmouseout="this.style.color='#7a7a7a'">Vermögensrechner</a>
+</nav>
 <div id="root"></div>
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
@@ -1291,126 +1296,291 @@ function SpendingComparison({ taxes }) {
         </button>
       </div>
 
-      {/* BIP-Vergleich international */}
-      <div style={{ marginTop: 24, background: 'var(--bg2)', borderRadius: 14, padding: '24px 28px', border: '1px solid var(--border)' }}>
-        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
-          Anteil am BIP · Internationaler Vergleich (2024)
+      {/* Prioritäten & internationaler Vergleich */}
+      <div style={{ marginTop: 24, background: 'var(--bg2)', borderRadius: 14, padding: '28px 28px', border: '1px solid var(--border)' }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
+          Deep-Dive · Wo dein Steuergeld wirklich landet
         </div>
-        <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 20 }}>
-          Wie viel Prozent der Wirtschaftsleistung investieren Länder in Bildung vs. Militär?
+        <h4 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: 6 }}>
+          Bildung vs. Militär — wer bekommt wie viel?
+        </h4>
+        <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 28 }}>
+          Deutschlands Ausgabenpolitik im internationalen Vergleich und im Zeitverlauf.
         </div>
-        <div style={{ display: 'grid', gap: 12 }}>
-          {[
-            { land: '🇩🇪 Deutschland', bildung: 4.6, militaer: 1.9, note: 'Platz ~30 von 38 OECD-Ländern bei Bildung' },
-            { land: '🇩🇪 DE 2029 (geplant)', bildung: 4.6, militaer: 3.5, planned: true, note: '~153 Mrd. € inkl. Sondervermögen — Bildung unverändert' },
-            { land: '🇳🇦 Namibia', bildung: 9.0, militaer: 2.7, note: 'weltweit Top 5 bei Bildungsausgaben' },
-            { land: '🇮🇸 Island', bildung: 7.1, militaer: 0, note: 'kein stehendes Militär' },
-            { land: '🇳🇴 Norwegen', bildung: 7.0, militaer: 2.1 },
-            { land: '🇩🇰 Dänemark', bildung: 6.4, militaer: 2.4 },
-          ].map((c, i) => {
-            const maxPct = 10;
-            return (
-              <div key={i} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: 12, alignItems: 'center' }}>
-                <div style={{ fontSize: 13, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? 'var(--text)' : 'var(--text-dim)', fontStyle: c.planned ? 'italic' : 'normal' }}>
-                  {c.land}
+
+        {/* Sub-section 1: International */}
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Anteil am BIP · Internationaler Vergleich (2024)</div>
+          <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: 14 }}>
+            Wie viel Prozent der Wirtschaftsleistung investieren Länder in Bildung vs. Militär?
+          </div>
+          <div style={{ display: 'grid', gap: 12 }}>
+            {[
+              { land: '🇩🇪 Deutschland', bildung: 4.6, militaer: 1.9, note: 'Platz ~30 von 38 OECD-Ländern bei Bildung' },
+              { land: '🇩🇪 DE 2029 (geplant)', bildung: 4.6, militaer: 3.5, planned: true, note: '~153 Mrd. € inkl. Sondervermögen — Bildung unverändert' },
+              { land: '🇳🇦 Namibia', bildung: 9.0, militaer: 2.7, note: 'weltweit Top 5 bei Bildungsausgaben' },
+              { land: '🇮🇸 Island', bildung: 7.1, militaer: 0, note: 'kein stehendes Militär' },
+              { land: '🇳🇴 Norwegen', bildung: 7.0, militaer: 2.1 },
+              { land: '🇩🇰 Dänemark', bildung: 6.4, militaer: 2.4 },
+            ].map((c, i) => {
+              const maxPct = 10;
+              return (
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: 12, alignItems: 'center' }}>
+                  <div style={{ fontSize: 13, fontWeight: i === 0 ? 700 : 400, color: i === 0 ? 'var(--text)' : 'var(--text-dim)', fontStyle: c.planned ? 'italic' : 'normal' }}>
+                    {c.land}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ height: 14, width: `${c.bildung / maxPct * 100}%`, background: '#2980b9', borderRadius: 3, transition: 'width 0.5s' }} />
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: '#2980b9', whiteSpace: 'nowrap' }}>
+                        {c.bildung}% Bildung
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{
+                        height: 14, width: `${c.militaer / maxPct * 100}%`, borderRadius: 3, transition: 'width 0.5s',
+                        background: c.planned
+                          ? 'repeating-linear-gradient(90deg, var(--red) 0px, var(--red) 6px, transparent 6px, transparent 10px)'
+                          : 'var(--red)',
+                      }} />
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--red)', whiteSpace: 'nowrap' }}>
+                        {c.militaer}% Militär{c.planned ? ' ⬆' : ''}
+                      </span>
+                    </div>
+                    {c.note && (
+                      <div style={{ fontSize: 11, color: 'var(--text-dim)', fontStyle: 'italic' }}>{c.note}</div>
+                    )}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ height: 14, width: `${c.bildung / maxPct * 100}%`, background: '#2980b9', borderRadius: 3, transition: 'width 0.5s' }} />
-                    <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: '#2980b9', whiteSpace: 'nowrap' }}>
-                      {c.bildung}% Bildung
-                    </span>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 16, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+            Deutschland investiert weniger in Bildung als der OECD-Durchschnitt — und steigert gleichzeitig die Militärausgaben auf 3,5% des BIP bis 2029. Skandinavische Länder zeigen: beides geht.
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'var(--border)', marginBottom: 28 }} />
+
+        {/* Sub-section 2: Finanzplan */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Finanzplan 2024–2029 · Wo setzt die Politik den Fokus?</div>
+          {(() => {
+            const cats = [
+              { name: 'Militär', v24: 52, v29: 100, color: '#a93226' },
+              { name: 'Zinsen', v24: 40, v29: 67, color: '#96281b' },
+              { name: 'Soziales', v24: 172, v29: 215, color: '#7f8c8d' },
+              { name: 'Verkehr', v24: 36, v29: 33, color: '#16a085' },
+              { name: 'Bildung', v24: 22, v29: 22, color: '#2980b9' },
+              { name: 'Gesundheit', v24: 16, v29: 17, color: '#27ae60' },
+            ];
+            const maxV = Math.max(...cats.map(c => Math.max(c.v24, c.v29)));
+            return (
+              <div>
+                <div style={{ display: 'flex', gap: 4, marginBottom: 8, paddingLeft: 90 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
+                    <div style={{ width: 10, height: 6, borderRadius: 1, background: 'var(--text)', opacity: 0.3 }} /> 2024
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{
-                      height: 14, width: `${c.militaer / maxPct * 100}%`, borderRadius: 3, transition: 'width 0.5s',
-                      background: c.planned
-                        ? 'repeating-linear-gradient(90deg, var(--red) 0px, var(--red) 6px, transparent 6px, transparent 10px)'
-                        : 'var(--red)',
-                    }} />
-                    <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--red)', whiteSpace: 'nowrap' }}>
-                      {c.militaer}% Militär{c.planned ? ' ⬆' : ''}
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--mono)', marginLeft: 12 }}>
+                    <div style={{ width: 10, height: 6, borderRadius: 1, background: 'var(--text)', opacity: 0.8 }} /> 2029
                   </div>
-                  {c.note && (
-                    <div style={{ fontSize: 11, color: 'var(--text-dim)', fontStyle: 'italic' }}>{c.note}</div>
-                  )}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {cats.map((c, i) => {
+                    const pct = ((c.v29 - c.v24) / c.v24 * 100);
+                    const pctStr = pct >= 0 ? `+${pct.toFixed(0)}%` : `${pct.toFixed(0)}%`;
+                    const isHot = pct > 15;
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ width: 82, fontSize: 12, color: 'var(--text-dim)', textAlign: 'right', flexShrink: 0 }}>{c.name}</span>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                          <div style={{ height: 10, background: 'var(--bg)', borderRadius: 2, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${c.v24/maxV*100}%`, background: c.color, opacity: 0.4, borderRadius: 2 }} />
+                          </div>
+                          <div style={{ height: 10, background: 'var(--bg)', borderRadius: 2, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${c.v29/maxV*100}%`, background: c.color, borderRadius: 2 }} />
+                          </div>
+                        </div>
+                        <span style={{ width: 36, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textAlign: 'right', flexShrink: 0 }}>{c.v29}</span>
+                        <span style={{
+                          width: 42, fontSize: 10, fontFamily: 'var(--mono)', textAlign: 'right', flexShrink: 0, fontWeight: 600,
+                          color: pct !== 0 ? '#2980b9' : 'var(--text-dim)',
+                        }}>{pctStr}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                  Militär + Zinsen: 19% → <strong style={{ color: 'var(--red)' }}>~29%</strong> des Bundeshaushalts.
+                  Bildung &amp; Gesundheit: <strong style={{ color: 'var(--text-dim)' }}>stagnieren</strong>.
                 </div>
               </div>
             );
-          })}
+          })()}
         </div>
-        <div style={{ marginTop: 16, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-          Deutschland investiert weniger in Bildung als der OECD-Durchschnitt — und steigert gleichzeitig die Militärausgaben auf 3,5% des BIP bis 2029. Skandinavische Länder zeigen: beides geht.
-          <span style={{ fontFamily: 'var(--mono)', fontSize: 11 }}> Quellen:{' '}
-            <a href="https://www.oecd.org/en/publications/education-at-a-glance-2024_c00cad36-en.html" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>OECD Education at a Glance 2024</a>,{' '}
-            <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>SIPRI 2024</a>,{' '}
-            <a href="https://www.bundesfinanzministerium.de/Content/DE/Pressemitteilungen/2025/2025-06-24-2-regierungsentwurf-bundeshaushalt-2025.html" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>Finanzplan des Bundes 2025–2029</a>
-          </span>
+
+        {/* Combined sources */}
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+          Quellen:{' '}
+          <a href="https://www.oecd.org/en/publications/education-at-a-glance-2024_c00cad36-en.html" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>OECD Education at a Glance 2024</a>,{' '}
+          <a href="https://www.sipri.org/databases/milex" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>SIPRI 2024</a>,{' '}
+          <a href="https://www.bundestag.de/dokumente/textarchiv/2024/kw05-de-haushaltsgesetz-2024-finanzplan-977680" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>BHH 2024</a>,{' '}
+          <a href="https://www.bundestag.de/dokumente/textarchiv/2025/kw48-de-haushaltsgesetz-2026-dritte-lesung-1126152" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>BHH 2026</a>,{' '}
+          <a href="https://dserver.bundestag.de/btd/21/006/2100601.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)' }}>Finanzplan 2025–2029</a>
         </div>
       </div>
 
-      {/* Geplante Entwicklung — kompakt */}
-      <div style={{ marginTop: 40, background: 'var(--bg2)', borderRadius: 14, padding: '24px 28px', border: '1px solid var(--border)' }}>
-        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
-          Finanzplan 2024–2029 · Wo setzt die Politik den Fokus?
+      {/* Deep-dive: Bundeszuschuss Rentenversicherung */}
+      <div style={{ marginTop: 24, background: 'var(--bg2)', borderRadius: 14, padding: '28px 28px', border: '1px solid var(--border)' }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
+          Deep-Dive · Wo dein Steuergeld wirklich landet
         </div>
-        {(() => {
-          const cats = [
-            { name: 'Militär', v24: 52, v29: 100, color: '#a93226' },
-            { name: 'Zinsen', v24: 40, v29: 67, color: '#96281b' },
-            { name: 'Soziales', v24: 172, v29: 215, color: '#7f8c8d' },
-            { name: 'Verkehr', v24: 36, v29: 33, color: '#16a085' },
-            { name: 'Bildung', v24: 22, v29: 22, color: '#2980b9' },
-            { name: 'Gesundheit', v24: 16, v29: 17, color: '#27ae60' },
-          ];
-          const maxV = Math.max(...cats.map(c => Math.max(c.v24, c.v29)));
-          return (
-            <div>
-              <div style={{ display: 'flex', gap: 4, marginBottom: 8, paddingLeft: 90 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
-                  <div style={{ width: 10, height: 6, borderRadius: 1, background: 'var(--text)', opacity: 0.3 }} /> 2024
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--mono)', marginLeft: 12 }}>
-                  <div style={{ width: 10, height: 6, borderRadius: 1, background: 'var(--text)', opacity: 0.8 }} /> 2029
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {cats.map((c, i) => {
-                  const pct = ((c.v29 - c.v24) / c.v24 * 100);
-                  const pctStr = pct >= 0 ? `+${pct.toFixed(0)}%` : `${pct.toFixed(0)}%`;
-                  const isHot = pct > 15;
-                  return (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ width: 82, fontSize: 12, color: 'var(--text-dim)', textAlign: 'right', flexShrink: 0 }}>{c.name}</span>
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <div style={{ height: 10, background: 'var(--bg)', borderRadius: 2, overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${c.v24/maxV*100}%`, background: c.color, opacity: 0.4, borderRadius: 2 }} />
-                        </div>
-                        <div style={{ height: 10, background: 'var(--bg)', borderRadius: 2, overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${c.v29/maxV*100}%`, background: c.color, borderRadius: 2 }} />
-                        </div>
-                      </div>
-                      <span style={{ width: 36, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textAlign: 'right', flexShrink: 0 }}>{c.v29}</span>
-                      <span style={{
-                        width: 42, fontSize: 10, fontFamily: 'var(--mono)', textAlign: 'right', flexShrink: 0, fontWeight: 600,
-                        color: pct !== 0 ? '#2980b9' : 'var(--text-dim)',
-                      }}>{pctStr}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.6 }}>
-                Militär + Zinsen: 19% → <strong style={{ color: 'var(--red)' }}>~29%</strong> des Bundeshaushalts.
-                Bildung &amp; Gesundheit: <strong style={{ color: 'var(--text-dim)' }}>stagnieren</strong>.
-              </div>
-              <div style={{ marginTop: 8, fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
-                <a href="https://www.bundestag.de/dokumente/textarchiv/2024/kw05-de-haushaltsgesetz-2024-finanzplan-977680" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)', textDecoration: 'underline' }}>BHH 2024</a> · <a href="https://www.bundestag.de/dokumente/textarchiv/2025/kw48-de-haushaltsgesetz-2026-dritte-lesung-1126152" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)', textDecoration: 'underline' }}>BHH 2026</a> · <a href="https://dserver.bundestag.de/btd/21/006/2100601.pdf" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-dim)', textDecoration: 'underline' }}>Finanzplan 2025–2029</a>
-              </div>
+        <h4 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: 6 }}>
+          Bundeszuschuss Rentenversicherung
+        </h4>
+        <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 20 }}>
+          Der größte Einzelposten im gesamten Bundeshaushalt — und er wächst jedes Jahr weiter.
+        </div>
+
+        {/* What is it */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Was ist das?</div>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            Die gesetzliche Rente funktioniert nach dem <strong style={{ color: 'var(--text)' }}>Umlageprinzip</strong>: Heutige Arbeitnehmer zahlen die Renten heutiger Rentner. Aber die Beiträge reichen schon lange nicht mehr aus. Die Lücke füllt der Bund — mit deinen Steuern. Dieser „Bundeszuschuss" umfasst den allgemeinen Bundeszuschuss, den zusätzlichen Bundeszuschuss und Beiträge für Kindererziehungszeiten. Er finanziert auch sogenannte „versicherungsfremde Leistungen" — Dinge wie Mütterrente oder Ost-West-Angleichung, die politisch gewollt sind, aber nicht durch Beiträge gedeckt werden.
+          </div>
+        </div>
+
+        {/* Share visualization */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+          <div style={{ background: 'var(--bg)', borderRadius: 10, padding: '16px 20px', border: '1px solid var(--border)' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: '#c0392b', lineHeight: 1 }}>~128</div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text-dim)', marginBottom: 8 }}>Mrd. € / Jahr <span style={{ fontSize: 11 }}>(2026)</span></div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+              Das sind <strong style={{ color: 'var(--text)' }}>⅓ aller Steuereinnahmen</strong> des Bundes — nur für Rentenzuschüsse.
             </div>
-          );
-        })()}
+          </div>
+          <div style={{ background: 'var(--bg)', borderRadius: 10, padding: '16px 20px', border: '1px solid var(--border)' }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 36, fontWeight: 500, color: '#c0392b', lineHeight: 1 }}>44%</div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text-dim)', marginBottom: 8 }}>des Etats „Arbeit & Soziales"</div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
+              Von den 172 Mrd. im größten Haushaltsposten geht fast die Hälfte an die Rentenkasse.
+            </div>
+          </div>
+        </div>
+
+        {/* Historical development */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 10 }}>Historische Entwicklung</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {[
+              { year: '2005', val: 76, label: '76 Mrd.' },
+              { year: '2010', val: 81, label: '81 Mrd.' },
+              { year: '2015', val: 88, label: '88 Mrd.' },
+              { year: '2020', val: 100, label: '100 Mrd.' },
+              { year: '2025', val: 123, label: '123 Mrd.' },
+              { year: '2026', val: 128, label: '128 Mrd.', current: true },
+            ].map((d, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 36, fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textAlign: 'right', flexShrink: 0 }}>{d.year}</span>
+                <div style={{ flex: 1, height: 16, background: 'var(--bg)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%', width: `${d.val / 128 * 100}%`, borderRadius: 3,
+                    background: d.current ? '#c0392b' : 'rgba(192,57,43,0.5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8,
+                    transition: 'width 0.5s cubic-bezier(0.4,0,0.2,1)',
+                  }}>
+                    <span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: '#fff', whiteSpace: 'nowrap' }}>{d.label}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 8, lineHeight: 1.5 }}>
+            In 20 Jahren sind die Bundesmittel um über 68% gestiegen — und wachsen schneller als der Gesamthaushalt.{' '}
+            <a href="https://www.deutsche-rentenversicherung.de/SharedDocs/Downloads/DE/Statistiken-und-Berichte/statistikpublikationen/rv_in_zeitreihen.html" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)', fontSize: 11, fontFamily: 'var(--mono)' }}>Quelle: DRV, Rentenversicherung in Zeitreihen</a>
+          </div>
+        </div>
+
+        {/* Why: demographic shift */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 10 }}>Warum wächst das so stark? Der demografische Wandel</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            {[
+              { year: '1962', ratio: '6:1', sub: '6 Beitragszahler pro Rentner', color: '#27ae60' },
+              { year: '2023', ratio: '2,2:1', sub: '2,2 Beitragszahler pro Rentner', color: '#f39c12' },
+              { year: '2045', ratio: '1,7:1', sub: '1,7 Beitragszahler pro Rentner', color: '#c0392b' },
+            ].map((d, i) => (
+              <div key={i} style={{ background: 'var(--bg)', borderRadius: 10, padding: '16px', border: '1px solid var(--border)', textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text-dim)', marginBottom: 4 }}>{d.year}</div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 28, fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.ratio}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 6, lineHeight: 1.4 }}>{d.sub}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 10, lineHeight: 1.6 }}>
+            Die Babyboomer gehen in Rente, die Geburtenrate liegt seit Jahrzehnten bei ~1,4 Kindern pro Frau (nötig wären 2,1), und die Lebenserwartung steigt. Immer weniger Einzahler müssen immer mehr Rentner finanzieren. Die Differenz zahlt der Staat — also du.
+          </div>
+        </div>
+
+        {/* Prognosis + sustainability combined */}
+        <div style={{ marginBottom: 8, padding: '16px 20px', background: 'rgba(192,57,43,0.08)', borderRadius: 10, border: '1px solid rgba(192,57,43,0.2)' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>Prognose: Kann das so weitergehen?</div>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+            Die kurze Antwort: <strong style={{ color: '#c0392b' }}>Nein</strong> — nicht ohne Anpassungen. Schon jetzt verschlingt der Rentenzuschuss ein Drittel aller Steuereinnahmen. Der Beitragssatz soll bis 2035 auf 22,3% steigen (aktuell: 18,6%), und ohne Reformen könnte der Zuschuss laut Sachverständigenrat auf <strong style={{ color: '#c0392b' }}>7,3% des BIP bis 2080</strong> wachsen (aktuell: ~3%). Die drei Stellschrauben — höhere Beiträge, niedrigere Renten oder späteres Rentenalter — sind alle politisch schmerzhaft. Das 2023 eingeführte „Generationenkapital" (Aktienrente) soll ab 2036 ~10 Mrd. €/Jahr beisteuern — bei einem 128-Milliarden-Problem kaum mehr als ein Tropfen.
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.7, padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)' }}>
+            <strong>Was heißt das für dich?</strong> Dein Netto wird durch steigende Beiträge weiter schrumpfen, und ob die gesetzliche Rente in 30 Jahren noch zum Leben reicht, ist offen. Wer sich nicht <a href="vermoegensrechner.html" style={{ color: 'var(--text)', fontWeight: 600 }}>privat absichert</a>, verlässt sich auf ein System, das schon heute nur mit massiven Steuerzuschüssen funktioniert.
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+          Quellen:{' '}
+          <a href="https://www.ihre-vorsorge.de/rente/nachrichten/bundeshaushalt-2026-fuenf-milliarden-euro-mehr-fuer-die-rentenversicherung" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>ihre-vorsorge.de (2026)</a>,{' '}
+          <a href="https://www.ifo.de/en/press-release/2025-11-18/pension-insurance-subsidy-germany-will-swallow-third-tax-revenues" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>ifo Institut (2025)</a>,{' '}
+          <a href="https://www.deutsche-rentenversicherung.de/DRV/DE/Ueber-uns-und-Presse/Presse/Meldungen/2024/240719-bundesmittel-bundeszuschuss.html" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>Deutsche Rentenversicherung</a>,{' '}
+          <a href="https://www.sachverstaendigenrat-wirtschaft.de/fileadmin/dateiablage/gutachten/jg202021/JG202021_Kapitel_6.pdf" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>Sachverständigenrat (2020)</a>
+        </div>
       </div>
+
+      {/* Deep-dive: Zinszahlungen */}
+      <div style={{ marginTop: 24, background: 'var(--bg2)', borderRadius: 14, padding: '28px 28px', border: '1px solid var(--border)' }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
+          Deep-Dive · Wo dein Steuergeld wirklich landet
+        </div>
+        <h4 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: 6 }}>
+          Zinsen auf Staatsschulden
+        </h4>
+        <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>
+          Deutschland hat über <strong style={{ color: 'var(--text)' }}>2,4 Billionen Euro Staatsschulden</strong> — aufgenommen für Wiedervereinigung, Krisenbekämpfung, Infrastruktur und vieles mehr. Schulden können sinnvoll sein, wenn sie in produktive Dinge fließen. Aber die Zinsen darauf — aktuell rund <strong style={{ color: 'var(--text)' }}>~30 Mrd. € pro Jahr</strong> — stehen nicht mehr für andere Ausgaben zur Verfügung. Zum Vergleich: Das ist mehr als der gesamte Bundesetat für Bildung und Forschung.
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>Warum schwankt dieser Posten so stark?</div>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 12 }}>
+            Zinsen hängen vom <strong style={{ color: 'var(--text)' }}>Zinsniveau der EZB</strong> ab — nicht nur von der Schuldenhöhe. In der Niedrigzinsphase (2015–2021) zahlte der Bund trotz hoher Schulden wenig Zinsen. Seit der Zinswende 2022 ist dieser Posten stark gestiegen. Wenn die EZB die Zinsen senkt, sinken auch die Kosten für neue Anleihen — aber alte Schulden laufen zu festen Konditionen weiter.
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>Das Dilemma: Niedrige Zinsen vs. stabile Preise</div>
+          <div style={{ fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
+            Für den Staat sind niedrige Zinsen attraktiv — weniger Geld geht an Gläubiger, mehr bleibt für den Haushalt. Aber niedrige Leitzinsen machen Kredite günstiger, Banken vergeben mehr Kredite und schaffen damit neues Geld. Diese <strong style={{ color: 'var(--text)' }}>Ausweitung der Geldmenge</strong> ist der zentrale Treiber von <a href="#inflation" style={{ color: 'var(--text)', fontWeight: 600 }}>Inflation</a>: Mehr Geld im Umlauf, aber nicht mehr Güter — also sinkt der Wert jedes einzelnen Euro. Hohe Zinsen wirken umgekehrt: Der Staat zahlt mehr Schuldendienst, aber die Geldmenge wächst langsamer, die Währung bleibt stabiler und dein Geld behält seine Kaufkraft. Die EZB versucht, diesen Balanceakt zu steuern — ihr Ziel ist eine Inflationsrate von 2%.
+          </div>
+        </div>
+
+        <div style={{ padding: '14px 18px', background: 'var(--bg)', borderRadius: 10, border: '1px solid var(--border)', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.7 }}>
+            <strong>Was heißt das für dich?</strong> Zinsen merkst du nicht direkt — aber sie binden Haushaltsmittel, die sonst in Bildung, Infrastruktur oder Entlastungen fließen könnten. Je höher die Zinslast, desto weniger Spielraum hat die Politik. Entscheidend ist, dass neue Schulden in Dinge fließen, die langfristig Wachstum schaffen — dann können sie sich lohnen.
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+          Quelle:{' '}
+          <a href="https://www.deutsche-finanzagentur.de/finanzierung-des-bundes/schuldenstatistik/zinsen" target="_blank" rel="noopener" style={{ color: 'var(--text-dim)' }}>Deutsche Finanzagentur</a>
+        </div>
+      </div>
+
       </>
       )}
     </div>
@@ -1761,7 +1931,7 @@ function App() {
       {/* SECTION 1: HERO */}
       <div style={{
         fontSize: 13, color: 'var(--text-dim)', textAlign: 'center',
-        padding: '8px 24px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
+        padding: '44px 24px 8px', background: 'var(--bg2)', borderBottom: '1px solid var(--border)',
         fontFamily: 'var(--mono)', letterSpacing: '0.02em', lineHeight: 1.5,
         animation: 'disclaimerGlow 1.5s ease-out forwards',
       }}>
