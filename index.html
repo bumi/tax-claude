@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dein Geld — Steuern verstehen, Vermögen aufbauen</title>
+<meta name="description" content="Wohin fließt dein Gehalt? Wie baust du Vermögen auf? Interaktive Tools zu Steuern, Bundeshaushalt, Inflation und Geldanlage.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dein Geld — Steuern verstehen, Vermögen aufbauen">
+<meta property="og:description" content="Interaktive Tools: Steuerrechner mit Bundeshaushalt-Analyse und Vermögensrechner mit Zinseszins, ETF-Portfolios und Entnahmeplan.">
+<meta property="og:locale" content="de_DE">
+<link rel="canonical" href="https://bumi.github.io/tax-claude/">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080a0d;
+  --bg2: #0f1217;
+  --bg3: #161b22;
+  --border: rgba(255,255,255,0.08);
+  --text: #eee8dd;
+  --text-dim: #7a7a7a;
+  --red: oklch(0.60 0.22 22);
+  --green: oklch(0.68 0.18 142);
+  --gold: oklch(0.75 0.14 75);
+  --blue: oklch(0.65 0.15 250);
+  --mono: 'DM Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+}
+html { background: var(--bg); color: var(--text); font-family: var(--sans); }
+body { overflow-x: hidden; margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 32px;
+  text-align: center;
+}
+.hero-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h1 span { color: var(--text-dim); }
+.hero-sub {
+  font-size: 18px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  max-width: 560px;
+  margin-bottom: 60px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 900px;
+  width: 100%;
+}
+
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 36px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.card:hover {
+  border-color: rgba(255,255,255,0.15);
+  transform: translateY(-4px);
+  background: var(--bg3);
+}
+.card:hover::before { opacity: 1; }
+.card-steuer::before { background: linear-gradient(90deg, oklch(0.60 0.22 22), oklch(0.75 0.14 75)); }
+.card-vermoegen::before { background: linear-gradient(90deg, oklch(0.68 0.18 142), oklch(0.65 0.15 250)); }
+
+.card-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+.card-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.card h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.card p {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  flex: 1;
+}
+.card-features {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.card-feature {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-feature::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.card-steuer .card-feature::before { background: oklch(0.60 0.22 22); }
+.card-vermoegen .card-feature::before { background: oklch(0.68 0.18 142); }
+
+.card-cta {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-cta .arrow {
+  transition: transform 0.3s;
+}
+.card:hover .card-cta .arrow {
+  transform: translateX(4px);
+}
+
+.footer {
+  padding: 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  border-top: 1px solid var(--border);
+}
+.footer a { color: var(--text-dim); }
+
+@media (max-width: 700px) {
+  .cards { grid-template-columns: 1fr; }
+  .card { padding: 28px 24px; }
+  .hero { padding: 40px 20px; }
+  .hero-sub { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">Interaktive Tools</div>
+  <h1>Dein Geld.<br><span>Verstehen. Behalten. Vermehren.</span></h1>
+  <p class="hero-sub">
+    Wie viel nimmt der Staat? Wohin fließt es? Und wie baust du trotzdem Vermögen auf? Zwei interaktive Tools, die Klarheit schaffen.
+  </p>
+
+  <div class="cards">
+    <a href="steuerbuerger.html" class="card card-steuer">
+      <div class="card-label">Tool 1</div>
+      <h2>Steuer&shy;bürger</h2>
+      <p>Wohin fließt dein Gehalt wirklich? Interaktiver Rechner mit Einkommensteuer, Sozialabgaben, Mehrwertsteuer, Bundeshaushalt-Analyse und Inflation.</p>
+      <div class="card-features">
+        <div class="card-feature">Gehaltsabzüge im Detail</div>
+        <div class="card-feature">Bundeshaushalt visualisiert</div>
+        <div class="card-feature">Bildung vs. Militär Vergleich</div>
+        <div class="card-feature">Inflation &amp; Kaufkraftverlust</div>
+        <div class="card-feature">Handlungsoptionen</div>
+      </div>
+      <div class="card-cta">Steuern verstehen <span class="arrow">&rarr;</span></div>
+    </a>
+
+    <a href="vermoegensrechner.html" class="card card-vermoegen">
+      <div class="card-label">Tool 2</div>
+      <h2>Vermögens&shy;rechner</h2>
+      <p>Wie wächst dein Geld? Zinseszins-Rechner mit ETF-Portfolios, Entnahmeplan, Inflation und Strategien bekannter Investoren.</p>
+      <div class="card-features">
+        <div class="card-feature">Zinseszins-Simulation</div>
+        <div class="card-feature">ETF-Portfolio-Vergleich</div>
+        <div class="card-feature">Entnahmeplan &amp; Altersvorsorge</div>
+        <div class="card-feature">Inflation eingerechnet</div>
+        <div class="card-feature">Investoren-Strategien</div>
+      </div>
+      <div class="card-cta">Vermögen aufbauen <span class="arrow">&rarr;</span></div>
+    </a>
+  </div>
+</div>
+
+<div class="footer">
+  Erstellt mit Claude AI &middot;
+  <a href="https://github.com/bumi/tax-claude" target="_blank" rel="noopener">GitHub</a>
+</div>
+
+</body>
+</html>
