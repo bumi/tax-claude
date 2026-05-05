@@ -145,6 +145,7 @@ function generateCrashes(seed, maxYears) {
 
 function App() {
   const [monthlySaving, setMonthlySaving] = useState(500);
+  const [initialAmount, setInitialAmount] = useState(0);
   const [oppYears, setOppYears] = useState(20);
   const [oppInterest, setOppInterest] = useState(7.5);
   const [oppInflation, setOppInflation] = useState(2);
@@ -167,8 +168,8 @@ function App() {
   crashes.forEach(c => { crashMap[c.yr] = c.magnitude; });
 
   // Future value
-  let fv = 0;
-  let totalPaid = 0;
+  let fv = initialAmount;
+  let totalPaid = initialAmount;
   for (let m = 0; m < months; m++) {
     const contribution = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, m) : monthlyTax;
     totalPaid += contribution;
@@ -258,7 +259,7 @@ function App() {
   // Year-by-year for chart (saving phase)
   const yearPoints = Array.from({ length: oppYears + 1 }, (_, yr) => {
     const m = yr * 12;
-    let value = 0, paid = 0;
+    let value = initialAmount, paid = initialAmount;
     for (let i = 0; i < m; i++) {
       const c = oppDynamic ? monthlyTax * Math.pow(1 + monthlyInflRate, i) : monthlyTax;
       paid += c;
@@ -339,6 +340,39 @@ function App() {
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, lineHeight: 1.6 }}>
                 Das sind <strong style={{ color: 'var(--text)' }}>{fmt(monthlySaving * 12)} €</strong> pro Jahr.
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--border)', marginTop: 20, paddingTop: 20 }}>
+                <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                  Startbetrag (einmalig)
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12 }}>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1000"
+                    value={initialAmount}
+                    onChange={e => setInitialAmount(Math.max(0, +e.target.value))}
+                  />
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: 24, color: 'var(--text-dim)' }}>€</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {[0, 5000, 10000, 25000, 50000].map(v => (
+                    <button
+                      key={v}
+                      onClick={() => setInitialAmount(v)}
+                      style={{
+                        padding: '6px 14px', borderRadius: 100, cursor: 'pointer',
+                        fontFamily: 'var(--sans)', fontSize: 13, transition: 'all 0.2s',
+                        border: initialAmount === v ? '1px solid var(--text)' : '1px solid var(--border)',
+                        background: 'transparent',
+                        color: initialAmount === v ? 'var(--text)' : 'var(--text-dim)',
+                      }}
+                    >
+                      {fmt(v)} €
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
