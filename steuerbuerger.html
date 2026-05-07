@@ -1892,6 +1892,7 @@ function App() {
   const [activeSection, setActiveSection] = useState(0);
   const [selectedCat, setSelectedCat] = useState(null);
   const [inclSocial, setInclSocial] = useState(false);
+  const [oppMode, setOppMode] = useState('pension'); // 'income' or 'pension'
   const [spendPct, setSpendPct] = useState(80);
   const [oppYears, setOppYears] = useState(20);
   const [oppInterest, setOppInterest] = useState(7.5);
@@ -2635,11 +2636,37 @@ function App() {
       {/* SECTION: OPPORTUNITY COST */}
       <section id="opportunity">
         <div className="section-label">Gedankenexperiment</div>
-        <h2>Was wäre, wenn du<br /><span className="red">keine Einkommensteuer{inclSocial ? ' & Sozialabgaben' : ''}</span> zahlen müsstest?</h2>
-        <div style={{ marginBottom: 24, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
-          Stell dir vor, du könntest den Betrag, der jeden Monat durch Einkommensteuer{inclSocial ? ' und Sozialabgaben' : ''} abfließt, stattdessen anlegen. Der Staat nimmt trotzdem weiterhin hunderte Milliarden über <strong style={{ color: 'var(--text)' }}>Konsumsteuern</strong> ein. Rein zur Inspiration — wie es anders gehen könnte, zeigt die Sektion <a href="#rethink" style={{ color: 'var(--gold)' }}>Steuern &amp; Geld neu denken</a>.
+        {/* Mode selector: Einkommensteuer vs. Rentenversicherung */}
+        <div style={{ marginBottom: 20, display: 'flex', gap: 0, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--border)', width: 'fit-content' }}>
+          {[
+            { key: 'pension', label: 'Rentenversicherung' },
+            { key: 'income', label: 'Einkommensteuer' },
+          ].map(opt => (
+            <button
+              key={opt.key}
+              onClick={() => setOppMode(opt.key)}
+              style={{
+                padding: '10px 20px', border: 'none', cursor: 'pointer',
+                background: oppMode === opt.key ? 'var(--red)' : 'var(--bg2)',
+                color: oppMode === opt.key ? '#fff' : 'var(--text-dim)',
+                fontSize: 14, fontWeight: oppMode === opt.key ? 600 : 400,
+                transition: 'all 0.2s',
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
-        {/* Toggle: Sozialabgaben einbeziehen */}
+        <h2>Was wäre, wenn du<br /><span className="red">{oppMode === 'income' ? `keine Einkommensteuer${inclSocial ? ' & Sozialabgaben' : ''}` : 'keine Rentenversicherung'}</span> zahlen müsstest?</h2>
+        <div style={{ marginBottom: 24, fontSize: 16, color: 'var(--text-dim)', lineHeight: 1.7, maxWidth: 720 }}>
+          {oppMode === 'income'
+            ? <>Stell dir vor, du könntest den Betrag, der jeden Monat durch Einkommensteuer{inclSocial ? ' und Sozialabgaben' : ''} abfließt, stattdessen anlegen. Der Staat nimmt trotzdem weiterhin hunderte Milliarden über <strong style={{ color: 'var(--text)' }}>Konsumsteuern</strong> ein.</>
+            : <>Stell dir vor, du könntest den Rentenversicherungsbeitrag (AN + AG: 18,6% bis zur BBG) jeden Monat selbst anlegen, statt ihn in ein Umlagesystem zu geben, das dir keine Eigentumsrechte gewährt.</>
+          }
+          {oppMode === 'income' && <>{' '}Rein zur Inspiration — wie es anders gehen könnte, zeigt die Sektion <a href="#rethink" style={{ color: 'var(--gold)' }}>Steuern &amp; Geld neu denken</a>.</>}
+        </div>
+        {/* Toggle: Sozialabgaben einbeziehen (only for income mode) */}
+        {oppMode === 'income' && (
         <div style={{ marginBottom: 36, display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
             onClick={() => setInclSocial(!inclSocial)}
@@ -2660,10 +2687,16 @@ function App() {
             + Sozialabgaben einbeziehen (AN + AG)
           </span>
         </div>
+        )}
+        {oppMode === 'pension' && <div style={{ marginBottom: 36 }} />}
         {(() => {
-          const monthlyTax = inclSocial
-            ? taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial
-            : taxes.incomeTax + taxes.soli;
+          const rvAN = Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12);
+          const rvAG = Math.round(Math.min(taxes.annualGross, 90600) * 0.093 / 12);
+          const monthlyTax = oppMode === 'pension'
+            ? rvAN + rvAG
+            : inclSocial
+              ? taxes.incomeTax + taxes.soli + taxes.social + taxes.employerSocial
+              : taxes.incomeTax + taxes.soli;
           const rate = oppInterest / 100 / 12;
           const inflRate = oppInflation / 100;
           const monthlyInflRate = Math.pow(1 + inflRate, 1/12) - 1;
@@ -2682,12 +2715,17 @@ function App() {
           const inflationLoss = fv - realFv;
 
           // Breakdown by type
-          const items = [
-            ...(inclSocial ? [{ label: 'AG-Sozialabgaben', amount: taxes.employerSocial, color: 'var(--red4)' }] : []),
-            { label: 'Einkommensteuer', amount: taxes.incomeTax, color: 'var(--red)' },
-            ...(taxes.soli > 0 ? [{ label: 'Soli', amount: taxes.soli, color: 'var(--red3)' }] : []),
-            ...(inclSocial ? [{ label: 'Sozialabgaben (AN)', amount: taxes.social, color: 'var(--red2)' }] : []),
-          ];
+          const items = oppMode === 'pension'
+            ? [
+                { label: 'RV Arbeitgeber (9,3%)', amount: rvAG, color: 'var(--red4)' },
+                { label: 'RV Arbeitnehmer (9,3%)', amount: rvAN, color: 'var(--red)' },
+              ]
+            : [
+                ...(inclSocial ? [{ label: 'AG-Sozialabgaben', amount: taxes.employerSocial, color: 'var(--red4)' }] : []),
+                { label: 'Einkommensteuer', amount: taxes.incomeTax, color: 'var(--red)' },
+                ...(taxes.soli > 0 ? [{ label: 'Soli', amount: taxes.soli, color: 'var(--red3)' }] : []),
+                ...(inclSocial ? [{ label: 'Sozialabgaben (AN)', amount: taxes.social, color: 'var(--red2)' }] : []),
+              ];
 
           // Withdrawal simulation
           const annualNet = taxes.net * 12;
@@ -2776,7 +2814,7 @@ function App() {
                 </div>
                 <div style={{ background: 'var(--bg2)', borderRadius: 14, padding: '28px', border: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
-                    {inclSocial ? 'Monatlich an den Staat (inkl. AG-Anteil)' : 'Monatlich Einkommensteuer + Soli'}
+                    {oppMode === 'pension' ? 'Monatlich Rentenversicherung (AN + AG)' : inclSocial ? 'Monatlich an den Staat (inkl. AG-Anteil)' : 'Monatlich Einkommensteuer + Soli'}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
                     {items.map((item, i) => (
@@ -2865,8 +2903,11 @@ function App() {
 
                 <div style={{ padding: '18px 22px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-dim)', lineHeight: 1.7 }}>
                   <strong style={{ color: 'var(--text)' }}>Zum Vergleich:</strong>{' '}
-                  Stattdessen zahlst du in {oppYears} Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und finanzierst damit ein Rentenversprechen (ob es in {oppYears} Jahren noch eingelöst wird, weiß niemand), Grundsicherung, Infrastruktur (Straßen, Schiene, Digital), Forschung, Energiewende — aber auch Militär, Schuldzinsen und EU-Transfers.
-                  Es geht nicht um die Abschaffung von Steuern, sondern darum, die <strong style={{ color: 'var(--text)' }}>Opportunitätskosten</strong> zu verdeutlichen. Ob das ein gutes Geschäft ist, entscheidest du.
+                  {oppMode === 'pension'
+                    ? <>Stattdessen fließen in {oppYears} Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> in die gesetzliche Rentenversicherung — ein Umlagesystem, bei dem dein Geld sofort an heutige Rentner ausgezahlt wird. Du erwirbst Rentenansprüche, aber kein Eigentum. Ob das Versprechen in {oppYears} Jahren noch eingelöst wird, hängt von der Demografie und politischen Entscheidungen ab.</>
+                    : <>Stattdessen zahlst du in {oppYears} Jahren <strong style={{ color: 'var(--red)' }}>{fmt(totalPaid)} €</strong> an den Staat — und finanzierst damit ein Rentenversprechen (ob es in {oppYears} Jahren noch eingelöst wird, weiß niemand), Grundsicherung, Infrastruktur (Straßen, Schiene, Digital), Forschung, Energiewende — aber auch Militär, Schuldzinsen und EU-Transfers.</>
+                  }
+                  {' '}Es geht nicht um die Abschaffung von {oppMode === 'pension' ? 'Sozialabgaben' : 'Steuern'}, sondern darum, die <strong style={{ color: 'var(--text)' }}>Opportunitätskosten</strong> zu verdeutlichen. Ob das ein gutes Geschäft ist, entscheidest du.
                 </div>
               </div>
 
