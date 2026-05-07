@@ -2504,6 +2504,7 @@ function App() {
 
           // Withdrawal simulation
           const annualNet = taxes.net * 12;
+          const annualNetHalf = annualNet * 0.5;
           const nominalRate = oppInterest / 100;
           let wdCapital = fv;
           let withdrawYears = 0;
@@ -2518,6 +2519,18 @@ function App() {
             withdrawPoints.push({ yr: oppYears + withdrawYears, value: wdCapital, real: wdCapital / Math.pow(1 + inflRate, oppYears + withdrawYears) });
           }
           const infiniteWithdraw = withdrawYears >= maxSim;
+
+          // Withdrawal simulation – 50% of net salary
+          let wdCapitalHalf = fv;
+          let withdrawYearsHalf = 0;
+          while (wdCapitalHalf > 0 && withdrawYearsHalf < maxSim) {
+            const yearsSinceStart = oppYears + withdrawYearsHalf;
+            const withdrawal = annualNetHalf * Math.pow(1 + inflRate, yearsSinceStart);
+            wdCapitalHalf = wdCapitalHalf * (1 + nominalRate) - withdrawal;
+            withdrawYearsHalf++;
+            if (wdCapitalHalf < 0) wdCapitalHalf = 0;
+          }
+          const infiniteWithdrawHalf = withdrawYearsHalf >= maxSim;
           const totalYears = oppYears + (infiniteWithdraw ? Math.min(withdrawYears, oppYears) : withdrawYears);
           // Cap withdrawal display to reasonable length
           const wdDisplayYears = infiniteWithdraw ? oppYears : withdrawYears;
@@ -2660,19 +2673,35 @@ function App() {
                     Withdrawal plan · How long does the capital last?
                   </div>
                   <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 16 }}>
-                    If from year {oppYears} you withdraw your current net salary ({fmt(annualNet)} €/year, inflation-adjusted) annually and the rest continues to earn {oppInterest}% return:
+                    If from year {oppYears} you withdraw your current net salary (inflation-adjusted) annually and the rest continues to earn {oppInterest}% return:
                   </div>
-                  <div style={{ fontFamily: 'var(--mono)', fontSize: 42, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
-                    {infiniteWithdraw ? '∞' : withdrawYears} {infiniteWithdraw ? '' : 'years'}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 8 }}>
+                    <div>
+                      <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', marginBottom: 6 }}>100% net · {fmt(annualNet)} €/year</div>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: 38, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
+                        {infiniteWithdraw ? '∞' : withdrawYears} {infiniteWithdraw ? '' : 'years'}
+                      </div>
+                    </div>
+                    <div style={{ opacity: 0.5 }}>
+                      <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', marginBottom: 6 }}>50% net · {fmt(annualNetHalf)} €/year</div>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: 30, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
+                        {infiniteWithdrawHalf ? '∞' : withdrawYearsHalf} {infiniteWithdrawHalf ? '' : 'years'}
+                      </div>
+                    </div>
                   </div>
                   <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 8, lineHeight: 1.6 }}>
                     {infiniteWithdraw
-                      ? 'The capital lasts indefinitely — the return exceeds the inflation-adjusted withdrawal.'
-                      : `After ${withdrawYears} years of withdrawals, the capital would be depleted. This corresponds to a total period of ${oppYears + withdrawYears} years (${oppYears}yr saving phase + ${withdrawYears}yr withdrawal).`
+                      ? 'At 100% withdrawal the capital lasts indefinitely — the return exceeds the inflation-adjusted withdrawal.'
+                      : `At 100% withdrawal the capital would be depleted after ${withdrawYears} years.`
+                    }
+                    {' '}
+                    {infiniteWithdrawHalf
+                      ? 'At 50% withdrawal the capital also lasts indefinitely.'
+                      : `At 50% withdrawal it lasts ${withdrawYearsHalf} years.`
                     }
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, padding: '10px 14px', background: 'rgba(241,196,15,0.08)', borderRadius: 8, lineHeight: 1.6 }}>
-                    <strong style={{ color: 'var(--gold)' }}>Note:</strong> The withdrawal is increased annually by {oppInflation}% to offset inflation. In the first withdrawal year you withdraw {fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears)))} €, in the last {!infiniteWithdraw && withdrawYears > 0 ? `${fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears + withdrawYears - 1)))} €` : '—'} — so purchasing power always remains at your current net salary level.
+                    <strong style={{ color: 'var(--gold)' }}>Note:</strong> The withdrawal is increased annually by {oppInflation}% to offset inflation. At 100% you withdraw {fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears)))} € in the first year, {!infiniteWithdraw && withdrawYears > 0 ? `${fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears + withdrawYears - 1)))} €` : '—'} in the last. At 50% you withdraw {fmt(Math.round(annualNetHalf * Math.pow(1 + inflRate, oppYears)))} € in the first year, {!infiniteWithdrawHalf && withdrawYearsHalf > 0 ? `${fmt(Math.round(annualNetHalf * Math.pow(1 + inflRate, oppYears + withdrawYearsHalf - 1)))} €` : '—'} in the last — so purchasing power always remains at your current net salary level.
                   </div>
                 </div>
 

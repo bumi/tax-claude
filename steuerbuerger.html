@@ -2729,6 +2729,7 @@ function App() {
 
           // Withdrawal simulation
           const annualNet = taxes.net * 12;
+          const annualNetHalf = annualNet * 0.5;
           const nominalRate = oppInterest / 100;
           let wdCapital = fv;
           let withdrawYears = 0;
@@ -2743,6 +2744,18 @@ function App() {
             withdrawPoints.push({ yr: oppYears + withdrawYears, value: wdCapital, real: wdCapital / Math.pow(1 + inflRate, oppYears + withdrawYears) });
           }
           const infiniteWithdraw = withdrawYears >= maxSim;
+
+          // Withdrawal simulation – 50% of net salary
+          let wdCapitalHalf = fv;
+          let withdrawYearsHalf = 0;
+          while (wdCapitalHalf > 0 && withdrawYearsHalf < maxSim) {
+            const yearsSinceStart = oppYears + withdrawYearsHalf;
+            const withdrawal = annualNetHalf * Math.pow(1 + inflRate, yearsSinceStart);
+            wdCapitalHalf = wdCapitalHalf * (1 + nominalRate) - withdrawal;
+            withdrawYearsHalf++;
+            if (wdCapitalHalf < 0) wdCapitalHalf = 0;
+          }
+          const infiniteWithdrawHalf = withdrawYearsHalf >= maxSim;
           const totalYears = oppYears + (infiniteWithdraw ? Math.min(withdrawYears, oppYears) : withdrawYears);
           // Cap withdrawal display to reasonable length
           const wdDisplayYears = infiniteWithdraw ? oppYears : withdrawYears;
@@ -2885,19 +2898,35 @@ function App() {
                     Entnahmeplan · Wie lange reicht das Kapital?
                   </div>
                   <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 16 }}>
-                    Wenn du ab Jahr {oppYears} jährlich dein heutiges Nettogehalt ({fmt(annualNet)} €/Jahr, inflationsbereinigt) entnimmst und der Rest weiter {oppInterest}% Rendite erwirtschaftet:
+                    Wenn du ab Jahr {oppYears} jährlich dein heutiges Nettogehalt inflationsbereinigt entnimmst und der Rest weiter {oppInterest}% Rendite erwirtschaftet:
                   </div>
-                  <div style={{ fontFamily: 'var(--mono)', fontSize: 42, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
-                    {infiniteWithdraw ? '∞' : withdrawYears} {infiniteWithdraw ? '' : 'Jahre'}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 8 }}>
+                    <div>
+                      <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', marginBottom: 6 }}>100% Netto · {fmt(annualNet)} €/Jahr</div>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: 38, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
+                        {infiniteWithdraw ? '∞' : withdrawYears} {infiniteWithdraw ? '' : 'Jahre'}
+                      </div>
+                    </div>
+                    <div style={{ opacity: 0.5 }}>
+                      <div style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)', marginBottom: 6 }}>50% Netto · {fmt(annualNetHalf)} €/Jahr</div>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: 30, fontWeight: 500, color: 'var(--gold)', lineHeight: 1 }}>
+                        {infiniteWithdrawHalf ? '∞' : withdrawYearsHalf} {infiniteWithdrawHalf ? '' : 'Jahre'}
+                      </div>
+                    </div>
                   </div>
                   <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 8, lineHeight: 1.6 }}>
                     {infiniteWithdraw
-                      ? 'Das Kapital reicht unbegrenzt — die Rendite übersteigt die inflationsbereinigte Entnahme.'
-                      : `Nach ${withdrawYears} Jahren Entnahme wäre das Kapital aufgebraucht. Das entspricht einem Gesamtzeitraum von ${oppYears + withdrawYears} Jahren (${oppYears}J Ansparphase + ${withdrawYears}J Entnahme).`
+                      ? 'Bei 100% Entnahme reicht das Kapital unbegrenzt — die Rendite übersteigt die inflationsbereinigte Entnahme.'
+                      : `Bei 100% Entnahme wäre das Kapital nach ${withdrawYears} Jahren aufgebraucht.`
+                    }
+                    {' '}
+                    {infiniteWithdrawHalf
+                      ? 'Bei 50% Entnahme reicht es ebenfalls unbegrenzt.'
+                      : `Bei 50% Entnahme reicht es ${withdrawYearsHalf} Jahre.`
                     }
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 12, padding: '10px 14px', background: 'rgba(241,196,15,0.08)', borderRadius: 8, lineHeight: 1.6 }}>
-                    <strong style={{ color: 'var(--gold)' }}>Hinweis:</strong> Die Entnahme wird jährlich um {oppInflation}% erhöht, um die Inflation auszugleichen. Im ersten Entnahmejahr entnimmst du {fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears)))} €, im letzten {!infiniteWithdraw && withdrawYears > 0 ? `${fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears + withdrawYears - 1)))} €` : '—'} — damit bleibt die Kaufkraft immer auf dem Niveau deines heutigen Nettogehalts.
+                    <strong style={{ color: 'var(--gold)' }}>Hinweis:</strong> Die Entnahme wird jährlich um {oppInflation}% erhöht, um die Inflation auszugleichen. Bei 100% entnimmst du im ersten Jahr {fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears)))} €, im letzten {!infiniteWithdraw && withdrawYears > 0 ? `${fmt(Math.round(annualNet * Math.pow(1 + inflRate, oppYears + withdrawYears - 1)))} €` : '—'}. Bei 50% entnimmst du im ersten Jahr {fmt(Math.round(annualNetHalf * Math.pow(1 + inflRate, oppYears)))} €, im letzten {!infiniteWithdrawHalf && withdrawYearsHalf > 0 ? `${fmt(Math.round(annualNetHalf * Math.pow(1 + inflRate, oppYears + withdrawYearsHalf - 1)))} €` : '—'} — damit bleibt die Kaufkraft immer auf dem Niveau deines heutigen Nettogehalts.
                   </div>
                 </div>
 
